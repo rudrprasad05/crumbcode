@@ -25,7 +25,7 @@ export default function CakeCard({
         <p className="text-gray-600 mb-4">{description}</p>
         <Link
           href="/order"
-          className="text-rose-600 font-medium hover:text-rose-800 transition-colors"
+          className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
         >
           Order Online
         </Link>

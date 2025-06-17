@@ -6,6 +6,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
+import { Label } from "@radix-ui/react-label";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
@@ -32,39 +33,46 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div>
+      <div className="flex flex-col gap-2 items-start text-sm">
+        <Label>Name</Label>
         <Input
           type="text"
           name="name"
-          placeholder="Name"
+          placeholder="Enter first name"
           value={formData.name}
           onChange={handleChange}
           required
-          className="w-full"
+          className="w-full border-gray-200 bg-rose-50"
         />
       </div>
-      <div>
+
+      <div className="flex flex-col gap-2 items-start text-sm">
+        <Label>Email</Label>
         <Input
           type="email"
           name="email"
-          placeholder="Email"
+          placeholder="Enter contact email"
           value={formData.email}
           onChange={handleChange}
           required
-          className="w-full"
+          className="w-full border-gray-200 bg-rose-50"
         />
       </div>
-      <div>
+      <div className="flex flex-col gap-2 items-start text-sm">
+        <Label>Message</Label>
         <Textarea
           name="message"
-          placeholder="Message"
+          placeholder="Enter Cake Details"
           value={formData.message}
           onChange={handleChange}
           required
-          className="w-full min-h-[120px]"
+          className="w-full border-gray-200 bg-rose-50 min-h-[120px]"
         />
       </div>
-      <Button type="submit" className="w-full bg-rose-600 hover:bg-rose-700">
+      <Button
+        type="submit"
+        className="text-white bg-rose-600 hover:bg-rose-700"
+      >
         Submit
       </Button>
     </form>

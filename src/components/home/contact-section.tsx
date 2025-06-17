@@ -3,7 +3,7 @@ import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 
 export default function ContactSection() {
   return (
-    <section className="py-16 bg-rose-50" id="contact">
+    <section className="py-16 bg-white" id="contact">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h2 className="text-3xl font-bold text-gray-900">Contact Us</h2>
@@ -11,7 +11,7 @@ export default function ContactSection() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-          <div className="bg-white rounded-xl shadow-md p-8">
+          <div className="">
             <ContactForm />
           </div>
 
