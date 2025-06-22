@@ -18,7 +18,7 @@ namespace CrumbCodeBackend.Config
     {
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {   
-            var frontend = configuration["Frontend:Url"] ?? throw new InvalidOperationException();
+            var frontend = configuration["AllowedHosts"] ?? throw new InvalidOperationException();
             services.AddCors(c => 
             {
                 c.AddPolicy("allowSpecificOrigin", options => 

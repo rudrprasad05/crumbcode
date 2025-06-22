@@ -15,9 +15,11 @@ namespace CrumbCodeBackend.Models
         public string Type { get; set; } = string.Empty;
         public bool IsAvailable { get; set; }
         public decimal Price { get; set; }
-        public string ImageUrl { get; set; } = string.Empty;
+
 
         // fk
+        public int? MediaId { get; set; }   // FK to Media (nullable)
+        public Media? Media { get; set; }
         public int CakeTypeId { get; set; }
         public CakeType CakeType { get; set; } = new CakeType();
         public ICollection<Allergen> Allergens { get; set; } = [];

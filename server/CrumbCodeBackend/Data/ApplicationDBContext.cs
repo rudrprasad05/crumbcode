@@ -11,6 +11,7 @@ namespace CrumbCodeBackend.Data
 {
     public class ApplicationDbContext : IdentityDbContext<AppUser>
     {
+        public ApplicationDbContext() {  }
         public ApplicationDbContext(DbContextOptions dbContextOptions) : base(dbContextOptions)
         {
 
@@ -34,6 +35,7 @@ namespace CrumbCodeBackend.Data
         }
         public DbSet<Cake> Cakes { get; set; }
         public DbSet<CakeType> CakeTypes { get; set; }
-        
+        public DbSet<Allergen> Allergens { get; set; }
+        public DbSet<Media> Medias { get; set; }
     }
 }
