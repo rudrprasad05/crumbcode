@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrumbCodeBackend.Controllers
 {
-    public class BaseController: ControllerBase
+    [Route("/api")]
+    public class BaseController : ControllerBase
     {
         protected async Task WriteLog(string message)
         {

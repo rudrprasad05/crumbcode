@@ -4,26 +4,22 @@ using CrumbCodeBackend.Interfaces;
 using AspNetCore.Swagger.Themes;
 using CrumbCodeBackend.Data;
 using Microsoft.EntityFrameworkCore;
+using CrumbCodeBackend.Service;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerServices();
 builder.Services.AddControllers();
-// builder.Services.AddDatabaseContext(builder.Configuration);
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseMySql(
-        builder.Configuration.GetConnectionString("DefaultConnection"),
-        ServerVersion.AutoDetect(builder.Configuration.GetConnectionString("DefaultConnection"))
-    )
-);
+builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddAuthentication(builder.Configuration);
 builder.Services.AddIdentityService();
-builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 
+builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
+
+builder.Services.AddScoped<ICakeRepository, CakeRepository>();
+builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 
 var app = builder.Build();
 

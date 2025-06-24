@@ -7,7 +7,7 @@ using static CrumbCodeBackend.Enum.Enum;
 
 namespace CrumbCodeBackend.Models
 {
-    [Table("cake")]
+    [Table("Cake")]
     public class Cake : BaseModel
     {
         public string Name { get; set; } = string.Empty;
