@@ -4,90 +4,11 @@ import { useState } from "react";
 import { MediaHeader } from "./media-header";
 import { MediaGrid } from "./media-grid";
 import { UploadModal } from "./upload-modal";
+import { Media } from "@/types";
 
-export interface MediaItem {
-  id: string;
-  name: string;
-  url: string;
-  type: "image" | "video" | "document";
-  size: number;
-  alt?: string;
-  caption?: string;
-  uploadedAt: Date;
-  dimensions?: {
-    width: number;
-    height: number;
-  };
-}
-
-// Mock data for demonstration
-const mockMediaItems: MediaItem[] = [
-  {
-    id: "1",
-    name: "chocolate-cake.jpg",
-    url: "/placeholder.svg?height=300&width=300",
-    type: "image",
-    size: 245760,
-    alt: "Delicious chocolate cake with berries",
-    caption: "Our signature chocolate cake",
-    uploadedAt: new Date("2024-01-15"),
-    dimensions: { width: 1200, height: 800 },
-  },
-  {
-    id: "2",
-    name: "vanilla-cupcakes.jpg",
-    url: "https://bucket.procyonfiji.com/procyon/cc-pop-5.png",
-    type: "image",
-    size: 189440,
-    alt: "Vanilla cupcakes with frosting",
-    uploadedAt: new Date("2024-01-14"),
-    dimensions: { width: 800, height: 600 },
-  },
-  {
-    id: "3",
-    name: "bakery-video.mp4",
-    url: "/placeholder.svg?height=300&width=300",
-    type: "video",
-    size: 15728640,
-    alt: "Behind the scenes bakery video",
-    uploadedAt: new Date("2024-01-13"),
-    dimensions: { width: 1920, height: 1080 },
-  },
-  {
-    id: "4",
-    name: "menu-2024.pdf",
-    url: "/placeholder.svg?height=300&width=300",
-    type: "document",
-    size: 524288,
-    uploadedAt: new Date("2024-01-12"),
-  },
-  {
-    id: "5",
-    name: "wedding-cake.jpg",
-    url: "/placeholder.svg?height=300&width=300",
-    type: "image",
-    size: 367616,
-    alt: "Three-tier wedding cake",
-    caption: "Custom wedding cake design",
-    uploadedAt: new Date("2024-01-11"),
-    dimensions: { width: 1000, height: 1200 },
-  },
-  {
-    id: "6",
-    name: "birthday-setup.jpg",
-    url: "/placeholder.svg?height=300&width=300",
-    type: "image",
-    size: 298752,
-    alt: "Birthday party cake setup",
-    uploadedAt: new Date("2024-01-10"),
-    dimensions: { width: 1400, height: 900 },
-  },
-];
-
-export function MediaLibrary() {
-  const [mediaItems, setMediaItems] = useState<MediaItem[]>(mockMediaItems);
-  const [filteredItems, setFilteredItems] =
-    useState<MediaItem[]>(mockMediaItems);
+export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
+  const [mediaItems, setMediaItems] = useState<Media[]>(mediaItemsData);
+  const [filteredItems, setFilteredItems] = useState<Media[]>(mediaItemsData);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
@@ -108,33 +29,28 @@ export function MediaLibrary() {
     if (query) {
       filtered = filtered.filter(
         (item) =>
-          item.name.toLowerCase().includes(query.toLowerCase()) ||
-          item.alt?.toLowerCase().includes(query.toLowerCase()) ||
-          item.caption?.toLowerCase().includes(query.toLowerCase())
+          item.fileName.toLowerCase().includes(query.toLowerCase()) ||
+          item.altText?.toLowerCase().includes(query.toLowerCase()) ||
+          item.contentType?.toLowerCase().includes(query.toLowerCase())
       );
     }
 
     if (type !== "all") {
-      filtered = filtered.filter((item) => item.type === type);
+      filtered = filtered.filter((item) => item.contentType === type);
     }
 
     setFilteredItems(filtered);
   };
 
-  const handleUpload = (newItem: Omit<MediaItem, "id" | "uploadedAt">) => {
-    const mediaItem: MediaItem = {
+  const handleUpload = (newItem: Partial<Media>) => {
+    const mediaItem: Partial<Media> = {
       ...newItem,
-      id: Date.now().toString(),
-      uploadedAt: new Date(),
     };
 
     const updatedItems = [mediaItem, ...mediaItems];
-    setMediaItems(updatedItems);
-    setFilteredItems(updatedItems);
-    setIsUploadModalOpen(false);
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (id: number) => {
     const updatedItems = mediaItems.filter((item) => item.id !== id);
     setMediaItems(updatedItems);
     filterItems(searchQuery, selectedType);

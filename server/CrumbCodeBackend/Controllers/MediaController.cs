@@ -8,13 +8,12 @@ using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models.Requests;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using server.Models.Requests;
 
 namespace CrumbCodeBackend.Controllers
 {
     [ApiController]
-    [Route("/media")]
-    public class MediaController : ControllerBase
+    [Route("api/media")]
+    public class MediaController : BaseController
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IAmazonS3Service _amazonS3Service;
@@ -28,9 +27,9 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateMedia([FromForm] string id, IFormFile file)
+        public async Task<IActionResult> CreateMedia([FromForm] NewMediaRequest newMediaObject)
         {
-            var req = await _mediaRepository.CreateAsync(file, id);
+            var req = await _mediaRepository.CreateAsync(newMediaObject);
             if(req == null)
             {
                 return BadRequest("Media not Created");
@@ -45,7 +44,7 @@ namespace CrumbCodeBackend.Controllers
         [HttpGet("sum")]
         public async Task<IActionResult> Sum()
         {
-            var req = await _mediaRepository.SumStorage("");
+            var req = await _mediaRepository.SumStorage();
 
             return Ok(req);
         }
@@ -53,7 +52,7 @@ namespace CrumbCodeBackend.Controllers
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll([FromQuery] MediaQueryObject queryObject)
         {
-            var media = await _mediaRepository.GetAll(queryObject, "");
+            var media = await _mediaRepository.GetAll(queryObject);
             if(media == null)
             {
                 return BadRequest();
@@ -62,10 +61,10 @@ namespace CrumbCodeBackend.Controllers
             return Ok(dtos);
         }
 
-        [HttpPatch("rename/{id}")]
-        public async Task<IActionResult> Rename([FromRoute] int id, [FromBody] RenameMediaRequest request)
+        [HttpPatch("edit/{id}")]
+        public async Task<IActionResult> Edit([FromRoute] string id, [FromBody] EditMediaRequest request)
         {
-            var media = await _mediaRepository.Rename(id, request.Name, "UserId");
+            var media = await _mediaRepository.Edit(id, request);
             if(media == null)
             {
                 return BadRequest();
@@ -75,9 +74,9 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpGet("get-one/{id}")]
-        public async Task<IActionResult> GetOne([FromRoute] int id)
+        public async Task<IActionResult> GetOne([FromRoute] string id)
         {
-            var media = await _mediaRepository.GetOne(id, "UserId");
+            var media = await _mediaRepository.GetOne(id);
             if(media == null)
             {
                 return Unauthorized();
@@ -88,7 +87,7 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpDelete("recycle/{id}")]
-        public async Task<IActionResult> Recycle([FromRoute] int id)
+        public async Task<IActionResult> Recycle([FromRoute] string id)
         {
             var media = await _mediaRepository.Recycle(id, "");
             if(media == null)
@@ -101,9 +100,9 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
+        public async Task<IActionResult> Delete([FromRoute] string id)
         {
-            var media = await _mediaRepository.Delete(id, "UserId");
+            var media = await _mediaRepository.Delete(id);
             if(media == null)
             {
                 return Unauthorized();

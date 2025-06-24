@@ -19,7 +19,7 @@ namespace CrumbCodeBackend.Service
         public AmazonS3Service(IConfiguration configuration)
         {
             // Initialize the S3 client
-            var awsOptions = configuration.GetSection("AWS:MINIO");
+            var awsOptions = configuration.GetSection("MINIO");
             var accessKey = awsOptions["AccessKey"];
             var secretKey = awsOptions["SecretKey"];
             var region = RegionEndpoint.GetBySystemName(awsOptions["Region"]);
@@ -44,7 +44,7 @@ namespace CrumbCodeBackend.Service
                 var request = new GetObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = "cloud/" + fileName
+                    Key = "crumbcode/" + fileName
                 };
 
                 var response = await _s3Client.GetObjectAsync(request);
@@ -68,7 +68,7 @@ namespace CrumbCodeBackend.Service
                 try
                 {
                     // Generate a unique file name for the file
-                    var fileName = "cloud/" + Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var fileName = "crumbcode/" + Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
 
                     // Create a new TransferUtility instance to upload the file
                     using (var newMemoryStream = new MemoryStream())
@@ -101,7 +101,7 @@ namespace CrumbCodeBackend.Service
                 var request = new DeleteObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = "cloud/" + fileName
+                    Key = "crumbcode/" + fileName
                 };
 
                 // Delete the object from S3

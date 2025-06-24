@@ -6,8 +6,6 @@ import {
 } from "@/components/ui/popover";
 import { Bell } from "lucide-react";
 
-const;
-
 export default function Notification() {
   return (
     <div className="flex items-center gap-2">

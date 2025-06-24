@@ -22,15 +22,16 @@ namespace CrumbCodeBackend.Repository
             _context = context;
             _amazonS3Service = amazonS3Service;
         }
-        public async Task<double> SumStorage(string userId)
+        public async Task<double> SumStorage()
         {
-            return 0;
-            // return await _context.Medias.SumAsync();
+            var sizes = await _context.Medias.Select(m => m.SizeInBytes).ToListAsync();
+            Console.WriteLine("Sizes: " + string.Join(", ", sizes));
+            return await _context.Medias.SumAsync(m => m.SizeInBytes);
         }
 
-        public async Task<Media?> CreateAsync(IFormFile file, string folderId)
+        public async Task<Media?> CreateAsync(NewMediaRequest newMediaObject)
         {
-            if (file == null || folderId == null)
+            if (newMediaObject.File == null || newMediaObject == null)
             {
                 return null;
             }
@@ -38,7 +39,7 @@ namespace CrumbCodeBackend.Repository
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
-                var fileUrl = await _amazonS3Service.UploadFileAsync(file);
+                var fileUrl = await _amazonS3Service.UploadFileAsync(newMediaObject.File);
                 if(fileUrl == null)
                 {
                     return null;
@@ -47,17 +48,16 @@ namespace CrumbCodeBackend.Repository
                 // Create Media
                 var media = new Media
                 {
-                    AltText = "",
-                    Url = "",
-                    ContentType = "",
-                    FileName = "",
-                    SizeInBytes = 0
+                    AltText = newMediaObject.AltText,
+                    Url = fileUrl,
+                    ContentType = newMediaObject.ContentType,
+                    FileName = newMediaObject.FileName,
+                    SizeInBytes = newMediaObject.SizeInBytes
                 };
 
                 await _context.Medias.AddAsync(media);
                 await _context.SaveChangesAsync();
 
-                // Commit transaction
                 await transaction.CommitAsync();
 
                 return media;
@@ -70,23 +70,23 @@ namespace CrumbCodeBackend.Repository
 
         }
 
-        public async Task<List<Media>?> GetAll(MediaQueryObject queryObject, string? userId)
+        public async Task<List<Media>?> GetAll(MediaQueryObject queryObject)
         {
-            if(string.IsNullOrEmpty(userId))
-            {
-                return null;
-            }
-
             var media = _context.Medias.AsQueryable();
+
+            // if(queryObject.IsStarred.HasValue)
+            // {
+            //     media = media.Where(s => s.Star.Equals(queryObject.IsStarred));
+            // }
             
 
             var res = await media.ToListAsync();
             return res; 
         }
 
-        public async Task<Media?> MoveMedia(int id, string moveId, string? token)
+        public async Task<Media?> MoveMedia(string uuid, string moveId, string? token)
         {
-            var folder = await _context.Medias.FirstOrDefaultAsync((i) => i.Id == id);
+            var folder = await _context.Medias.FirstOrDefaultAsync((i) => i.UUID == uuid);
             if(folder == null)
             {
                 return null;
@@ -96,9 +96,23 @@ namespace CrumbCodeBackend.Repository
             return folder;
         }
 
-        public async Task<Media?> Rename(int id, string name, string? token)
+        public async Task<Media?> Edit(string uuid, EditMediaRequest request)
         {
-            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.Id == id);
+            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
+            if(media == null)
+            {
+                return null;
+            }
+
+            media.AltText = request.AltText;
+            media.FileName = request.FileName;
+
+            await _context.SaveChangesAsync();
+            return media;
+        }
+        public async Task<Media?> Star(string uuid, bool star, string? token)
+        {
+            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
             if(media == null)
             {
                 return null;
@@ -107,22 +121,11 @@ namespace CrumbCodeBackend.Repository
             await _context.SaveChangesAsync();
             return media;
         }
-        public async Task<Media?> Star(int id, bool star, string? token)
-        {
-            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.Id == id);
-            if(media == null)
-            {
-                return null;
-            }
 
-            await _context.SaveChangesAsync();
-            return media;
-        }
-
-        public async Task<Media?> GetOne(int id, string? token)
+        public async Task<Media?> GetOne(string uuid)
         {
             var mediaQ = _context.Medias.AsQueryable();
-            var media = mediaQ.FirstOrDefaultAsync(m => m.Id == id);
+            var media = mediaQ.FirstOrDefaultAsync(m => m.UUID == uuid);
             
             if(media == null)
             {
@@ -132,9 +135,9 @@ namespace CrumbCodeBackend.Repository
             return await media;
         }
 
-        public async Task<Media?> Recycle(int id, string? token)
+        public async Task<Media?> Recycle(string uuid, string? token)
         {
-            var media = await GetOne(id, token);
+            var media = await GetOne(uuid);
             if(media == null)
             {
                 return null;
@@ -144,9 +147,9 @@ namespace CrumbCodeBackend.Repository
             return media;
         }
 
-        public async Task<Media?> Delete(int id, string? token)
+        public async Task<Media?> Delete(string uuid)
         {
-            var media = await GetOne(id, token);
+            var media = await GetOne(uuid);
             if(media == null)
             {
                 return null;
@@ -157,6 +160,5 @@ namespace CrumbCodeBackend.Repository
 
             return media;
         }
-
     }
 }

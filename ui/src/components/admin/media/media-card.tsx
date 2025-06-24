@@ -19,10 +19,10 @@ import {
   Video,
   ImageIcon,
 } from "lucide-react";
-import type { MediaItem } from "./media-library";
+import { Media } from "@/types";
 
 interface MediaCardProps {
-  item: MediaItem;
+  item: Media;
   onDelete: () => void;
 }
 
@@ -41,7 +41,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
   };
 
   const getTypeIcon = () => {
-    switch (item.type) {
+    switch (item.contentType) {
       case "image":
         return <ImageIcon className="h-4 w-4" />;
       case "video":
@@ -54,7 +54,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
   };
 
   const getTypeColor = () => {
-    switch (item.type) {
+    switch (item.contentType) {
       case "image":
         return "bg-green-100 text-green-800";
       case "video":
@@ -74,14 +74,14 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
     >
       <CardContent className="p-0">
         <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
-          {item.type === "image" && isImageValid ? (
+          {item.contentType === "image" && isImageValid ? (
             <img
               src={item.url || "/image.svg"}
               onError={(e) => {
                 e.currentTarget.onerror = null; // prevent infinite loop
                 setIsImageValid(false);
               }}
-              alt={item.alt || item.name}
+              alt={item.altText || item.fileName}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -109,7 +109,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
 
           <div className="absolute top-2 right-2">
             <Badge variant="secondary" className={`text-xs ${getTypeColor()}`}>
-              {item.type}
+              {item.contentType}
             </Badge>
           </div>
         </div>
@@ -117,28 +117,22 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
         <div className="p-3 space-y-2">
           <div
             className="font-medium text-sm text-gray-900 truncate"
-            title={item.name}
+            title={item.fileName}
           >
-            {item.name}
+            {item.fileName}
           </div>
 
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>{formatFileSize(item.size)}</span>
-            {item.dimensions && (
-              <span>
-                {item.dimensions.width} × {item.dimensions.height}
-              </span>
-            )}
-          </div>
-
-          {item.alt && (
-            <div className="text-xs text-gray-600 truncate" title={item.alt}>
-              Alt: {item.alt}
+          {item.altText && (
+            <div
+              className="text-xs text-gray-600 truncate"
+              title={item.altText}
+            >
+              Alt: {item.altText}
             </div>
           )}
 
           <div className="text-xs text-gray-400">
-            {item.uploadedAt.toLocaleDateString()}
+            {new Date(item.createdOn).toLocaleDateString()}
           </div>
         </div>
       </CardContent>

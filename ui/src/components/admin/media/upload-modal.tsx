@@ -14,12 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Upload, X, File } from "lucide-react";
-import type { MediaItem } from "./media-library";
+import { Media } from "@/types";
 
 interface UploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onUpload: (item: Omit<MediaItem, "id" | "uploadedAt">) => void;
+  onUpload: (item: Partial<Media>) => void;
 }
 
 export function UploadModal({ isOpen, onClose, onUpload }: UploadModalProps) {
@@ -59,7 +59,7 @@ export function UploadModal({ isOpen, onClose, onUpload }: UploadModalProps) {
     }));
   };
 
-  const getFileType = (file: File): MediaItem["type"] => {
+  const getFileType = (file: File): Media["contentType"] => {
     if (file.type.startsWith("image/")) return "image";
     if (file.type.startsWith("video/")) return "video";
     return "document";
@@ -74,16 +74,12 @@ export function UploadModal({ isOpen, onClose, onUpload }: UploadModalProps) {
     // For demo purposes, we'll create a mock URL
     const mockUrl = URL.createObjectURL(selectedFile);
 
-    const mediaItem: Omit<MediaItem, "id" | "uploadedAt"> = {
-      name: formData.name || selectedFile.name,
+    const mediaItem: Partial<Media> = {
+      fileName: formData.name || selectedFile.name,
       url: mockUrl,
-      type: getFileType(selectedFile),
-      size: selectedFile.size,
-      alt: formData.alt,
-      caption: formData.caption,
-      dimensions: selectedFile.type.startsWith("image/")
-        ? { width: 800, height: 600 }
-        : undefined,
+      contentType: getFileType(selectedFile),
+      sizeInBytes: selectedFile.size,
+      altText: formData.alt,
     };
 
     onUpload(mediaItem);

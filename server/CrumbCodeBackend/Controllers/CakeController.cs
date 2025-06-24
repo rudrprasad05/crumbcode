@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrumbCodeBackend.Controllers
 {
-    [Route("/cake")]
+    [Route("api/cake")]
     [ApiController]
     public class CakeController : BaseController
     {

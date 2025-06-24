@@ -9,14 +9,14 @@ namespace CrumbCodeBackend.Interfaces
 {
     public interface IMediaRepository
     {
-        public Task<Media?> CreateAsync(IFormFile file, string id);
-        public Task<List<Media>?> GetAll(MediaQueryObject queryObject, string? token);
-        public Task<Media?> Star(int id, bool star, string? token);
-        public Task<Media?> Rename(int id, string name, string? token);
-        public Task<Media?> MoveMedia(int id, string moveId, string? token);
-        public Task<Media?> GetOne(int id, string? token);
-        public Task<Media?> Recycle(int id, string? token);   
-        public Task<Media?> Delete(int id, string? token);   
-        public Task<double> SumStorage(string userId);
+        public Task<Media?> CreateAsync(NewMediaRequest newMediaObject);
+        public Task<List<Media>?> GetAll(MediaQueryObject queryObject);
+        public Task<Media?> Star(string uuid, bool star, string? token);
+        public Task<Media?> Edit(string uuid, EditMediaRequest request);
+        public Task<Media?> MoveMedia(string uuid, string moveId, string? token);
+        public Task<Media?> GetOne(string uuid);
+        public Task<Media?> Recycle(string uuid, string? token);   
+        public Task<Media?> Delete(string uuid);   
+        public Task<double> SumStorage();
     }
 }

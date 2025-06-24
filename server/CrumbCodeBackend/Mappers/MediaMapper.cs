@@ -14,7 +14,14 @@ namespace CrumbCodeBackend.Mappers
             ArgumentNullException.ThrowIfNull(request);
             return new GetOnlyMediaRes
             {
-                Id = request.Id
+                Id = request.Id,
+                AltText = request.AltText,
+                FileName = request.FileName,
+                ContentType = request.ContentType,
+                SizeInBytes = request.SizeInBytes,
+                UUID = request.UUID,
+                Url = request.Url,
+                CreatedOn = request.CreatedOn,
             };
         }
     }
