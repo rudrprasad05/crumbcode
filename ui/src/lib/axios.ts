@@ -1,5 +1,4 @@
 import axios from "axios";
-import https from "https";
 import http from "https";
 
 const agent = new http.Agent({

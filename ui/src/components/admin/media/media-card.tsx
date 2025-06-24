@@ -18,8 +18,10 @@ import {
   FileText,
   Video,
   ImageIcon,
+  Ban,
 } from "lucide-react";
 import { Media } from "@/types";
+import { DeleteMediaDialoge } from "./delete-media-dialoge";
 
 interface MediaCardProps {
   item: Media;
@@ -68,7 +70,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
 
   return (
     <Card
-      className="group cursor-pointer transition-all duration-200 hover:shadow-md border-gray-200"
+      className="group p-0 transition-all duration-200 hover:shadow-md border-gray-200"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -93,10 +95,6 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
           {isHovered && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-12 text-black transition-all bg-white/50 backdrop-blur-sm group-hover:opacity-100">
               <Button variant="outline" className="w-full">
-                <Download className="h-4 w-4 mr-2" />
-                Download
-              </Button>
-              <Button variant="outline" className="w-full">
                 <Edit className="h-4 w-4 mr-2" />
                 Edit
               </Button>
@@ -104,6 +102,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
                 <Trash2 className="h-4 w-4 mr-2" />
                 Delete
               </Button>
+              <DeleteMediaDialoge id={item.uuid} />
             </div>
           )}
 
@@ -114,7 +113,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
           </div>
         </div>
 
-        <div className="p-3 space-y-2">
+        <div className="p-4 space-y-2">
           <div
             className="font-medium text-sm text-gray-900 truncate"
             title={item.fileName}
@@ -122,14 +121,17 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
             {item.fileName}
           </div>
 
-          {item.altText && (
-            <div
-              className="text-xs text-gray-600 truncate"
-              title={item.altText}
-            >
-              Alt: {item.altText}
-            </div>
-          )}
+          <div
+            className="text-xs flex gap-1 text-gray-600 truncate"
+            title={item.altText}
+          >
+            Alt:{" "}
+            {item.altText.length > 0 ? (
+              item.altText
+            ) : (
+              <Ban className="w-4 h-4 text-gray-600" />
+            )}
+          </div>
 
           <div className="text-xs text-gray-400">
             {new Date(item.createdOn).toLocaleDateString()}
