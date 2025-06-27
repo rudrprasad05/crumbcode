@@ -1,16 +1,23 @@
-export type Folder = {
-  id: string;
+export interface Cake {
+  id: number;
+  uuid: string;
+  createdOn: string;
+  updatedOn: string;
+
   name: string;
-  parent: Folder | null;
-  parentId: string | null;
-  children: Folder[];
-  medias: Media[];
-  user: User;
-  userId: string;
-  createdAt: string;
-  updatedAt: string | null;
-  star: boolean;
-};
+  description: string;
+  type: string;
+  isAvailable: boolean;
+  price: number;
+
+  mediaId?: number; // nullable FK
+  media?: Partial<Media> | null;
+
+  cakeTypeId: number;
+  //   cakeType: CakeType;
+
+  //   allergens: Allergen[];
+}
 
 export interface Media {
   id: number;

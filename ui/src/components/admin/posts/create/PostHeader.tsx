@@ -12,7 +12,7 @@ export default function PostHeader() {
   return (
     <div className="w-full flex items-center border border-gray-200 p-4">
       <div
-        className="flex gap-2 items-center text-sm"
+        className="cursor-pointer flex gap-2 items-center text-sm"
         onClick={() => router.back()}
       >
         <ArrowLeft /> Back

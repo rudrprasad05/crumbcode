@@ -56,8 +56,10 @@ export default function NewPostModal({
             <SelectValue placeholder="Select a type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="image">Image</SelectItem>
-            <SelectItem value="video">Video</SelectItem>
+            <SelectItem value="cake">Cake</SelectItem>
+            <SelectItem value="services">Services</SelectItem>
+            <SelectItem value="allergen">Allergen</SelectItem>
+            <SelectItem value="ingredient">Ingredient</SelectItem>
           </SelectContent>
         </Select>
         <Label className="text-sm text-rose-500">{selectedTypeError}</Label>
