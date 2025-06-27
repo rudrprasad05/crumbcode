@@ -5,6 +5,7 @@ using AspNetCore.Swagger.Themes;
 using CrumbCodeBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using CrumbCodeBackend.Service;
+using CrumbCodeBackend.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -36,7 +37,13 @@ app
 .UseAuthentication()
 .UseAuthorization();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage(); // gives full stack trace in browser
+}
+
 // app.UseMiddleware<TokenMiddleware>();
+app.UseMiddleware<Log>();
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())

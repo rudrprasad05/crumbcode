@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CrumbCodeBackend.Models.Requests
 {
@@ -10,13 +11,13 @@ namespace CrumbCodeBackend.Models.Requests
         public string AltText { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;
     }
-    public class NewMediaRequest
+    public class NewMediaRequest(string url, string altText, string fileName, string contentType, IFormFile file)
     {
-        public string Url { get; set; } = string.Empty;
-        public string AltText { get; set; } = string.Empty;
-        public string FileName { get; set; } = string.Empty;
-        public string ContentType { get; set; } = string.Empty;
-        public long SizeInBytes { get; set; }
-        public IFormFile File { get; set; } = null!;
+        public string Url { get; set; } = url;
+        public string AltText { get; set; } = altText;
+        public string FileName { get; set; } = fileName;
+        public string ContentType { get; set; } = contentType;
+        public long SizeInBytes { get; set; } = file.Length;
+        public IFormFile File { get; set; } = file;
     }
 }

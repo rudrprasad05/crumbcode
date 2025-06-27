@@ -1,3 +1,5 @@
+"use client";
+
 import { DeleteForever } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,21 +12,36 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Trash } from "lucide-react";
+import { Loader2, Trash } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export function DeleteMediaDialoge({ id }: { id: string }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
   async function handleDelete() {
-    const res = await DeleteForever(id);
+    setIsLoading(true);
+    try {
+      const res = await DeleteForever(id);
+      setIsLoading(false);
+      toast.success("Media Deleted");
+      setIsOpen(false);
+      router.refresh();
+    } catch (error) {
+      setIsLoading(false);
+      toast.error("Error Occured");
+      console.log(error);
+    }
   }
   return (
-    <Dialog open={isOpen} onOpenChange={() => setIsOpen(!open)}>
+    <Dialog>
       <DialogTrigger className="w-full" asChild>
         <Button
           variant="outline"
+          onClick={() => setIsOpen(true)}
           className="w-full flex items-center justify-between"
         >
           Delete <Trash className="" />
@@ -46,11 +63,11 @@ export function DeleteMediaDialoge({ id }: { id: string }) {
           </DialogClose>
           <Button
             onClick={() => handleDelete()}
-            type="submit"
-            className="bg-rose-500"
+            className="bg-rose-500 hover:bg-red-600"
             variant={"destructive"}
           >
             Delete
+            {isLoading && <Loader2 className="animate-spin" />}
           </Button>
         </DialogFooter>
       </DialogContent>

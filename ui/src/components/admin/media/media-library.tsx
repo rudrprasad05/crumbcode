@@ -3,8 +3,13 @@
 import { useState } from "react";
 import { MediaHeader } from "./media-header";
 import { MediaGrid } from "./media-grid";
-import { UploadModal } from "./upload-modal";
-import { Media } from "@/types";
+import { Media, NewMediaRequest } from "@/types";
+import { UploadOneFile } from "@/actions/Media";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import NewMediaModal from "./NewMediaModal";
+import { buttonVariants } from "@/components/ui/button";
+import { CloudUpload } from "lucide-react";
 
 export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
   const [mediaItems, setMediaItems] = useState<Media[]>(mediaItemsData);
@@ -12,6 +17,8 @@ export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedType, setSelectedType] = useState<string>("all");
+
+  const router = useRouter();
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
@@ -42,14 +49,6 @@ export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
     setFilteredItems(filtered);
   };
 
-  const handleUpload = (newItem: Partial<Media>) => {
-    const mediaItem: Partial<Media> = {
-      ...newItem,
-    };
-
-    const updatedItems = [mediaItem, ...mediaItems];
-  };
-
   const handleDelete = (id: number) => {
     const updatedItems = mediaItems.filter((item) => item.id !== id);
     setMediaItems(updatedItems);
@@ -67,12 +66,6 @@ export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
       />
 
       <MediaGrid items={filteredItems} onDelete={handleDelete} />
-
-      <UploadModal
-        isOpen={isUploadModalOpen}
-        onClose={() => setIsUploadModalOpen(false)}
-        onUpload={handleUpload}
-      />
     </div>
   );
 }

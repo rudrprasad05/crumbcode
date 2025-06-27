@@ -8,6 +8,7 @@ namespace CrumbCodeBackend.Models
     public class Media: BaseModel
     {
         public string Url { get; set; } = string.Empty;
+        public string ObjectKey { get; set; } = string.Empty;
         public string AltText { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;

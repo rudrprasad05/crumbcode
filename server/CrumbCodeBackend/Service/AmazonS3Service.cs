@@ -37,14 +37,28 @@ namespace CrumbCodeBackend.Service
             _bucketName = awsOptions["BucketName"] ?? throw new InvalidOperationException("bucket name");
         }
 
-        public async Task<GetObjectResponse?> GetObjectAsync(string fileName)
+        public async Task<string> GetImageSignedUrl(string key)
+        {
+            var url = await _s3Client.GetPreSignedURLAsync(new GetPreSignedUrlRequest
+            {
+                BucketName = _bucketName,
+                Key = key,
+                Verb = HttpVerb.GET,
+                Expires = DateTime.UtcNow.AddMinutes(15)
+            });
+
+            return url;
+                        
+        }
+
+        public async Task<GetObjectResponse?> GetObjectAsync(string objKey)
         {
             try
             {
                 var request = new GetObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = "crumbcode/" + fileName
+                    Key = objKey
                 };
 
                 var response = await _s3Client.GetObjectAsync(request);
@@ -61,14 +75,14 @@ namespace CrumbCodeBackend.Service
                 return null;
             }
         }
-        public async Task<string?> UploadFileAsync(IFormFile file)
+        public async Task<string?> UploadFileAsync(IFormFile file, string guid)
         {
             if (file.Length > 0)
             {
                 try
                 {
                     // Generate a unique file name for the file
-                    var fileName = "crumbcode/" + Guid.NewGuid().ToString() + Path.GetExtension(file.FileName);
+                    var fileName = "crumbcode/" + guid + Path.GetExtension(file.FileName);
 
                     // Create a new TransferUtility instance to upload the file
                     using (var newMemoryStream = new MemoryStream())

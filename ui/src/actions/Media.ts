@@ -1,7 +1,7 @@
 "use server";
 
 import { axiosGlobal } from "@/lib/axios";
-import { Media } from "@/types";
+import { Media, NewMediaRequest } from "@/types";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { GetToken } from "./User";
@@ -11,6 +11,15 @@ export async function GetMedia(token?: string) {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;
+}
+
+export async function UploadOneFile(form: FormData) {
+  try {
+    const res = await axiosGlobal.post("media/create", form);
+    return res.data;
+  } catch (error) {
+    console.dir(error, { depth: null });
+  }
 }
 
 export async function GetStarMedia() {
@@ -80,9 +89,9 @@ export async function DeleteMedia(id: string) {
 
 export async function DeleteForever(id: string) {
   const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
+  //   if (!token) {
+  //     return redirect("/");
+  //   }
   const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id, {
     headers: { Authorization: `Bearer ${token}` },
   });

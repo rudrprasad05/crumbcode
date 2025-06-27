@@ -37,10 +37,11 @@ namespace CrumbCodeBackend.Repository
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
+            var guid = Guid.NewGuid().ToString();
             try
             {
-                var fileUrl = await _amazonS3Service.UploadFileAsync(newMediaObject.File);
-                if(fileUrl == null)
+                var fileUrl = await _amazonS3Service.UploadFileAsync(newMediaObject.File, guid);
+                if (fileUrl == null)
                 {
                     return null;
                 }
@@ -50,6 +51,8 @@ namespace CrumbCodeBackend.Repository
                 {
                     AltText = newMediaObject.AltText,
                     Url = fileUrl,
+                    ObjectKey = "crumbcode/" + guid + "." + fileUrl.Split(".").Last(),
+                    UUID = guid,
                     ContentType = newMediaObject.ContentType,
                     FileName = newMediaObject.FileName,
                     SizeInBytes = newMediaObject.SizeInBytes
@@ -74,14 +77,18 @@ namespace CrumbCodeBackend.Repository
         {
             var media = _context.Medias.AsQueryable();
 
-            // if(queryObject.IsStarred.HasValue)
-            // {
-            //     media = media.Where(s => s.Star.Equals(queryObject.IsStarred));
-            // }
-            
-
             var res = await media.ToListAsync();
-            return res; 
+            var signedMedia = new List<Media>();
+
+            foreach (var item in res)
+            {
+                var signedUrl = await _amazonS3Service.GetImageSignedUrl(item.ObjectKey);
+
+                item.Url = signedUrl;
+                signedMedia.Add(item);
+            }
+
+            return signedMedia; 
         }
 
         public async Task<Media?> MoveMedia(string uuid, string moveId, string? token)
@@ -125,14 +132,17 @@ namespace CrumbCodeBackend.Repository
         public async Task<Media?> GetOne(string uuid)
         {
             var mediaQ = _context.Medias.AsQueryable();
-            var media = mediaQ.FirstOrDefaultAsync(m => m.UUID == uuid);
+            var media = await mediaQ.FirstOrDefaultAsync(m => m.UUID == uuid);
             
             if(media == null)
             {
                 return null;
             }
 
-            return await media;
+            var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
+            media.Url = signedUrl;
+
+            return media;
         }
 
         public async Task<Media?> Recycle(string uuid, string? token)

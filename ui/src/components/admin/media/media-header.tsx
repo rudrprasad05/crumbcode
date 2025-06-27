@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -9,7 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Upload, Search, Filter } from "lucide-react";
+import { Upload, Search, Filter, CloudUpload } from "lucide-react";
+import NewMediaModal from "./NewMediaModal";
 
 interface MediaHeaderProps {
   onUpload: () => void;
@@ -52,16 +53,16 @@ export function MediaHeader({
         </Select>
       </div>
 
-      <div className="flex items-center gap-4">
-        <span className="text-sm text-gray-500">{totalItems} items</span>
-        <Button
-          onClick={onUpload}
-          className="bg-rose-500 hover:bg-rose-600 text-white"
+      <NewMediaModal>
+        <div
+          className={`${buttonVariants({
+            variant: "default",
+          })} w-full text-start justify-start px-2 my-2`}
         >
-          <Upload className="h-4 w-4 mr-2" />
-          Upload Media
-        </Button>
-      </div>
+          <CloudUpload />
+          Upload
+        </div>
+      </NewMediaModal>
     </div>
   );
 }

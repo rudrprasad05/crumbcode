@@ -1,5 +1,8 @@
 import { GetMedia } from "@/actions/Media";
 import { MediaLibrary } from "@/components/admin/media/media-library";
+import NewMediaModal from "../../../../components/admin/media/NewMediaModal";
+import { CloudUpload } from "lucide-react";
+import { buttonVariants } from "@/components/ui/button";
 
 export default async function MediaPage() {
   const data = await GetMedia();

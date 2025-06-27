@@ -19,6 +19,7 @@ export interface Media {
   updatedOn: string; // or Date, see note below
   url: string;
   altText: string;
+  objectKey: string;
   fileName: string;
   contentType: string;
   sizeInBytes: number;
@@ -48,3 +49,12 @@ export type User = {
   email: string;
   username: string;
 };
+
+export interface NewMediaRequest {
+  url: string;
+  altText: string;
+  fileName: string;
+  contentType: string;
+  sizeInBytes: number;
+  file: File; // This is the native browser File object for uploads
+}

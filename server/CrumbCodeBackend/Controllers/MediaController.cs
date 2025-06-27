@@ -27,18 +27,47 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateMedia([FromForm] NewMediaRequest newMediaObject)
+        public async Task<IActionResult> CreateMedia(
+            [FromForm] string Url,
+            [FromForm] string AltText,
+            [FromForm] string FileName,
+            [FromForm] string ContentType,
+            [FromForm] long SizeInBytes,
+            IFormFile File
+        )
         {
-            var req = await _mediaRepository.CreateAsync(newMediaObject);
-            if(req == null)
+            if (!ModelState.IsValid)
             {
-                return BadRequest("Media not Created");
+                // Return detailed model validation errors
+                return BadRequest(ModelState);
             }
+            if (File == null)
+            {
+                return BadRequest("File is required.");
+            }
+            try
+            {
+                var mo = new NewMediaRequest(
+                    Url,
+                    AltText,
+                    FileName,
+                    ContentType,
+                    File
+                );
+                var media = await _mediaRepository.CreateAsync(mo);
+                if (media == null)
+                {
+                    return BadRequest("Media not created.");
+                }
 
-
-            var resp = req.FromMediaToDTO();
-
-            return Ok(resp);
+                var dto = media.FromMediaToDTO(); // if you have a mapper
+                return Ok(dto);
+            }
+            catch (Exception ex)
+            {
+                // log error (optional)
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
         [HttpGet("sum")]
@@ -108,7 +137,7 @@ namespace CrumbCodeBackend.Controllers
                 return Unauthorized();
             }
 
-            var deleteFromS3 = await _amazonS3Service.DeleteFileAsync("fileName" ?? throw new InvalidOperationException());
+            var deleteFromS3 = await _amazonS3Service.DeleteFileAsync(media.ObjectKey ?? throw new InvalidOperationException());
             
             if(deleteFromS3 == true)
             {
@@ -119,11 +148,11 @@ namespace CrumbCodeBackend.Controllers
         }
         
         [HttpGet("download")]
-        public async Task<IActionResult> DownloadFile([FromQuery] string fileName)
+        public async Task<IActionResult> DownloadFile([FromQuery] string objKey)
         {
             try
             {
-                var fileStream = await _amazonS3Service.GetObjectAsync(fileName);
+                var fileStream = await _amazonS3Service.GetObjectAsync(objKey);
 
                 if (fileStream == null)
                 {
@@ -135,7 +164,7 @@ namespace CrumbCodeBackend.Controllers
                 await responseStream.CopyToAsync(memoryStream);
                 
                 var contentType = fileStream.Headers["Content-Type"];
-                return File(memoryStream.ToArray(), contentType, fileName);
+                return File(memoryStream.ToArray(), contentType, objKey);
             }
             catch (AmazonS3Exception ex)
             {

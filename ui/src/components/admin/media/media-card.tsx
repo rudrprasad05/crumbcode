@@ -43,40 +43,38 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
   };
 
   const getTypeIcon = () => {
-    switch (item.contentType) {
-      case "image":
-        return <ImageIcon className="h-4 w-4" />;
-      case "video":
-        return <Video className="h-4 w-4" />;
-      case "document":
-        return <FileText className="h-4 w-4" />;
-      default:
-        return <FileText className="h-4 w-4" />;
+    const type = item.contentType;
+
+    if (type.startsWith("image/")) {
+      return <ImageIcon className="h-4 w-4" />;
+    } else if (type.startsWith("video/")) {
+      return <Video className="h-4 w-4" />;
+    } else if (type.startsWith("application/") || type.startsWith("text/")) {
+      return <FileText className="h-4 w-4" />;
+    } else {
+      return <FileText className="h-4 w-4" />;
     }
   };
 
   const getTypeColor = () => {
-    switch (item.contentType) {
-      case "image":
-        return "bg-green-100 text-green-800";
-      case "video":
-        return "bg-blue-100 text-blue-800";
-      case "document":
-        return "bg-purple-100 text-purple-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
+    console.log(item);
+    const type = item.contentType;
+    if (type.startsWith("image/")) return "bg-green-100 text-green-800";
+    else if (type.startsWith("video/")) return "bg-blue-100 text-blue-800";
+    else if (type.startsWith("application/") || type.startsWith("text/"))
+      return "bg-purple-100 text-purple-800";
+    else return "bg-gray-100 text-gray-800";
   };
 
   return (
     <Card
-      className="group p-0 transition-all duration-200 hover:shadow-md border-gray-200"
+      className="group bg-white p-0 transition-all duration-200 hover:shadow-md border-gray-200"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <CardContent className="p-0">
+      <CardContent className="p-0 bg-white">
         <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
-          {item.contentType === "image" && isImageValid ? (
+          {item.contentType.includes("image") && isImageValid ? (
             <img
               src={item.url || "/image.svg"}
               onError={(e) => {
@@ -108,7 +106,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
 
           <div className="absolute top-2 right-2">
             <Badge variant="secondary" className={`text-xs ${getTypeColor()}`}>
-              {item.contentType}
+              {item.contentType.split("/")[0]}
             </Badge>
           </div>
         </div>
