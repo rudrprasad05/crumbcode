@@ -1,20 +1,50 @@
-"use client";
-
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { useCake } from "@/context/CakeContext";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useState, useEffect } from "react";
-import { Media } from "@/types";
-import { Button } from "@/components/ui/button";
-import { toast } from "sonner";
-import axios from "axios";
+import { Textarea } from "@/components/ui/textarea";
+import { CakeProvider, useCake } from "@/context/CakeContext";
 import { axiosGlobal } from "@/lib/axios";
+import { Media } from "@/types";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import CakeCardCreation from "./CakeCardCreation";
+import PostHeader from "../PostHeader";
 
-export default function SideBar() {
-  const { cake, setCake } = useCake();
+export default function CakeEditor() {
+  const { saveCakeContext, hasChanged } = useCake();
+  return (
+    <CakeProvider>
+      <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
+        <PostHeader
+          header="Create New Category"
+          onSave={saveCakeContext}
+          hasChanged={hasChanged}
+        />
+        <div className="flex-1 min-h-screen flex flex-row">
+          <main className="flex-1 p-6">
+            <div className="w-full h-full grid grid-cols-1 place-items-center">
+              <CakeCardCreation />
+            </div>
+          </main>
+          <SideBar />
+        </div>
+      </div>
+    </CakeProvider>
+  );
+}
+
+function SideBar() {
+  const { cake, setCake, updateCakeValues } = useCake();
+
   return (
     <div className="overflow-hidden relative h-screen w-[500px] p-4 border border-gray-200 border-t-0 flex flex-col">
       <div className="flex items-center justify-between">
@@ -27,9 +57,7 @@ export default function SideBar() {
             <Input
               id="name"
               value={cake.name ?? ""}
-              onChange={(e) =>
-                setCake((prev) => ({ ...prev, name: e.target.value }))
-              }
+              onChange={(e) => updateCakeValues("name", e.target.value)}
             />
           </div>
 
@@ -38,9 +66,7 @@ export default function SideBar() {
             <Textarea
               id="description"
               value={cake.description ?? ""}
-              onChange={(e) =>
-                setCake((prev) => ({ ...prev, description: e.target.value }))
-              }
+              onChange={(e) => updateCakeValues("description", e.target.value)}
             />
           </div>
 
@@ -51,10 +77,7 @@ export default function SideBar() {
               type="number"
               value={cake.price ?? 0}
               onChange={(e) =>
-                setCake((prev) => ({
-                  ...prev,
-                  price: parseFloat(e.target.value),
-                }))
+                updateCakeValues("price", Number.parseInt(e.target.value))
               }
             />
           </div>
@@ -64,13 +87,14 @@ export default function SideBar() {
             <Switch
               id="isAvailable"
               checked={cake.isAvailable ?? false}
-              onCheckedChange={(val) =>
-                setCake((prev) => ({ ...prev, isAvailable: val }))
-              }
+              onCheckedChange={(val) => updateCakeValues("isAvailable", val)}
             />
           </div>
 
           <div>
+            <MediaSelectDialog
+              onSelect={(media) => setCake((prev) => ({ ...prev, media }))}
+            />
             <Label htmlFor="mediaUrl">Media</Label>
             {cake.media?.url && (
               <img
@@ -79,12 +103,8 @@ export default function SideBar() {
                 className="w-full rounded-md border aspect-video object-cover"
               />
             )}
-            <MediaSelectDialog
-              onSelect={(media) => setCake((prev) => ({ ...prev, media }))}
-            />
           </div>
         </div>
-        );
       </div>
     </div>
   );
@@ -93,14 +113,18 @@ export default function SideBar() {
 function MediaSelectDialog({ onSelect }: { onSelect: (media: Media) => void }) {
   const [open, setOpen] = useState(false);
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
+  const [isLoading, setisLoading] = useState(true);
 
   useEffect(() => {
     const fetchMedia = async () => {
+      setisLoading(true);
       try {
         const res = await axiosGlobal.get("/media/get-all");
         setMediaItems(res.data);
+        setisLoading(false);
       } catch {
         toast.error("Failed to fetch media");
+        setisLoading(false);
       }
     };
 
@@ -113,6 +137,12 @@ function MediaSelectDialog({ onSelect }: { onSelect: (media: Media) => void }) {
         <Button variant="outline">Select Image</Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle>Select a Media</DialogTitle>
+          <DialogDescription>
+            Chose an appropriate media for your cake
+          </DialogDescription>
+        </DialogHeader>
         <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
           {mediaItems.map((media) => (
             <div
@@ -133,7 +163,8 @@ function MediaSelectDialog({ onSelect }: { onSelect: (media: Media) => void }) {
               </p>
             </div>
           ))}
-          {mediaItems.length === 0 && <div>No items to show</div>}
+          {mediaItems.length === 0 && !isLoading && <div>No items to show</div>}
+          {mediaItems.length === 0 && isLoading && <div>Loading</div>}
         </div>
       </DialogContent>
     </Dialog>

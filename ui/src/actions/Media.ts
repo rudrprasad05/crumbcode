@@ -6,8 +6,18 @@ import axios from "axios";
 import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
-export async function GetMedia(token?: string) {
+export async function GetMedia(token?: string): Promise<Media[]> {
   const res = await axiosGlobal.get<Media[]>("media/get-all", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return res.data;
+}
+
+export async function GetOneMedia(
+  uuid: string,
+  token?: string
+): Promise<Media> {
+  const res = await axiosGlobal.get<Media>("media/get-one/" + uuid, {
     headers: { Authorization: `Bearer ${token}` },
   });
   return res.data;

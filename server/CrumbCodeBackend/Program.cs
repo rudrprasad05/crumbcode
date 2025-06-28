@@ -21,6 +21,8 @@ builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
 
 builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
+builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();
+
 
 var app = builder.Build();
 

@@ -14,9 +14,15 @@ export interface Cake {
   media?: Partial<Media> | null;
 
   cakeTypeId: number;
-  //   cakeType: CakeType;
+  cakeType: CakeType;
 
   //   allergens: Allergen[];
+}
+
+export interface CakeType {
+  name: string;
+  color: string;
+  description: string;
 }
 
 export interface Media {

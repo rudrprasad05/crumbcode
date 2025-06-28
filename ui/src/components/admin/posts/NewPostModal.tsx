@@ -20,6 +20,8 @@ import {
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
+const selVal = ["cake", "services", "allergen", "category"];
+
 export default function NewPostModal({
   children,
 }: {
@@ -56,10 +58,11 @@ export default function NewPostModal({
             <SelectValue placeholder="Select a type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="cake">Cake</SelectItem>
-            <SelectItem value="services">Services</SelectItem>
-            <SelectItem value="allergen">Allergen</SelectItem>
-            <SelectItem value="ingredient">Ingredient</SelectItem>
+            {selVal.map((i) => (
+              <SelectItem value={i}>
+                {i.charAt(0).toUpperCase() + i.slice(1)}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
         <Label className="text-sm text-rose-500">{selectedTypeError}</Label>

@@ -1,13 +1,20 @@
 "use client";
 
 import { SidebarHeader } from "@/components/ui/sidebar";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CloudOff, CloudUpload, FileWarning } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { PostSidebarLogo } from "../../sidebar/sidebar-logo";
 import { Button } from "@/components/ui/button";
+import { useCake } from "@/context/CakeContext";
 
-export default function PostHeader() {
+type PostHeader = {
+  header: string;
+  hasChanged: boolean;
+  onSave: () => void;
+};
+
+export default function PostHeader({ header, hasChanged, onSave }: PostHeader) {
   const router = useRouter();
   return (
     <div className="w-full flex items-center border border-gray-200 p-4">
@@ -18,11 +25,23 @@ export default function PostHeader() {
         <ArrowLeft /> Back
       </div>
       <div className="ml-5 text-xl font-bold">
-        <h1>Create Cake Card</h1>
+        <h1>{header}</h1>
       </div>
-      <div className="flex gap-2 ml-auto">
-        <Button variant={"outline"}>Save</Button>
-        <Button>Publish</Button>
+      <div className="flex gap-2 items-center ml-auto">
+        <div className="text-sm text-gray-500 ">
+          {hasChanged ? (
+            <div className="flex items-center gap-2">
+              <CloudOff className="w-4 h-4 " /> Changes not saved
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <CloudUpload className="w-4 h-4 " /> Saved to Cloud
+            </div>
+          )}
+        </div>
+        <Button disabled={!hasChanged} onClick={onSave} variant={"outline"}>
+          Save
+        </Button>
       </div>
       <SidebarHeader className="ml-5">
         <PostSidebarLogo />

@@ -15,9 +15,12 @@ export default function CakeCardCreation() {
         />
       </div>
       <div className="p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          {cake.name as string}
-        </h3>
+        <div className="flex">
+          <h3 className="grow text-xl font-semibold text-gray-900 mb-2">
+            {cake.name as string}
+          </h3>
+          <div className="text-lg text-rose-600 font-bold">$ {cake.price}</div>
+        </div>
         <p className="text-gray-600 mb-4">{cake.description as string}</p>
         <Link
           href="#"
