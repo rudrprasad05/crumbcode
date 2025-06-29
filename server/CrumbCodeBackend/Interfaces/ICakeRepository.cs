@@ -9,6 +9,6 @@ namespace CrumbCodeBackend.Interfaces
     public interface ICakeRepository
     {
         public Task<Cake> CreateAsync(Cake count);
-        public Task<List<Cake>> GetAllCakeAsync();
+        public Task<List<Cake>> GetAllAsync();
     }
 }

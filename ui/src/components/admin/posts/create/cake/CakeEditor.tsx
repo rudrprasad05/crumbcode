@@ -17,18 +17,18 @@ import { Media } from "@/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import CakeCardCreation from "./CakeCardCreation";
-import PostHeader from "../PostHeader";
+import { useRouter } from "next/navigation";
+import { SidebarHeader } from "@/components/ui/sidebar";
+import { ArrowLeft, CloudOff, CloudUpload, FileWarning } from "lucide-react";
+import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
+import { useCakeType } from "@/context/CakeTypeContext";
 
 export default function CakeEditor() {
   const { saveCakeContext, hasChanged } = useCake();
   return (
     <CakeProvider>
       <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
-        <PostHeader
-          header="Create New Category"
-          onSave={saveCakeContext}
-          hasChanged={hasChanged}
-        />
+        <Header />
         <div className="flex-1 min-h-screen flex flex-row">
           <main className="flex-1 p-6">
             <div className="w-full h-full grid grid-cols-1 place-items-center">
@@ -39,6 +39,48 @@ export default function CakeEditor() {
         </div>
       </div>
     </CakeProvider>
+  );
+}
+
+function Header() {
+  const router = useRouter();
+  const { saveContext, hasChanged } = useCakeType();
+
+  return (
+    <div className="w-full flex items-center border border-gray-200 p-4">
+      <div
+        className="cursor-pointer flex gap-2 items-center text-sm"
+        onClick={() => router.back()}
+      >
+        <ArrowLeft /> Back
+      </div>
+      <div className="ml-5 text-xl font-bold">
+        <h1>Create New Category</h1>
+      </div>
+      <div className="flex gap-2 items-center ml-auto">
+        <div className="text-sm text-gray-500 ">
+          {hasChanged ? (
+            <div className="flex items-center gap-2">
+              <CloudOff className="w-4 h-4 " /> Changes not saved
+            </div>
+          ) : (
+            <div className="flex items-center gap-2">
+              <CloudUpload className="w-4 h-4 " /> Saved to Cloud
+            </div>
+          )}
+        </div>
+        <Button
+          disabled={!hasChanged}
+          onClick={saveContext}
+          variant={"outline"}
+        >
+          Save
+        </Button>
+      </div>
+      <SidebarHeader className="ml-5">
+        <PostSidebarLogo />
+      </SidebarHeader>
+    </div>
   );
 }
 

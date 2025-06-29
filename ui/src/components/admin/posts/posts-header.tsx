@@ -12,25 +12,7 @@ import {
 import { Plus, Search } from "lucide-react";
 import NewPostModal from "./NewPostModal";
 
-interface PostsHeaderProps {
-  onCreatePost: () => void;
-  onSearch: (query: string) => void;
-  onTypeFilter: (type: string) => void;
-  onStatusFilter: (status: string) => void;
-  selectedType: string;
-  selectedStatus: string;
-  totalPosts: number;
-}
-
-export function PostsHeader({
-  onCreatePost,
-  onSearch,
-  onTypeFilter,
-  onStatusFilter,
-  selectedType,
-  selectedStatus,
-  totalPosts,
-}: PostsHeaderProps) {
+export function PostsHeader() {
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="flex items-center gap-4 flex-1">
@@ -39,11 +21,10 @@ export function PostsHeader({
           <Input
             placeholder="Search posts..."
             className="pl-10 bg-white border-gray-200"
-            onChange={(e) => onSearch(e.target.value)}
           />
         </div>
 
-        <Select value={selectedType} onValueChange={onTypeFilter}>
+        <Select>
           <SelectTrigger className="w-32 bg-white border-gray-200">
             <SelectValue />
           </SelectTrigger>
@@ -54,7 +35,7 @@ export function PostsHeader({
           </SelectContent>
         </Select>
 
-        <Select value={selectedStatus} onValueChange={onStatusFilter}>
+        <Select>
           <SelectTrigger className="w-32 bg-white border-gray-200">
             <SelectValue />
           </SelectTrigger>

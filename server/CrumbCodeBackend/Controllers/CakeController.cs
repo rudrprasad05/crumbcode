@@ -16,19 +16,25 @@ namespace CrumbCodeBackend.Controllers
     public class CakeController : BaseController
     {
         private readonly ICakeRepository _cakeRepository;
-        private readonly IAntiforgery _antiforgery;
 
-        public CakeController(ICakeRepository cakeRepository, IAntiforgery antiforgery)
+        public CakeController(ICakeRepository cakeRepository)
         {
             _cakeRepository = cakeRepository;
-            _antiforgery = antiforgery;
         }
 
-        // [HttpPost("create")]
-        // public Task<Cake> CreateAsync()
-        // {
+       [HttpGet("get-all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var model = await _cakeRepository.GetAllAsync();
+
+            if (model == null)
+            {
+                return BadRequest("model not created");
+            }
+
+            return Ok(model);
             
-        // }
+        }
 
     }
 }

@@ -1,3 +1,5 @@
+import { CreateCakeType } from "@/actions/CakeType";
+import { FromModelToNewRequestDTO } from "@/mappers/CaketypeMapper";
 import { Cake, CakeType } from "@/types";
 import hash from "object-hash";
 import React, {
@@ -39,6 +41,7 @@ export const CakeTypeProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const currentHash = hash(data);
     console.log(currentHash, initialHashRef.current);
+    console.log(currentHash !== initialHashRef.current);
     setHasChanged(currentHash !== initialHashRef.current);
   }, [data]);
 
@@ -49,8 +52,11 @@ export const CakeTypeProvider = ({ children }: { children: ReactNode }) => {
     }));
   }
 
-  function saveContext() {
+  async function saveContext() {
     console.log(data);
+    try {
+      await CreateCakeType(FromModelToNewRequestDTO(data as CakeType));
+    } catch (error) {}
     initialHashRef.current = hash(data);
     setHasChanged(false);
   }

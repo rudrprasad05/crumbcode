@@ -1,14 +1,18 @@
-import { PostsManager } from "@/components/admin/posts/posts-manager"
+import { GetAllCakes } from "@/actions/Cake";
+import { GetAllCakeTypes } from "@/actions/CakeType";
+import CakeSection from "@/components/admin/posts/create/cake/CakeSection";
+import CakeTypesSection from "@/components/admin/posts/create/caketype/CakeTypesSection";
+import { PostsManager } from "@/components/admin/posts/posts-manager";
 
-export default function PostsPage() {
+export default async function PostsPage() {
+  const cakeTypes = await GetAllCakeTypes();
+  const cakes = await GetAllCakes();
+
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Posts Management</h1>
-        <p className="text-gray-600 mt-2">Create and manage your cake products and feature highlights.</p>
-      </div>
-
-      <PostsManager />
+      {/* <PostsManager /> */}
+      <CakeSection data={cakes} />
+      <CakeTypesSection data={cakeTypes} />
     </div>
-  )
+  );
 }

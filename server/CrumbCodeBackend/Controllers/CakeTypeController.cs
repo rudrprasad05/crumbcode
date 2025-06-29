@@ -7,6 +7,7 @@ using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Models;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
+using static CrumbCodeBackend.Models.Requests.CakeTypeRequestObject;
 
 namespace CrumbCodeBackend.Controllers
 {
@@ -14,13 +15,39 @@ namespace CrumbCodeBackend.Controllers
     [ApiController]
     public class CakeTypeController : BaseController
     {
-        private readonly ICakeRepository _cakeRepository;
-        private readonly IAntiforgery _antiforgery;
+        private readonly ICakeTypeRepository _cakeTypeRepository;
 
-        public CakeTypeController(ICakeRepository cakeRepository, IAntiforgery antiforgery)
+        public CakeTypeController(ICakeTypeRepository cakeTypeRepository)
         {
-            _cakeRepository = cakeRepository;
-            _antiforgery = antiforgery;
+            _cakeTypeRepository = cakeTypeRepository;
+        }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> CreateCakeType([FromBody] NewCakeTypeRequest newCakeTypeRequest)
+        {
+            var model = await _cakeTypeRepository.CreateAsync(newCakeTypeRequest);
+
+            if (model == null)
+            {
+                return BadRequest("model not created");
+            }
+
+            return Ok(model);
+
+        }
+        
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAll()
+        {
+            var model = await _cakeTypeRepository.GetAllAsync();
+
+            if (model == null)
+            {
+                return BadRequest("model not created");
+            }
+
+            return Ok(model);
+            
         }
 
     }

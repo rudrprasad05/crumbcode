@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using CrumbCodeBackend.Data;
 using CrumbCodeBackend.Interfaces;
+using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models;
 using Microsoft.EntityFrameworkCore;
+using static CrumbCodeBackend.Models.Requests.CakeTypeRequestObject;
 
 namespace CrumbCodeBackend.Repository
 {
@@ -17,14 +19,27 @@ namespace CrumbCodeBackend.Repository
             _context = applicationDbContext;
         }
 
-        public Task<Cake> CreateAsync(Cake count)
+        public async Task<CakeType?> CreateAsync(NewCakeTypeRequest cakeTypeRequest)
         {
-            throw new NotImplementedException();
+            var model = cakeTypeRequest.FromNewCakeTypeRequestToModel();
+            if (model == null)
+            {
+                return null;
+            }
+
+            await _context.CakeTypes.AddAsync(model);
+            await _context.SaveChangesAsync();
+            return model;
         }
 
-        public Task<List<Cake>> GetAllAsync()
+        public async Task<List<CakeType>> GetAllAsync()
         {
-            throw new NotImplementedException();
+
+            var data = _context.CakeTypes.AsQueryable();
+
+            var res = await data.ToListAsync();
+
+            return res; 
         }
     }
 }

@@ -10,7 +10,7 @@ import React, {
 import hash from "object-hash";
 
 let defaultMedia: Partial<Media> = {
-  url: "https://bucket.procyonfiji.com/procyon/crumbcode/d6dab80c-3acd-4e6a-a750-506c7243991f.jpeg?AWSAccessKeyId=TdRjJ2lJ3C6KEGfrRmxM&Expires=1751108204&Signature=g%2F1TLfYeujrL0sJxs0Hrwiu8Tr4%3D",
+  url: "/default-img.jpeg",
   objectKey: "crumbcode/d6dab80c-3acd-4e6a-a750-506c7243991f.jpeg",
   altText: "default image placeholder",
   fileName: "default-img",

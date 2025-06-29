@@ -1,26 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import {
-  MoreHorizontal,
-  Download,
-  Edit,
-  Trash2,
-  FileText,
-  Video,
-  ImageIcon,
-  Ban,
-} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Media } from "@/types";
+import { Ban, Edit, FileText, ImageIcon, Trash2, Video } from "lucide-react";
+import { useState } from "react";
 import { DeleteMediaDialoge } from "./delete-media-dialoge";
 
 interface MediaCardProps {

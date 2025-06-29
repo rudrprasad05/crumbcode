@@ -22,9 +22,13 @@ namespace CrumbCodeBackend.Repository
             throw new NotImplementedException();
         }
 
-        public Task<List<Cake>> GetAllCakeAsync()
+        public async Task<List<Cake>> GetAllAsync()
         {
-            throw new NotImplementedException();
+            var data = _context.Cakes.AsQueryable();
+
+            var res = await data.ToListAsync();
+
+            return res; 
         }
     }
 }

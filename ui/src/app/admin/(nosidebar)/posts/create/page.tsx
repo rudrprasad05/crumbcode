@@ -10,7 +10,7 @@ export default function page() {
   const paramType = searchParams.get("type");
 
   if (paramType?.toLowerCase() === "cake") {
-    <CakeEditor />;
+    return <CakeEditor />;
   } else if (paramType?.toLowerCase() === "services") {
     return (
       <CakeProvider>
