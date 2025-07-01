@@ -1,15 +1,25 @@
 "use client";
 
 import { useCake } from "@/context/CakeContext";
+import { Cake } from "@/types";
 import Link from "next/link";
+import { useEffect } from "react";
 
-export default function CakeCardCreation() {
+export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
   const { cake, setCake } = useCake();
+
+  useEffect(() => {
+    if (cakeData) {
+      console.log("cakecontextedittor", cakeData);
+      setCake(cakeData);
+    }
+  }, [cakeData]);
+
   return (
     <div className="bg-white rounded-xl w-[340px] shadow-md overflow-hidden">
       <div className="h-48 overflow-hidden">
         <img
-          src={cake.media?.url as string}
+          src={cake.media?.signedUrl as string}
           alt={""}
           className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
         />

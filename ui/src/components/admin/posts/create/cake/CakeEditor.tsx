@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { CakeProvider, useCake } from "@/context/CakeContext";
 import { axiosGlobal } from "@/lib/axios";
-import { Media } from "@/types";
+import { Cake, Media } from "@/types";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import CakeCardCreation from "./CakeCardCreation";
@@ -23,8 +23,7 @@ import { ArrowLeft, CloudOff, CloudUpload, FileWarning } from "lucide-react";
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
 import { useCakeType } from "@/context/CakeTypeContext";
 
-export default function CakeEditor() {
-  const { saveCakeContext, hasChanged } = useCake();
+export default function CakeEditor({ cake }: { cake?: Cake }) {
   return (
     <CakeProvider>
       <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
@@ -32,7 +31,7 @@ export default function CakeEditor() {
         <div className="flex-1 min-h-screen flex flex-row">
           <main className="flex-1 p-6">
             <div className="w-full h-full grid grid-cols-1 place-items-center">
-              <CakeCardCreation />
+              <CakeCardCreation cakeData={cake} />
             </div>
           </main>
           <SideBar />
@@ -55,7 +54,7 @@ function Header() {
         <ArrowLeft /> Back
       </div>
       <div className="ml-5 text-xl font-bold">
-        <h1>Create New Category</h1>
+        <h1>Cake Editor</h1>
       </div>
       <div className="flex gap-2 items-center ml-auto">
         <div className="text-sm text-gray-500 ">

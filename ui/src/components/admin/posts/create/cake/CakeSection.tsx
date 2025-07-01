@@ -86,30 +86,33 @@ function HandleDataSection({ data }: ICakeTypesSection) {
   if (data.length === 0) {
     return <NoDataContainer />;
   }
+  console.log(data);
   return (
-    <div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
-        <div className="bg-white rounded-xl w-[340px] shadow-md overflow-hidden">
+        <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="h-48 overflow-hidden">
             <img
-              src={i.media?.url as string}
+              src={i.media?.signedUrl as string}
               alt={""}
               className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
             />
           </div>
-          <div className="p-6">
-            <div className="flex">
-              <h3 className="grow text-xl font-semibold text-gray-900 mb-2">
+          <div className="p-4">
+            <div className="flex justify-between">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {i.name as string}
               </h3>
-              <div className="text-lg text-rose-600 font-bold">$ {i.price}</div>
+              <div className="text-xs text-rose-600 font-bold">
+                {"$" + i.price}
+              </div>
             </div>
             <p className="text-gray-600 mb-4">{i.description as string}</p>
             <Link
-              href="#"
+              href={`/admin/posts/edit/cake/${i.uuid}`}
               className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
             >
-              Order Online
+              Edit
             </Link>
           </div>
         </div>
