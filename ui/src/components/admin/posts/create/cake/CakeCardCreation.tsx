@@ -6,12 +6,12 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
-  const { cake, setCake } = useCake();
+  const { cake, setInitialCakeState } = useCake();
 
   useEffect(() => {
     if (cakeData) {
       console.log("cakecontextedittor", cakeData);
-      setCake(cakeData);
+      setInitialCakeState(cakeData);
     }
   }, [cakeData]);
 

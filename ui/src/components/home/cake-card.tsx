@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import Image from "next/image";
+import { useState } from "react";
 
 interface CakeCardProps {
   title: string;
@@ -11,14 +15,28 @@ export default function CakeCard({
   description,
   imageSrc,
 }: CakeCardProps) {
+  const [isLoading, setIsLoading] = useState(true);
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden">
-      <div className="h-48 overflow-hidden">
-        <img
+      <div className="relative w-full h-64">
+        {isLoading && (
+          <div className="absolute inset-0 bg-gray-300 animate-pulse rounded" />
+        )}
+
+        <Image
+          src={imageSrc || "/placeholder.svg"}
+          alt={title}
+          fill
+          className={`object-cover transition-opacity duration-500 ${
+            isLoading ? "opacity-0" : "opacity-100"
+          }`}
+          onLoadingComplete={() => setIsLoading(false)}
+        />
+        {/* <img
           src={imageSrc || "/placeholder.svg"}
           alt={title}
           className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-        />
+        /> */}
       </div>
       <div className="p-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>

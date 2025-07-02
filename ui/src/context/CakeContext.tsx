@@ -37,14 +37,16 @@ let defaultCakeData: Partial<Cake> = {
 // Create context
 const CakeContext = createContext<{
   cake: Partial<Cake>;
-  setCake: React.Dispatch<React.SetStateAction<Partial<Cake>>>;
+  setInitialCakeState: (cake: Partial<Cake>) => void;
+  changeMedia: (media: Media) => void;
   updateCakeValues: <K extends keyof Cake>(key: K, value: Cake[K]) => void;
   saveCakeContext: () => void;
   hasChanged: boolean;
   setHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   cake: defaultCakeData,
-  setCake: () => {},
+  setInitialCakeState: (cake: Partial<Cake>) => {},
+  changeMedia: (media: Media) => {},
   updateCakeValues: () => {},
   saveCakeContext: () => {},
   hasChanged: false,
@@ -55,18 +57,30 @@ const CakeContext = createContext<{
 export const CakeProvider = ({ children }: { children: ReactNode }) => {
   const [cake, setCake] = useState<Partial<Cake>>(defaultCakeData);
   const [hasChanged, setHasChanged] = useState(false);
-  const initialHashRef = useRef<string>(hash(cake));
+  const initialHashRef = useRef<string>(null);
 
   useEffect(() => {
     const currentHash = hash(cake);
+    if (!initialHashRef.current) {
+      initialHashRef.current = currentHash;
+    }
     setHasChanged(currentHash !== initialHashRef.current);
   }, [cake]);
+
+  function setInitialCakeState(cake: Partial<Cake>) {
+    setCake(cake);
+    initialHashRef.current = hash(cake);
+  }
 
   function updateCakeValues<K extends keyof Cake>(key: K, value: Cake[K]) {
     setCake((prev) => ({
       ...prev,
       [key]: value,
     }));
+  }
+
+  function changeMedia(media: Media) {
+    setCake((prev) => ({ ...prev, media }));
   }
 
   function saveCakeContext() {
@@ -79,10 +93,11 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
     <CakeContext.Provider
       value={{
         cake,
-        setCake,
+        setInitialCakeState,
         updateCakeValues,
         saveCakeContext,
         hasChanged,
+        changeMedia,
         setHasChanged,
       }}
     >

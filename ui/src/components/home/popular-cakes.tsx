@@ -1,23 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import CakeCard from "./cake-card";
+import { Cake } from "@/types";
+import LoadingContainer from "../global/LoadingContainer";
+import { GetAllCakes } from "@/actions/Cake";
+import Error from "next/error";
+import ErrorContainer from "../global/ErrorContainer";
 
 export default function PopularCakes() {
-  const cakes = [
-    {
-      title: "Black Forest",
-      description: "Rich chocolate, whipped cream, and cherries in every bite.",
-      imageSrc: "https://bucket.procyonfiji.com/procyon/cc-pop-1.jpeg",
-    },
-    {
-      title: "Cheese Cake",
-      description: "Rich chocolate, whipped cream, and cherries in every bite.",
-      imageSrc: "https://bucket.procyonfiji.com/procyon/cc-pop-4.jpeg",
-    },
-    {
-      title: "Tiramisu",
-      description: "Rich chocolate, whipped cream, and cherries in every bite.",
-      imageSrc: "https://bucket.procyonfiji.com/procyon/cc-pop-3.jpeg",
-    },
-  ];
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, seterror] = useState<any | null>(null);
+  const [cakes, setcakes] = useState<Cake[]>([]);
+
+  useEffect(() => {
+    const getData = async () => {
+      try {
+        const data = await GetAllCakes();
+        setcakes(data);
+        seterror(null);
+        setIsLoading(false);
+      } catch (error: any) {
+        seterror(error);
+        setIsLoading(false);
+      }
+    };
+    getData();
+  }, []);
 
   return (
     <section className="py-16 bg-white">
@@ -29,13 +38,16 @@ export default function PopularCakes() {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {isLoading && !error && <LoadingContainer />}
+        {!isLoading && error && <ErrorContainer />}
+
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {cakes.map((cake, index) => (
             <CakeCard
               key={index}
-              title={cake.title}
+              title={cake.name}
               description={cake.description}
-              imageSrc={cake.imageSrc}
+              imageSrc={cake.media?.signedUrl as string}
             />
           ))}
         </div>

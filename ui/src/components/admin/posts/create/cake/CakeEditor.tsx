@@ -22,6 +22,7 @@ import { SidebarHeader } from "@/components/ui/sidebar";
 import { ArrowLeft, CloudOff, CloudUpload, FileWarning } from "lucide-react";
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
 import { useCakeType } from "@/context/CakeTypeContext";
+import { cn } from "@/lib/utils";
 
 export default function CakeEditor({ cake }: { cake?: Cake }) {
   return (
@@ -43,7 +44,11 @@ export default function CakeEditor({ cake }: { cake?: Cake }) {
 
 function Header() {
   const router = useRouter();
-  const { saveContext, hasChanged } = useCakeType();
+  const { saveCakeContext, hasChanged } = useCake();
+
+  useEffect(() => {
+    console.log("hasChanged", hasChanged);
+  }, [hasChanged]);
 
   return (
     <div className="w-full flex items-center border border-gray-200 p-4">
@@ -70,7 +75,7 @@ function Header() {
         </div>
         <Button
           disabled={!hasChanged}
-          onClick={saveContext}
+          onClick={saveCakeContext}
           variant={"outline"}
         >
           Save
@@ -84,7 +89,7 @@ function Header() {
 }
 
 function SideBar() {
-  const { cake, setCake, updateCakeValues } = useCake();
+  const { cake, changeMedia, updateCakeValues } = useCake();
 
   return (
     <div className="overflow-hidden relative h-screen w-[500px] p-4 border border-gray-200 border-t-0 flex flex-col">
@@ -134,12 +139,13 @@ function SideBar() {
 
           <div>
             <MediaSelectDialog
-              onSelect={(media) => setCake((prev) => ({ ...prev, media }))}
+              onSelect={(media) => changeMedia(media)}
+              selected={cake.media?.objectKey as string}
             />
             <Label htmlFor="mediaUrl">Media</Label>
-            {cake.media?.url && (
+            {cake.media?.signedUrl && (
               <img
-                src={cake.media.url}
+                src={cake.media.signedUrl}
                 alt={cake.media.altText}
                 className="w-full rounded-md border aspect-video object-cover"
               />
@@ -151,7 +157,13 @@ function SideBar() {
   );
 }
 
-function MediaSelectDialog({ onSelect }: { onSelect: (media: Media) => void }) {
+function MediaSelectDialog({
+  onSelect,
+  selected,
+}: {
+  onSelect: (media: Media) => void;
+  selected: string;
+}) {
   const [open, setOpen] = useState(false);
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
   const [isLoading, setisLoading] = useState(true);
@@ -188,7 +200,10 @@ function MediaSelectDialog({ onSelect }: { onSelect: (media: Media) => void }) {
           {mediaItems.map((media) => (
             <div
               key={media.uuid}
-              className="border rounded hover:ring-2 ring-primary transition cursor-pointer"
+              className={cn(
+                "border rounded hover:ring-2 ring-primary transition cursor-pointer",
+                selected == media.objectKey && "border-blue-500 border"
+              )}
               onClick={() => {
                 onSelect(media);
                 setOpen(false);
