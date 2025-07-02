@@ -1,3 +1,6 @@
+"use client";
+
+import { GetAllCakes } from "@/actions/Cake";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -13,16 +16,27 @@ import { cn } from "@/lib/utils";
 import { Cake, CakeType, CakeTypeColorClasses } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 interface ICakeTypesSection {
   data: Cake[];
 }
 
-export default function CakeSection({ data }: ICakeTypesSection) {
+export default function CakeSection() {
+  const [cakes, setCakes] = useState<Cake[]>([]);
+
+  useEffect(() => {
+    const get = async () => {
+      const data = await GetAllCakes();
+      setCakes(data);
+    };
+    get();
+  }, []);
+
   return (
     <div>
       <Header />
-      <HandleDataSection data={data} />
+      <HandleDataSection data={cakes} />
     </div>
   );
 }
@@ -86,14 +100,13 @@ function HandleDataSection({ data }: ICakeTypesSection) {
   if (data.length === 0) {
     return <NoDataContainer />;
   }
-  console.log(data);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
         <div className="bg-white rounded-xl shadow-md overflow-hidden">
           <div className="h-48 overflow-hidden">
             <img
-              src={i.media?.signedUrl as string}
+              src={i.media?.url as string}
               alt={""}
               className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
             />

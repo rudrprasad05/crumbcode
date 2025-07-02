@@ -12,6 +12,9 @@ namespace CrumbCodeBackend.Interfaces
         public Task<Cake> CreateAsync(Cake cake);
         public Task<List<CakeDto>> GetAllAsync();
         public Task<CakeDto?> GetOneAsync(string uuid);
+        public Task<Cake?> Exists(string uuid);
+
+        public Task<Cake> UpdateAsync(string uuid, Cake cake);
 
     }
 }

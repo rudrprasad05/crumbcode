@@ -1,12 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import CakeCard from "./cake-card";
-import { Cake } from "@/types";
-import LoadingContainer from "../global/LoadingContainer";
 import { GetAllCakes } from "@/actions/Cake";
-import Error from "next/error";
+import { Cake } from "@/types";
+import { useEffect, useState } from "react";
 import ErrorContainer from "../global/ErrorContainer";
+import LoadingContainer from "../global/LoadingContainer";
+import CakeCard from "./cake-card";
 
 export default function PopularCakes() {
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +46,7 @@ export default function PopularCakes() {
               key={index}
               title={cake.name}
               description={cake.description}
-              imageSrc={cake.media?.signedUrl as string}
+              imageSrc={cake.media?.url as string}
             />
           ))}
         </div>

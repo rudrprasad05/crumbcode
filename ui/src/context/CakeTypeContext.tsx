@@ -40,8 +40,6 @@ export const CakeTypeProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const currentHash = hash(data);
-    console.log(currentHash, initialHashRef.current);
-    console.log(currentHash !== initialHashRef.current);
     setHasChanged(currentHash !== initialHashRef.current);
   }, [data]);
 
@@ -53,7 +51,6 @@ export const CakeTypeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function saveContext() {
-    console.log(data);
     try {
       await CreateCakeType(FromModelToNewRequestDTO(data as CakeType));
     } catch (error) {}

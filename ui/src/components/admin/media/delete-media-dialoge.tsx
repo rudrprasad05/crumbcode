@@ -33,7 +33,6 @@ export function DeleteMediaDialoge({ id }: { id: string }) {
     } catch (error) {
       setIsLoading(false);
       toast.error("Error Occured");
-      console.log(error);
     }
   }
   return (

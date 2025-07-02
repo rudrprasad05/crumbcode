@@ -42,7 +42,6 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
   };
 
   const getTypeColor = () => {
-    console.log(item);
     const type = item.contentType;
     if (type.startsWith("image/")) return "bg-green-100 text-green-800";
     else if (type.startsWith("video/")) return "bg-blue-100 text-blue-800";

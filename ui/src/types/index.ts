@@ -36,7 +36,6 @@ export interface Media extends BaseModel {
   fileName: string;
   contentType: string;
   sizeInBytes: number;
-  signedUrl: string;
 }
 
 export const CakeTypeColors = [
@@ -61,6 +60,16 @@ export interface NewCakeTypeRequest {
   name: string;
   description: string;
   color: string;
+}
+
+export interface NewCakeRequest {
+  name: string;
+  description: string;
+  type: string;
+  isAvailable: boolean;
+  price: number;
+  mediaId?: number; // optional
+  cakeTypeId: number;
 }
 
 export interface NewMediaRequest {

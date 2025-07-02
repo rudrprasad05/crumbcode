@@ -17,6 +17,7 @@ export default function page({ params }: { params: { id: string } }) {
     const getData = async () => {
       const cake = await GetOneCake(params.id);
       setCake(cake);
+
       setLoading(false);
     };
     getData();

@@ -52,7 +52,7 @@ namespace CrumbCodeBackend.Controllers
             return Ok(model);
 
         }
-        
+
         [HttpPost("create")]
         public async Task<IActionResult> CreateAsync([FromBody] NewCakeRequest newCakeRequest)
         {
@@ -72,6 +72,43 @@ namespace CrumbCodeBackend.Controllers
                 CakeTypeId = model.CakeTypeId,
                 Description = model.Description
             };
+
+            return Ok(result);
+
+        }
+        
+        [HttpPost("upsert")]
+        public async Task<IActionResult> UpsertAsync([FromQuery] string uuid, [FromBody] NewCakeRequest newCakeRequest)
+        {
+            var dto = newCakeRequest.FromNewCakeRequestToModel();
+            var exists = await _cakeRepository.Exists(uuid);
+            var result = new CakeDto();
+
+            if (exists != null) // update
+            {
+                var model = await _cakeRepository.UpdateAsync(uuid, dto);
+                result = new CakeDto
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Price = model.Price,
+                    CakeTypeId = model.CakeTypeId,
+                    Description = model.Description
+                };
+            }
+            else // create new
+            {
+                var model = await _cakeRepository.CreateAsync(dto);
+                result = new CakeDto
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Price = model.Price,
+                    CakeTypeId = model.CakeTypeId,
+                    Description = model.Description
+                };
+            }
+
 
             return Ok(result);
             

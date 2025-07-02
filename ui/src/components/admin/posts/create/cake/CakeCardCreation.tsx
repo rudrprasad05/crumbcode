@@ -10,7 +10,6 @@ export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
 
   useEffect(() => {
     if (cakeData) {
-      console.log("cakecontextedittor", cakeData);
       setInitialCakeState(cakeData);
     }
   }, [cakeData]);
@@ -19,7 +18,7 @@ export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
     <div className="bg-white rounded-xl w-[340px] shadow-md overflow-hidden">
       <div className="h-48 overflow-hidden">
         <img
-          src={cake.media?.signedUrl as string}
+          src={cake.media?.url as string}
           alt={""}
           className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
         />

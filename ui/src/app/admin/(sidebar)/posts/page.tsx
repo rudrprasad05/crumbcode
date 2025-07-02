@@ -6,12 +6,11 @@ import { PostsManager } from "@/components/admin/posts/posts-manager";
 
 export default async function PostsPage() {
   const cakeTypes = await GetAllCakeTypes();
-  const cakes = await GetAllCakes();
 
   return (
     <div className="space-y-6">
       {/* <PostsManager /> */}
-      <CakeSection data={cakes} />
+      <CakeSection />
       <CakeTypesSection data={cakeTypes} />
     </div>
   );

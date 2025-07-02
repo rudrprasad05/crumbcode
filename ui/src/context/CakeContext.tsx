@@ -8,6 +8,8 @@ import React, {
   useRef,
 } from "react";
 import hash from "object-hash";
+import { SaveCake } from "@/actions/Cake";
+import { toast } from "sonner";
 
 let defaultMedia: Partial<Media> = {
   url: "/default-img.jpeg",
@@ -79,14 +81,19 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
     }));
   }
 
+  // TODO when media is uploaded, it calls this function to change the context. but the url being sent is incorrect?? idk. this occurs in NewMediaForm in the edit cake page. should also occur in the new cake page
+
   function changeMedia(media: Media) {
+    console.log("trigger1");
+    console.log(media);
     setCake((prev) => ({ ...prev, media }));
   }
 
-  function saveCakeContext() {
-    console.log(cake);
+  async function saveCakeContext() {
     initialHashRef.current = hash(cake);
     setHasChanged(false);
+    await SaveCake(cake, cake.uuid);
+    toast.success("Saved successfully");
   }
 
   return (

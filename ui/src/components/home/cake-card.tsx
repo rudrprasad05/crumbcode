@@ -30,13 +30,8 @@ export default function CakeCard({
           className={`object-cover transition-opacity duration-500 ${
             isLoading ? "opacity-0" : "opacity-100"
           }`}
-          onLoadingComplete={() => setIsLoading(false)}
+          onLoad={() => setIsLoading(false)}
         />
-        {/* <img
-          src={imageSrc || "/placeholder.svg"}
-          alt={title}
-          className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-        /> */}
       </div>
       <div className="p-6">
         <h3 className="text-xl font-semibold text-gray-900 mb-2">{title}</h3>

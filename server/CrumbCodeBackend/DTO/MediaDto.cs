@@ -8,7 +8,9 @@ namespace CrumbCodeBackend.DTO
     public class MediaDto
     {
 
-        public string SignedUrl { get; set; } = string.Empty;
+        public string Url { get; set; } = string.Empty;
+        public string UUID { get; set; } = string.Empty;
+        public int Id { get; set; }
         public string ObjectKey { get; set; } = string.Empty;
         public string AltText { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;

@@ -29,6 +29,33 @@ namespace CrumbCodeBackend.Repository
             return cake;
         }
 
+        public async Task<Cake> UpdateAsync(string uuid, Cake updatedCake)
+        {
+            var existingCake = await _context.Cakes.FirstOrDefaultAsync(c => c.UUID == uuid);
+
+            if (existingCake == null)
+            {
+                throw new KeyNotFoundException("Cake not found");
+            }
+
+            // Update fields manually
+            existingCake.Name = updatedCake.Name;
+            existingCake.Description = updatedCake.Description;
+            existingCake.Price = updatedCake.Price;
+            existingCake.MediaId = updatedCake.MediaId;
+            // ... copy other fields as needed
+
+            await _context.SaveChangesAsync();
+
+            return existingCake;
+        }
+
+        public Task<Cake?> Exists(string uuid)
+        {
+            var cake = _context.Cakes.FirstOrDefaultAsync(c => c.UUID == uuid);
+            return cake;
+        }
+
         public async Task<List<CakeDto>> GetAllAsync()
         {
             var cakes = await _context.Cakes
@@ -47,7 +74,9 @@ namespace CrumbCodeBackend.Repository
                     var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
                     mediaDto = new MediaDto
                     {
-                        SignedUrl = signedUrl,
+                        Url = signedUrl,
+                        Id = media.Id,
+                        UUID = media.UUID,
                         ObjectKey = media.ObjectKey,
                         AltText = media.AltText,
                         FileName = media.FileName,
@@ -89,7 +118,9 @@ namespace CrumbCodeBackend.Repository
                 var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
                 mediaDto = new MediaDto
                 {
-                    SignedUrl = signedUrl,
+                    Url = signedUrl,
+                    Id = media.Id,
+                    UUID = media.UUID,
                     ObjectKey = media.ObjectKey,
                     AltText = media.AltText,
                     FileName = media.FileName,
@@ -107,6 +138,7 @@ namespace CrumbCodeBackend.Repository
                 Media = mediaDto,
                 UUID = cake.UUID,
                 CreatedOn = cake.CreatedOn,
+                Description = cake.Description
             };
         
             return dto;
