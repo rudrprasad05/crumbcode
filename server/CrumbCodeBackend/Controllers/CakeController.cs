@@ -20,7 +20,11 @@ namespace CrumbCodeBackend.Controllers
     {
         private readonly ICakeRepository _cakeRepository;
 
-        public CakeController(ICakeRepository cakeRepository)
+        public CakeController(
+            ICakeRepository cakeRepository,
+            IConfiguration configuration, 
+            ITokenService tokenService
+        )  : base(configuration, tokenService)
         {
             _cakeRepository = cakeRepository;
         }

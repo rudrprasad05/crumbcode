@@ -19,6 +19,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
+builder.Services.AddSingleton<ITokenService, TokenService>();
+builder.Services.AddSingleton<IUserContextService, UserContextService>();
 
 builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
@@ -45,7 +47,7 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage(); // gives full stack trace in browser
 }
 
-// app.UseMiddleware<TokenMiddleware>();
+app.UseMiddleware<TokenMiddleware>();
 app.UseMiddleware<Log>();
 app.MapControllers();
 

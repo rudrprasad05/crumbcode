@@ -19,8 +19,10 @@ namespace CrumbCodeBackend.Controllers
         private readonly IAmazonS3Service _amazonS3Service;
 
         public MediaController(IMediaRepository mediaRepository,
-            IAmazonS3Service amazonS3Service
-        )
+            IAmazonS3Service amazonS3Service,
+            IConfiguration configuration, 
+            ITokenService tokenService
+        )  : base(configuration, tokenService)
         {
             _mediaRepository = mediaRepository;
             _amazonS3Service = amazonS3Service;

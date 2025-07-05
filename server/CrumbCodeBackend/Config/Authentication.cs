@@ -47,6 +47,7 @@ namespace CrumbCodeBackend.Config
                     ValidateIssuer = true,
                     ValidIssuer = configuration["JWT:Issuer"],
                     ValidateAudience = true,
+                    ValidateLifetime = true,
                     ValidAudience = configuration["JWT:Audience"],
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
@@ -60,7 +61,7 @@ namespace CrumbCodeBackend.Config
         public static void AddIdentityService(this IServiceCollection services)
         {
             services.AddIdentity<AppUser, IdentityRole>(
-                options => 
+                options =>
                 {
                     options.User.RequireUniqueEmail = true;
                     options.Password.RequireDigit = true;
@@ -69,7 +70,9 @@ namespace CrumbCodeBackend.Config
                     options.Password.RequireNonAlphanumeric = true;
                     options.Password.RequiredLength = 8;
                 }
-            ).AddEntityFrameworkStores<ApplicationDbContext>();
+            )
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
 
         }
     }
