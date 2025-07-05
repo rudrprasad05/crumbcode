@@ -1,3 +1,7 @@
+"use client";
+
+import { GetAllCakeTypes } from "@/actions/CakeType";
+import LoadingContainer from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -13,16 +17,19 @@ import { cn } from "@/lib/utils";
 import { CakeType, CakeTypeColorClasses } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { columns } from "./columns";
+import { DataTable } from "./dataTable";
 
 interface ICakeTypesSection {
   data: CakeType[];
 }
 
-export default function CakeTypesSection({ data }: ICakeTypesSection) {
+export default function CakeTypesSection() {
   return (
     <div>
       <Header />
-      <HandleDataSection data={data} />
+      <HandleDataSection />
     </div>
   );
 }
@@ -84,19 +91,29 @@ function Header() {
   );
 }
 
-function HandleDataSection({ data }: ICakeTypesSection) {
+function HandleDataSection() {
+  const [data, setData] = useState<CakeType[]>([]);
+
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    const getData = async () => {
+      const cake = await GetAllCakeTypes();
+      setData(cake);
+
+      setLoading(false);
+    };
+    getData();
+  }, []);
+
+  if (loading) {
+    return <LoadingContainer />;
+  }
+
+  if (!data) {
+    return <>Invalid URL</>;
+  }
   if (data.length === 0) {
     return <NoDataContainer />;
   }
-  return (
-    <div>
-      {data.map((i) => (
-        <Badge
-          className={cn("text-white", CakeTypeColorClasses[i.color as string])}
-        >
-          {i.name}
-        </Badge>
-      ))}
-    </div>
-  );
+  return <DataTable columns={columns} data={data} />;
 }

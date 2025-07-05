@@ -1,6 +1,5 @@
 "use client";
 
-import NewMediaModal from "@/components/admin/media/NewMediaModal";
 import NewSocialDialog from "@/components/admin/socials/NewSocialDialog";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,8 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CloudUpload, Plus, Search } from "lucide-react";
-import Link from "next/link";
+import { CloudUpload, Search } from "lucide-react";
 
 export default function SocialPage() {
   return (
@@ -64,7 +62,7 @@ function Header() {
           </Select>
         </div>
 
-        <NewMediaModal>
+        <NewSocialDialog>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -73,7 +71,7 @@ function Header() {
             <CloudUpload />
             New
           </div>
-        </NewMediaModal>
+        </NewSocialDialog>
       </div>
     </>
   );

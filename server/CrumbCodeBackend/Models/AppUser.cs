@@ -8,6 +8,7 @@ namespace CrumbCodeBackend.Models
 {
     public class AppUser : IdentityUser
     {
+        public ICollection<Notification> Notifications { get; set; } = [];
         
     }
 }

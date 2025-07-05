@@ -1,15 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { MediaHeader } from "./media-header";
-import { MediaGrid } from "./media-grid";
-import { Media, NewMediaRequest } from "@/types";
-import { UploadOneFile } from "@/actions/Media";
-import { toast } from "sonner";
+import { Media } from "@/types";
 import { useRouter } from "next/navigation";
-import NewMediaModal from "./NewMediaModal";
-import { buttonVariants } from "@/components/ui/button";
-import { CloudUpload } from "lucide-react";
+import { useState } from "react";
+import { MediaGrid } from "./media-grid";
+import { MediaHeader } from "./media-header";
 
 export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
   const [mediaItems, setMediaItems] = useState<Media[]>(mediaItemsData);

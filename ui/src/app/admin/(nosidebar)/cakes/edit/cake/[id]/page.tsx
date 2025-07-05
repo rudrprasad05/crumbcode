@@ -2,11 +2,8 @@
 
 import { GetOneCake } from "@/actions/Cake";
 import CakeEditor from "@/components/admin/posts/create/cake/CakeEditor";
-import CakeTypeEditor from "@/components/admin/posts/create/caketype/CakeTypeEditor";
-import { CakeProvider } from "@/context/CakeContext";
 import { Cake } from "@/types";
 import { Loader2 } from "lucide-react";
-import { notFound, useParams, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function page({ params }: { params: { id: string } }) {

@@ -31,6 +31,12 @@ namespace CrumbCodeBackend.Data
             modelBuilder.UseCollation("utf8mb4_general_ci");
             modelBuilder.Entity<IdentityRole>().HasData(roles);
 
+            modelBuilder.Entity<Notification>()
+            .HasOne(n => n.User)
+            .WithMany(u => u.Notifications)
+            .HasForeignKey(n => n.UserId)
+            .OnDelete(DeleteBehavior.SetNull);
+
 
         }
         public DbSet<Cake> Cakes { get; set; }

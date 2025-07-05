@@ -15,6 +15,8 @@ import {
   Share2,
   MessageSquare,
   Database,
+  Tag,
+  Cake,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -25,9 +27,14 @@ const navigationItems = [
     icon: LayoutDashboard,
   },
   {
-    title: "Posts",
-    href: "/admin/posts",
-    icon: FileText,
+    title: "Cakes",
+    href: "/admin/cakes",
+    icon: Cake,
+  },
+  {
+    title: "Categories",
+    href: "/admin/categories",
+    icon: Tag,
   },
   {
     title: "Reviews",

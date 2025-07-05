@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CloudUpload, Filter, Search } from "lucide-react";
+import { Box, CloudUpload, Search } from "lucide-react";
 import NewMediaModal from "./NewMediaModal";
 
 interface MediaHeaderProps {
@@ -41,7 +41,7 @@ export function MediaHeader({
 
         <Select value={selectedType} onValueChange={onFilter}>
           <SelectTrigger className="w-40 bg-white border-gray-200">
-            <Filter className="h-4 w-4 mr-2" />
+            <Box className="h-4 w-4 mr-2" />
             <SelectValue />
           </SelectTrigger>
           <SelectContent className="bg-white">

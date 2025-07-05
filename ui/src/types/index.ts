@@ -38,6 +38,14 @@ export interface Media extends BaseModel {
   sizeInBytes: number;
 }
 
+export interface Notification extends BaseModel {
+  title: string;
+  message: string;
+  isRead: boolean;
+  type: "info" | "warning" | "error";
+  userId?: number;
+}
+
 export const CakeTypeColors = [
   "gray-600",
   "rose-600",

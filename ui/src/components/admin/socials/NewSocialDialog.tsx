@@ -72,9 +72,11 @@ export default function NewSocialDialog({
       <DialogTrigger>{children}</DialogTrigger>
       <DialogContent>
         <DialogHeader>
+
           <DialogTitle>Create a New Media Upload</DialogTitle>
           <DialogDescription>Upload a file to the cloud</DialogDescription>
         </DialogHeader>
+
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
           <div>

@@ -12,10 +12,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerServices();
-builder.Services.AddControllers();
 builder.Services.AddDatabaseContext(builder.Configuration);
-builder.Services.AddAuthentication(builder.Configuration);
 builder.Services.AddIdentityService();
+builder.Services.AddAuthentication(builder.Configuration);
+builder.Services.AddAuthorization();
+builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
 

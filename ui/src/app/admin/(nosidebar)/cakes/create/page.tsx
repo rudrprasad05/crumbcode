@@ -1,7 +1,7 @@
 "use client";
 
 import CakeEditor from "@/components/admin/posts/create/cake/CakeEditor";
-import CakeTypeEditor from "@/components/admin/posts/create/caketype/CakeTypeEditor";
+import CakeTypeEditor from "@/components/admin/posts/create/categories/CakeTypeEditor";
 import { CakeProvider } from "@/context/CakeContext";
 import { useSearchParams } from "next/navigation";
 
