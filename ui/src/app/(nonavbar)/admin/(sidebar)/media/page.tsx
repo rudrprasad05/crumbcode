@@ -3,6 +3,7 @@ import { MediaLibrary } from "@/components/admin/media/media-library";
 
 export default async function MediaPage() {
   const data = await GetMedia();
+  console.dir(data);
   return (
     <div className="space-y-6">
       <div>

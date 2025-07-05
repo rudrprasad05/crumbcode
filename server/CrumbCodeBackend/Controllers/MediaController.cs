@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 using Amazon.S3;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Mappers;
+using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +32,8 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpPost("create")]
+        [ProducesResponseType(typeof(GetOnlyMediaRes), 200)]
+
         public async Task<IActionResult> CreateMedia(
             [FromForm] string Url,
             [FromForm] string AltText,
@@ -81,10 +86,13 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpGet("get-all")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(List<Media>), 200)]
+        
         public async Task<IActionResult> GetAll([FromQuery] MediaQueryObject queryObject)
         {
             var media = await _mediaRepository.GetAll(queryObject);
-            if(media == null)
+            if (media == null)
             {
                 return BadRequest();
             }

@@ -19,9 +19,9 @@ builder.Services.AddAuthorization();
 builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
-builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddSingleton<IUserContextService, UserContextService>();
 
+builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();

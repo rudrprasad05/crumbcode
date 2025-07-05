@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 
 namespace CrumbCodeBackend.Service
@@ -15,10 +16,15 @@ namespace CrumbCodeBackend.Service
     {
         private readonly SymmetricSecurityKey _key;
         private readonly IConfiguration _config; 
-        public TokenService(IConfiguration config)
+        private readonly UserManager<AppUser> _userManager;
+        public TokenService(IConfiguration config, UserManager<AppUser> userManager)
         {
             _config = config;
-            _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JWT:SigningKey"] ?? throw new InvalidOperationException("No jwt signing key")));
+            _userManager = userManager;
+            _key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_config["JWT:SigningKey"] ??
+                throw new InvalidOperationException("No jwt signing key")
+            ));
         }
         public string CreateToken(AppUser user)
         {
@@ -29,6 +35,12 @@ namespace CrumbCodeBackend.Service
                 new(JwtRegisteredClaimNames.NameId, user.Id)
             };
 
+            var roles = _userManager.GetRolesAsync(user).Result;
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
+            
             var creds = new SigningCredentials(_key, SecurityAlgorithms.HmacSha512Signature);
             var tokenDescriptor = new SecurityTokenDescriptor
             {
@@ -40,7 +52,6 @@ namespace CrumbCodeBackend.Service
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
-
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);

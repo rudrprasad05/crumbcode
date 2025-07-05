@@ -23,13 +23,15 @@ export default function Header() {
             <Link href="/contact" className="text-gray-700 hover:text-rose-600">
               Contact
             </Link>
+            <Link
+              href="/auth/login"
+              className="text-gray-700 hover:text-rose-600"
+            >
+              Login
+            </Link>
           </div>
 
           <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <div className="flex items-center text-gray-700">
-              <Phone className="h-4 w-4 mr-2" />
-              <span>+679 999 9999</span>
-            </div>
             <Link
               href="/order"
               className="bg-rose-600 text-white px-4 py-2 rounded-md hover:bg-rose-700 transition-colors"

@@ -7,10 +7,14 @@ import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
 export async function GetMedia(token?: string): Promise<Media[]> {
-  const res = await axiosGlobal.get<Media[]>("media/get-all", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  return res.data;
+  try {
+    const res = await axiosGlobal.get<Media[]>("media/get-all");
+    console.dir(res);
+    return res.data;
+  } catch (error) {
+    console.dir(error);
+    return [];
+  }
 }
 
 export async function GetOneMedia(

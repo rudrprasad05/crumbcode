@@ -46,6 +46,14 @@ export interface Notification extends BaseModel {
   userId?: number;
 }
 
+export interface User {
+  username: string;
+  id: string;
+  email: string;
+  token: string;
+  role: "Admin" | "User";
+}
+
 export const CakeTypeColors = [
   "gray-600",
   "rose-600",

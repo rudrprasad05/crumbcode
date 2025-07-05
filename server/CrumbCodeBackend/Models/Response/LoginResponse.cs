@@ -9,12 +9,13 @@ namespace CrumbCodeBackend.Models.Response
     public class LoginResponse
     {
         [Required]
-        public string Username{get; set;} = string.Empty;
+        public string Username { get; set; } = string.Empty;
         [Required]
-        public string Id{get; set;} = string.Empty;
+        public string Id { get; set; } = string.Empty;
         [Required]
-        public string Email{get; set;} = string.Empty;
+        public string Email { get; set; } = string.Empty;
         [Required]
-        public string Token{get; set;} = string.Empty;
+        public string Token { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
     }
 }
