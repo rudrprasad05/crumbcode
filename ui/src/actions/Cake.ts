@@ -2,12 +2,23 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { FromModelToNewRequestDTO } from "@/mappers/CakeMapper";
-import { Cake } from "@/types";
+import { ApiResponse, Cake, MediaQueryObject } from "@/types";
+import { GetToken } from "./User";
+import { buildMediaQueryParams } from "@/lib/params";
 
-export async function GetAllCakes(token?: string): Promise<Cake[]> {
-  const res = await axiosGlobal.get<Cake[]>("cake/get-all", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function GetAllCakes(
+  query?: MediaQueryObject
+): Promise<ApiResponse<Cake[]>> {
+  const token = await GetToken();
+  const params = buildMediaQueryParams(query);
+
+  const res = await axiosGlobal.get<ApiResponse<Cake[]>>(
+    `cake/get-all?${params}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
   return res.data;
 }
 

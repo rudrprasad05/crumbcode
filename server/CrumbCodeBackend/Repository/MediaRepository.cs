@@ -8,6 +8,7 @@ using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Data;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
 
 namespace CrumbCodeBackend.Repository
 {
@@ -73,11 +74,15 @@ namespace CrumbCodeBackend.Repository
 
         }
 
-        public async Task<List<Media>?> GetAll(MediaQueryObject queryObject)
+        public async Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject)
         {
             var media = _context.Medias.AsQueryable();
+            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
 
-            var res = await media.ToListAsync();
+            var res = await media
+                .Skip(skip)
+                .Take(queryObject.PageSize)
+                .ToListAsync();
             var signedMedia = new List<Media>();
 
             foreach (var item in res)
@@ -88,7 +93,21 @@ namespace CrumbCodeBackend.Repository
                 signedMedia.Add(item);
             }
 
-            return signedMedia; 
+            var totalCount = await _context.Medias.CountAsync();
+
+            return new ApiResponse<List<Media>>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = signedMedia,
+                Meta = new MetaData
+                {
+                    TotalCount = totalCount,
+                    PageNumber = queryObject.PageNumber,
+                    PageSize = queryObject.PageSize
+                }
+            };
+
         }
 
         public async Task<Media?> MoveMedia(string uuid, string moveId, string? token)

@@ -1,7 +1,10 @@
 "use client";
 
 import { GetAllCakes } from "@/actions/Cake";
+import { GetMedia } from "@/actions/Media";
+import { LoadingCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
+import PaginationSection from "@/components/global/PaginationSection";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Cake, CakeType, CakeTypeColorClasses } from "@/types";
+import { Cake, CakeType, CakeTypeColorClasses, Media, MetaData } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -23,20 +26,47 @@ interface ICakeTypesSection {
 }
 
 export default function CakeSection() {
-  const [cakes, setCakes] = useState<Cake[]>([]);
+  const [cakeItems, setCakeItems] = useState<Cake[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [pagination, setPagination] = useState<MetaData>({
+    pageNumber: 1,
+    totalCount: 1,
+    pageSize: 8,
+    totalPages: 0,
+  });
 
   useEffect(() => {
-    const get = async () => {
-      const data = await GetAllCakes();
-      setCakes(data);
+    setCakeItems([]);
+    const getData = async () => {
+      const data = await GetAllCakes({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+      });
+
+      setCakeItems(data.data as Cake[]);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: Math.ceil(
+          (data.meta?.totalCount as number) / pagination.pageSize
+        ),
+      }));
+
+      setLoading(false);
     };
-    get();
-  }, []);
+    getData();
+  }, [pagination.pageNumber]);
 
   return (
     <div>
       <Header />
-      <HandleDataSection data={cakes} />
+      <HandleDataSection data={cakeItems} />
+      <div className="py-8">
+        <PaginationSection
+          pagination={pagination}
+          setPagination={setPagination}
+        />
+      </div>
     </div>
   );
 }
@@ -81,7 +111,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/posts/create?type=cake"}>
+        <Link href={"/admin/cakes/create?type=cake"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -98,7 +128,13 @@ function Header() {
 
 function HandleDataSection({ data }: ICakeTypesSection) {
   if (data.length === 0) {
-    return <NoDataContainer />;
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
+        {Array.from({ length: 8 }, (_, i) => (
+          <LoadingCard key={i} />
+        ))}
+      </div>
+    );
   }
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
@@ -122,7 +158,7 @@ function HandleDataSection({ data }: ICakeTypesSection) {
             </div>
             <p className="text-gray-600 mb-4">{i.description as string}</p>
             <Link
-              href={`/admin/posts/edit/cake/${i.uuid}`}
+              href={`/admin/cakes/edit/cake/${i.uuid}`}
               className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
             >
               Edit

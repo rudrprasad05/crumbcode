@@ -2,3 +2,4 @@
 - create allergenrs using sql for now
 - create ingredients using sql for now
 - in the context, i cant change the values. make it so its editable. same goes for media
+- was making user context. need to sort out roles

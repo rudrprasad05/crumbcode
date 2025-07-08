@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Image, Loader2, Trash, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { NewMediaFormSchema, NewMediaFormType } from "@/types/zod";
-import { UploadOneFile } from "@/actions/Media";
+import { GetOneMedia, UploadOneFile } from "@/actions/Media";
 import { cn } from "@/lib/utils";
 import { useCake } from "@/context/CakeContext";
 
@@ -50,7 +50,12 @@ export default function NewMediaForm() {
       formData.append("file", data.file);
 
       const res = await UploadOneFile(formData);
-      changeMedia(res);
+      const getMedia = await GetOneMedia(res.uuid);
+
+      console.log("res", res);
+      console.log("getMedia", getMedia);
+
+      changeMedia(getMedia);
 
       if (!res) throw new Error("Upload failed");
 

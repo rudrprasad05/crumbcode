@@ -1,22 +1,21 @@
+import { LoadingCard } from "@/components/global/LoadingContainer";
 import { Media } from "@/types";
 import { MediaCard } from "./media-card";
 
 interface MediaGridProps {
-  items: Media[];
+  items: Media[] | undefined;
   onDelete: (id: number) => void;
 }
 
 export function MediaGrid({ items, onDelete }: MediaGridProps) {
-  if (items.length === 0) {
+  if (items?.length === 0 || !items)
     return (
-      <div className="text-center py-12">
-        <div className="text-gray-400 text-lg mb-2">No media files found</div>
-        <div className="text-gray-500 text-sm">
-          Try adjusting your search or filter criteria
-        </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {Array.from({ length: 5 }, (_, i) => (
+          <LoadingCard />
+        ))}
       </div>
     );
-  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">

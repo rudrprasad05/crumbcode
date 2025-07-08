@@ -86,8 +86,7 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpGet("get-all")]
-        [Authorize(Roles = "Admin")]
-        [ProducesResponseType(typeof(List<Media>), 200)]
+        [ProducesResponseType(typeof(GetAllMediaResponse), 200)]
         
         public async Task<IActionResult> GetAll([FromQuery] MediaQueryObject queryObject)
         {
@@ -96,8 +95,8 @@ namespace CrumbCodeBackend.Controllers
             {
                 return BadRequest();
             }
-            var dtos = media.ToList();
-            return Ok(dtos);
+
+            return Ok(media);
         }
 
         [HttpPatch("edit/{id}")]

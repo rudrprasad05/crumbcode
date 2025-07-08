@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace CrumbCodeBackend.Models.Requests
 {
-    public class MediaQueryObject
+    public class CakeQueryObject
     {
-        public bool? IsStarred { get; set; } = null;
-        public bool? IsDeleted { get; set; } = false;
+
         private const int MaxPageSize = 100;
         private int _pageSize = 10;
         public int PageNumber { get; set; } = 1;

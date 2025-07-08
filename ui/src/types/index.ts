@@ -96,3 +96,25 @@ export interface NewMediaRequest {
   sizeInBytes: number;
   file: File; // This is the native browser File object for uploads
 }
+
+export interface MediaQueryObject {
+  pageNumber?: number;
+  pageSize?: number;
+}
+
+export interface MetaData {
+  pageSize: number;
+  totalCount: number;
+  pageNumber: number;
+  totalPages: number;
+}
+
+export interface ApiResponse<T> {
+  success: boolean; // True/false operation flag
+  statusCode: number; // HTTP status code
+  message?: string; // Human-readable message
+  data?: T; // Actual data payload
+  meta?: MetaData; // Extra metadata (pagination, etc.)
+  errors?: string[]; // For validation or server-side errors
+  timestamp: string; // ISO timestamp (e.g., "2025-07-05T10:00:00Z")
+}

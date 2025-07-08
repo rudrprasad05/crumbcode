@@ -1,14 +1,14 @@
 "use client";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { GetMedia } from "@/actions/Media";
+import NewMediaForm from "@/components/admin/media/NewMediaForm";
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
-import LoadingContainer from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
+import PaginationSection from "@/components/global/PaginationSection";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -22,18 +22,17 @@ import {
 } from "@/components/ui/resizable";
 import { SidebarHeader } from "@/components/ui/sidebar";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { CakeProvider, useCake } from "@/context/CakeContext";
-import { axiosGlobal } from "@/lib/axios";
 import { cn } from "@/lib/utils";
-import { Cake, Media } from "@/types";
+import { Cake, Media, MetaData } from "@/types";
 import { ArrowLeft, Check, CloudOff, CloudUpload } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import CakeCardCreation from "./CakeCardCreation";
-import NewMediaForm from "@/components/admin/media/NewMediaForm";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function CakeEditor({ cake }: { cake?: Cake }) {
   return (
@@ -188,29 +187,9 @@ function SideBar() {
 function MediaSelectDialog() {
   const { changeMedia, cake } = useCake();
   const [open, setOpen] = useState(false);
-  const [mediaItems, setMediaItems] = useState<Media[]>([]);
   const [selectedMedia, setSelectedMedia] = useState<Media>(
     cake.media as Media
   );
-  const [isLoading, setisLoading] = useState(true);
-  const [isImageLoading, setIsImageLoading] = useState<boolean[]>([]);
-
-  useEffect(() => {
-    const fetchMedia = async () => {
-      setisLoading(true);
-      try {
-        const res = await axiosGlobal.get("/media/get-all");
-        setMediaItems(res.data);
-        setisLoading(false);
-        setIsImageLoading(Array(res.data.length).fill(true));
-      } catch {
-        toast.error("Failed to fetch media");
-        setisLoading(false);
-      }
-    };
-
-    if (open) fetchMedia();
-  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -224,58 +203,13 @@ function MediaSelectDialog() {
             Chose an appropriate media for your cake
           </DialogDescription>
         </DialogHeader>
-        <Tabs defaultValue="account" className="w-[400px]">
+        <Tabs defaultValue="account" className="w-full">
           <TabsList>
             <TabsTrigger value="Select">Select</TabsTrigger>
             <TabsTrigger value="Upload">Upload</TabsTrigger>
           </TabsList>
-          <TabsContent value="Select">
-            <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-visible">
-              {mediaItems.map((media, index) => (
-                <div
-                  onClick={() => {
-                    changeMedia(media);
-                    setOpen(false);
-                  }}
-                  key={media.uuid}
-                  className={cn(
-                    "relative overflow-visible border rounded hover:ring-2 ring-primary transition cursor-pointer"
-                  )}
-                >
-                  {cake.media?.objectKey == media.objectKey && (
-                    <div className="bg-blue-500 rounded-full p-0.5 absolute top-[-5px] right-[-5px] z-10">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                  )}
-                  <div className="relative w-full h-32">
-                    {isImageLoading[index] && (
-                      <div className="absolute inset-0 bg-gray-300 animate-pulse rounded" />
-                    )}
-
-                    <Image
-                      src={media.url || "/placeholder.svg"}
-                      alt={media.fileName}
-                      fill
-                      className={`object-cover transition-opacity duration-500 ${
-                        isImageLoading[index] ? "opacity-0" : "opacity-100"
-                      }`}
-                      onLoad={() =>
-                        setIsImageLoading((prev) => {
-                          const updated = [...prev];
-                          updated[index] = false;
-                          return updated;
-                        })
-                      }
-                    />
-                  </div>
-                  <p className="text-xs truncate p-1 text-center">
-                    {media.fileName}
-                  </p>
-                </div>
-              ))}
-              {mediaItems.length === 0 && !isLoading && <NoDataContainer />}
-              {mediaItems.length === 0 && isLoading && <LoadingContainer />}
-            </div>
+          <TabsContent value="Select" className="w-full">
+            <MediaListTab open={open} setOpen={setOpen} />
           </TabsContent>
           <TabsContent value="Upload">
             <NewMediaForm />
@@ -283,5 +217,120 @@ function MediaSelectDialog() {
         </Tabs>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function MediaListTab({
+  open,
+  setOpen,
+}: {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}) {
+  const { changeMedia, cake } = useCake();
+  const [isImageLoading, setIsImageLoading] = useState<boolean[]>([]);
+  const [mediaItems, setMediaItems] = useState<Media[]>([]);
+  const [isLoading, setisLoading] = useState(true);
+
+  const [pagination, setPagination] = useState<MetaData>({
+    pageNumber: 1,
+    totalCount: 1,
+    pageSize: 6,
+    totalPages: 0,
+  });
+
+  useEffect(() => {
+    setMediaItems([]);
+    const getData = async () => {
+      const data = await GetMedia({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+      });
+
+      console.log(data);
+
+      setMediaItems(data.data as Media[]);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: Math.ceil(
+          (data.meta?.totalCount as number) / pagination.pageSize
+        ),
+      }));
+
+      setisLoading(false);
+    };
+    if (open) getData();
+  }, [open, pagination.pageNumber]);
+
+  if (mediaItems.length === 0) {
+    return (
+      <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-visible w-full">
+        {Array.from({ length: 6 }, (_, i) => (
+          <LoadingCard />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-visible w-full">
+      {mediaItems.map((media, index) => (
+        <div
+          onClick={() => {
+            changeMedia(media);
+            setOpen(false);
+          }}
+          key={media.uuid}
+          className={cn(
+            "relative overflow-visible border rounded hover:ring-2 ring-primary transition cursor-pointer"
+          )}
+        >
+          {cake.media?.objectKey == media.objectKey && (
+            <div className="bg-blue-500 rounded-full p-0.5 absolute top-[-5px] right-[-5px] z-10">
+              <Check className="w-4 h-4 text-white" />
+            </div>
+          )}
+          <div className="relative w-full h-32">
+            {isImageLoading[index] && (
+              <div className="absolute inset-0 bg-gray-300 animate-pulse rounded" />
+            )}
+
+            <Image
+              width={50}
+              height={50}
+              src={media.url || "/placeholder.svg"}
+              alt={media.fileName}
+              className={`object-cover h-full w-full transition-opacity duration-500 ${
+                isImageLoading[index] ? "opacity-0" : "opacity-100"
+              }`}
+              onLoad={() =>
+                setIsImageLoading((prev) => {
+                  const updated = [...prev];
+                  updated[index] = false;
+                  return updated;
+                })
+              }
+            />
+          </div>
+          <p className="text-xs truncate p-1 text-center">{media.fileName}</p>
+        </div>
+      ))}
+
+      <PaginationSection
+        pagination={pagination}
+        setPagination={setPagination}
+      />
+    </div>
+  );
+}
+
+function LoadingCard() {
+  return (
+    <div className="flex flex-col space-y-3  bg-gray-100 rounded-lg">
+      <Skeleton className="h-full aspect-square w-full rounded-t-xl rounded-b-none bg-gray-300" />
+      <div className="space-y-2 p-2">
+        <Skeleton className="h-4 w-full  bg-gray-300" />
+      </div>
+    </div>
   );
 }

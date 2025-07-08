@@ -1,66 +1,68 @@
 "use client";
 
-import { Media } from "@/types";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { GetMedia } from "@/actions/Media";
+import { Media, MetaData } from "@/types";
+import { useEffect, useState } from "react";
 import { MediaGrid } from "./media-grid";
 import { MediaHeader } from "./media-header";
+import { useRouter } from "next/navigation";
 
-export function MediaLibrary({ mediaItemsData }: { mediaItemsData: Media[] }) {
-  const [mediaItems, setMediaItems] = useState<Media[]>(mediaItemsData);
-  const [filteredItems, setFilteredItems] = useState<Media[]>(mediaItemsData);
+import { cn } from "@/lib/utils";
+import PaginationSection from "@/components/global/PaginationSection";
+
+export function MediaLibrary() {
+  const [mediaItems, setMediaItems] = useState<Media[]>([]);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedType, setSelectedType] = useState<string>("all");
+  const [loading, setLoading] = useState(true);
 
   const router = useRouter();
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    filterItems(query, selectedType);
-  };
+  const [pagination, setPagination] = useState<MetaData>({
+    pageNumber: 1,
+    totalCount: 1,
+    pageSize: 5,
+    totalPages: 0,
+  });
 
-  const handleTypeFilter = (type: string) => {
-    setSelectedType(type);
-    filterItems(searchQuery, type);
-  };
+  useEffect(() => {
+    setMediaItems([]);
+    const getData = async () => {
+      const data = await GetMedia({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+      });
 
-  const filterItems = (query: string, type: string) => {
-    let filtered = mediaItems;
+      setMediaItems(data.data as Media[]);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: Math.ceil(
+          (data.meta?.totalCount as number) / pagination.pageSize
+        ),
+      }));
 
-    if (query) {
-      filtered = filtered.filter(
-        (item) =>
-          item.fileName.toLowerCase().includes(query.toLowerCase()) ||
-          item.altText?.toLowerCase().includes(query.toLowerCase()) ||
-          item.contentType?.toLowerCase().includes(query.toLowerCase())
-      );
-    }
-
-    if (type !== "all") {
-      filtered = filtered.filter((item) => item.contentType === type);
-    }
-
-    setFilteredItems(filtered);
-  };
+      setLoading(false);
+    };
+    getData();
+  }, [pagination.pageNumber]);
 
   const handleDelete = (id: number) => {
     const updatedItems = mediaItems.filter((item) => item.id !== id);
     setMediaItems(updatedItems);
-    filterItems(searchQuery, selectedType);
   };
 
   return (
     <div className="space-y-6">
       <MediaHeader
         onUpload={() => setIsUploadModalOpen(true)}
-        onSearch={handleSearch}
-        onFilter={handleTypeFilter}
-        selectedType={selectedType}
-        totalItems={filteredItems.length}
+        totalItems={mediaItems?.length || 0}
       />
 
-      <MediaGrid items={filteredItems} onDelete={handleDelete} />
+      <MediaGrid items={mediaItems} onDelete={handleDelete} />
+
+      <PaginationSection
+        pagination={pagination}
+        setPagination={setPagination}
+      />
     </div>
   );
 }

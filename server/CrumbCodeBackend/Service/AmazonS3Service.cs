@@ -19,7 +19,7 @@ namespace CrumbCodeBackend.Service
         public AmazonS3Service(IConfiguration configuration)
         {
             // Initialize the S3 client
-            var awsOptions = configuration.GetSection("MINIO2");
+            var awsOptions = configuration.GetSection("MINIO");
             var accessKey = awsOptions["AccessKey"];
             var secretKey = awsOptions["SecretKey"];
             var region = RegionEndpoint.GetBySystemName(awsOptions["Region"]);

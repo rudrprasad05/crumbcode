@@ -36,13 +36,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // 🔹 Load session from cookies on mount
   useEffect(() => {
     checkAuth();
+    console.log("user", user);
   }, [pathname, searchParams, router]);
 
-  const helperHandleRedirectAfterLogin = (tmp?: User) => {
-    if (!tmp) {
-      router.push(redirect || "/");
-      return;
-    }
+  const helperHandleRedirectAfterLogin = (tmp: User) => {
+    // if (!tmp) {
+    //   router.push(redirect || "/");
+    //   return;
+    // }
     setUser(tmp);
     toast.success("Successfully logged in", {
       description: "Redirecting shortly",
@@ -109,8 +110,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem("token");
     setUser(null);
 
-    unAuth && toast.error("403 Unauthorised");
-
     toast.info("Logging out");
     router.push("/");
   };
@@ -121,10 +120,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let tempUser: User;
     console.log("trigger 1");
 
-    if (token && isAdmin && token?.length > 0) {
-      console.log("trigger 2");
+    try {
       let res = await axiosGlobal.get<LoginResponse>("auth/me");
-
       tempUser = {
         id: res.data.id,
         username: res.data.username,
@@ -132,12 +129,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token: res.data.token,
         role: res.data.role,
       };
-    } else {
-      logout(true);
-      return;
+    } catch (error) {
+      console.log(error);
     }
-    setIsLoading(false);
-    helperHandleRedirectAfterLogin(tempUser);
   };
 
   return (

@@ -37,7 +37,7 @@ export default function NewPostModal({
 
   function handleClick() {
     if (!selectedType) setSelectedTypeError("Select type first");
-    else router.push("/admin/posts/create?type=" + selectedType);
+    else router.push("/admin/cakes/create?type=" + selectedType);
   }
 
   return (

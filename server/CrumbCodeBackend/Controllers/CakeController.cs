@@ -7,6 +7,8 @@ using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models;
+using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using static CrumbCodeBackend.Models.Requests.CakeRequestObject;
@@ -30,13 +32,20 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpGet("get-all")]
-        public async Task<IActionResult> GetAll()
+        [ProducesResponseType(typeof(GetAllCakeReponse), 200)]
+        public async Task<IActionResult> GetAll([FromQuery] CakeQueryObject queryObject)
         {
-            var model = await _cakeRepository.GetAllAsync();
+            var model = await _cakeRepository.GetAllAsync(queryObject);
 
             if (model == null)
             {
-                return BadRequest("model not created");
+                return BadRequest(new ApiResponse<List<CakeDto>>
+                    {
+                        Success = false,
+                        StatusCode = 400,
+                        
+                    }
+                );
             }
 
             return Ok(model);

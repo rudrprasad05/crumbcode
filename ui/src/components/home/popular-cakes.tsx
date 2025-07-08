@@ -4,7 +4,7 @@ import { GetAllCakes } from "@/actions/Cake";
 import { Cake } from "@/types";
 import { useEffect, useState } from "react";
 import ErrorContainer from "../global/ErrorContainer";
-import LoadingContainer from "../global/LoadingContainer";
+import { LoadingContainer } from "../global/LoadingContainer";
 import CakeCard from "./cake-card";
 
 export default function PopularCakes() {

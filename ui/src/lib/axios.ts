@@ -1,5 +1,6 @@
 import axios from "axios";
 import http from "https";
+import { destroyCookie } from "nookies";
 
 const agent = new http.Agent({
   rejectUnauthorized: false,
@@ -14,3 +15,42 @@ export const axiosGlobal = axios.create({
   },
   withCredentials: true,
 });
+
+axiosGlobal.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = localStorage.getItem("token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
+// axiosGlobal.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     const status = error?.response?.status;
+//     console.log("axios interceptop");
+//     console.dir(error);
+
+//     if (status === 401 || status === 403) {
+//       console.log("axios interceptop inside");
+
+//       // Remove token cookie or localStorage
+//       destroyCookie(null, "token");
+
+//       if (typeof window !== "undefined") {
+//         localStorage.removeItem("token");
+
+//         // Redirect to login or home
+//         window.location.href = "/";
+//       }
+
+//       // Optional: reject with meaningful message
+//       return Promise.reject("Unauthorized - Logged out");
+//     }
+
+//     // For other errors, just forward them
+//     return Promise.reject(error);
+//   }
+// );

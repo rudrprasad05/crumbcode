@@ -170,7 +170,6 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpGet("me")]
-        [Authorize] // Requires Authentication
         public async Task<IActionResult> GetCurrentUser()
         {
             try

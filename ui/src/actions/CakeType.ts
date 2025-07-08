@@ -7,9 +7,7 @@ import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
 export async function GetAllCakeTypes(token?: string): Promise<CakeType[]> {
-  const res = await axiosGlobal.get<CakeType[]>("caketype/get-all", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axiosGlobal.get<CakeType[]>("caketype/get-all");
   return res.data;
 }
 
@@ -28,10 +26,7 @@ export async function GetStarMedia() {
     return redirect("/");
   }
   const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsStarred=true",
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    "media/get-all?IsStarred=true"
   );
 
   return res.data;
@@ -42,9 +37,7 @@ export async function SumMedia() {
   if (!token) {
     return redirect("/");
   }
-  const res = await axiosGlobal.get<number>("media/sum", {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axiosGlobal.get<number>("media/sum");
 
   return res.data;
 }
@@ -55,10 +48,7 @@ export async function GetDeleted() {
     return redirect("/");
   }
   const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsDeleted=true",
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    "media/get-all?IsDeleted=true"
   );
 
   return res.data;
@@ -77,12 +67,7 @@ export async function DeleteMedia(id: string) {
   if (!token) {
     return redirect("/");
   }
-  const res = await axiosGlobal.delete<Partial<Media>[]>(
-    "media/recycle/" + id,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  const res = await axiosGlobal.delete<Partial<Media>[]>("media/recycle/" + id);
 
   return res.data;
 }
@@ -92,9 +77,7 @@ export async function DeleteForever(id: string) {
   //   if (!token) {
   //     return redirect("/");
   //   }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id);
 
   return res.data;
 }
@@ -106,9 +89,7 @@ export async function GetOne(id: string): Promise<Partial<Media>> {
     if (!token || token == "" || token == undefined) {
       return redirect("/errors/403");
     }
-    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id);
 
     return res.data;
   } catch (error) {

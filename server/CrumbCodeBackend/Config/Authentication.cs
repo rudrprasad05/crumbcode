@@ -52,7 +52,8 @@ namespace CrumbCodeBackend.Config
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(
                         System.Text.Encoding.UTF8.GetBytes(configuration["JWT:SigningKey"] ?? throw new InvalidOperationException())
-                    )
+                    ),
+                    RoleClaimType = ClaimTypes.Role
                 };
             });
         }

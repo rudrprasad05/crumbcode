@@ -1,9 +1,11 @@
 "use client";
 
 import { GetAllCakeTypes } from "@/actions/CakeType";
-import LoadingContainer from "@/components/global/LoadingContainer";
+import {
+  LoadingContainer,
+  TableSkeleton,
+} from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,8 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { CakeType, CakeTypeColorClasses } from "@/types";
+import { CakeType } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -76,7 +77,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/posts/create?type=category"}>
+        <Link href={"/admin/category/create"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -93,8 +94,8 @@ function Header() {
 
 function HandleDataSection() {
   const [data, setData] = useState<CakeType[]>([]);
-
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const getData = async () => {
       const cake = await GetAllCakeTypes();
@@ -106,7 +107,7 @@ function HandleDataSection() {
   }, []);
 
   if (loading) {
-    return <LoadingContainer />;
+    return <TableSkeleton columns={3} rows={8} showHeader />;
   }
 
   if (!data) {

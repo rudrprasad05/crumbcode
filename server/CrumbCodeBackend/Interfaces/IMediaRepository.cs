@@ -4,13 +4,14 @@ using System.Linq;
 using System.Threading.Tasks;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
 
 namespace CrumbCodeBackend.Interfaces
 {
     public interface IMediaRepository
     {
         public Task<Media?> CreateAsync(NewMediaRequest newMediaObject);
-        public Task<List<Media>?> GetAll(MediaQueryObject queryObject);
+        public Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject);
         public Task<Media?> Star(string uuid, bool star, string? token);
         public Task<Media?> Edit(string uuid, EditMediaRequest request);
         public Task<Media?> MoveMedia(string uuid, string moveId, string? token);

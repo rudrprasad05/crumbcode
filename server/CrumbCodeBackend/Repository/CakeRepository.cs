@@ -6,6 +6,8 @@ using CrumbCodeBackend.Data;
 using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Models;
+using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
 using Microsoft.EntityFrameworkCore;
 
 namespace CrumbCodeBackend.Repository
@@ -56,15 +58,20 @@ namespace CrumbCodeBackend.Repository
             return cake;
         }
 
-        public async Task<List<CakeDto>> GetAllAsync()
+        public async Task<ApiResponse<List<CakeDto>>> GetAllAsync(CakeQueryObject queryObject)
         {
-            var cakes = await _context.Cakes
-            .Include(c => c.Media)
-            .ToListAsync();
+            var cakes = _context.Cakes.AsQueryable();
+            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
+
+            var res = await cakes
+                .Include(c => c.Media)
+                .Skip(skip)
+                .Take(queryObject.PageSize)
+                .ToListAsync();
 
             var result = new List<CakeDto>();
 
-            foreach (var cake in cakes)
+            foreach (var cake in res)
             {
                 var media = cake.Media;
 
@@ -97,7 +104,20 @@ namespace CrumbCodeBackend.Repository
                 });
             }
 
-            return result;
+            var totalCount = await _context.Cakes.CountAsync();
+
+            return new ApiResponse<List<CakeDto>>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = result,
+                Meta = new MetaData
+                {
+                    TotalCount = totalCount,
+                    PageNumber = queryObject.PageNumber,
+                    PageSize = queryObject.PageSize
+                }
+            };
         }
 
         public async Task<CakeDto?> GetOneAsync(string uuid)
