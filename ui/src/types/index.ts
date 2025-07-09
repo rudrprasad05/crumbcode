@@ -23,6 +23,11 @@ export interface Cake extends BaseModel {
   //   allergens: Allergen[];
 }
 
+export interface IconType {
+  name: string;
+  Icon: any;
+}
+
 export interface CakeType extends BaseModel {
   name: string;
   color: string;
