@@ -6,6 +6,8 @@ using CrumbCodeBackend.Data;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models;
+using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
 using Microsoft.EntityFrameworkCore;
 using static CrumbCodeBackend.Models.Requests.CakeTypeRequestObject;
 
@@ -32,14 +34,77 @@ namespace CrumbCodeBackend.Repository
             return model;
         }
 
-        public async Task<List<CakeType>> GetAllAsync()
+        public async Task<ApiResponse<CakeType>> DeleteAsync(string uuid)
+        {
+            var ct = await GetOne(uuid);
+            var model = ct.Data;
+            if (model == null)
+            {
+                return new ApiResponse<CakeType>
+                {
+                    Success = false,
+                    StatusCode = 400
+                };
+            }
+
+            _context.CakeTypes.Remove(model);
+            await _context.SaveChangesAsync();
+
+            return new ApiResponse<CakeType>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = model
+            };
+        }
+        
+        public async Task<ApiResponse<CakeType>> GetOne(string uuid)
+        {
+            var modelQ = _context.CakeTypes.AsQueryable();
+            var model = await modelQ.FirstOrDefaultAsync(m => m.UUID == uuid);
+            
+            if (model == null)
+            {
+                return new ApiResponse<CakeType>
+                {
+                    Success = true,
+                    StatusCode = 400
+                };
+            }
+
+            return new ApiResponse<CakeType>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = model
+            };
+        }
+
+        public async Task<ApiResponse<List<CakeType>>> GetAllAsync(MediaQueryObject queryObject)
         {
 
-            var data = _context.CakeTypes.AsQueryable();
+            var media = _context.CakeTypes.AsQueryable();
+            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
 
-            var res = await data.ToListAsync();
+            var res = await media
+                .Skip(skip)
+                .Take(queryObject.PageSize)
+                .ToListAsync();
 
-            return res; 
+            var totalCount = await _context.CakeTypes.CountAsync();
+
+            return new ApiResponse<List<CakeType>>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = res,
+                Meta = new MetaData
+                {
+                    TotalCount = totalCount,
+                    PageNumber = queryObject.PageNumber,
+                    PageSize = queryObject.PageSize
+                }
+            };
         }
     }
 }

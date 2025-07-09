@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Models;
 using static CrumbCodeBackend.Models.Requests.CakeRequestObject;
 
@@ -21,6 +22,20 @@ namespace CrumbCodeBackend.Mappers
                 Price = request.Price,
                 MediaId = request.MediaId,
                 CakeTypeId = request.CakeTypeId,
+            };
+        }
+
+        public static CakeDto FromModelToDto(this Cake cake)
+        {
+            ArgumentNullException.ThrowIfNull(cake);
+            return new CakeDto
+            {
+                Name = cake.Name,
+                Description = cake.Description,
+                IsAvailable = cake.IsAvailable,
+                Price = cake.Price,
+                Media = cake.Media?.FromModelToDTO(),
+                CakeType = cake.CakeType?.FromModelToDto(),
             };
         }
     }

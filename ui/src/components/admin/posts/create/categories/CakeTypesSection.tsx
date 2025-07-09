@@ -1,10 +1,7 @@
 "use client";
 
 import { GetAllCakeTypes } from "@/actions/CakeType";
-import {
-  LoadingContainer,
-  TableSkeleton,
-} from "@/components/global/LoadingContainer";
+import { TableSkeleton } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,23 +12,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CakeType } from "@/types";
+import { CakeTypeProvider, useCakeType } from "@/context/CakeTypeContext";
+import { CakeType, MetaData } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { columns } from "./columns";
 import { DataTable } from "./dataTable";
-
-interface ICakeTypesSection {
-  data: CakeType[];
-}
+import PaginationSection from "@/components/global/PaginationSection";
 
 export default function CakeTypesSection() {
   return (
-    <div>
+    <CakeTypeProvider>
       <Header />
       <HandleDataSection />
-    </div>
+    </CakeTypeProvider>
   );
 }
 
@@ -93,28 +89,53 @@ function Header() {
 }
 
 function HandleDataSection() {
-  const [data, setData] = useState<CakeType[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const router = useRouter();
+  const { list, setList } = useCakeType();
+  const [pagination, setPagination] = useState<MetaData>({
+    pageNumber: 1,
+    totalCount: 1,
+    pageSize: 10,
+    totalPages: 0,
+  });
   useEffect(() => {
     const getData = async () => {
-      const cake = await GetAllCakeTypes();
-      setData(cake);
+      const res = await GetAllCakeTypes({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+      });
+      setList(res.data || []);
+      setPagination((prev) => ({
+        ...prev,
+        totalPages: Math.ceil(
+          (res.meta?.totalCount as number) / pagination.pageSize
+        ),
+      }));
 
       setLoading(false);
     };
     getData();
-  }, []);
+  }, [router, pagination.pageNumber]);
 
   if (loading) {
     return <TableSkeleton columns={3} rows={8} showHeader />;
   }
 
-  if (!data) {
+  if (!list) {
     return <>Invalid URL</>;
   }
-  if (data.length === 0) {
+  if (list.length === 0) {
     return <NoDataContainer />;
   }
-  return <DataTable columns={columns} data={data} />;
+  return (
+    <>
+      <DataTable columns={columns} data={list as CakeType[]} />
+      <div className="py-8">
+        <PaginationSection
+          pagination={pagination}
+          setPagination={setPagination}
+        />
+      </div>
+    </>
+  );
 }

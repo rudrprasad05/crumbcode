@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Response;
 
@@ -22,6 +23,21 @@ namespace CrumbCodeBackend.Mappers
                 UUID = request.UUID,
                 Url = request.Url,
                 CreatedOn = request.CreatedOn,
+            };
+        }
+
+        public static MediaDto FromModelToDTO(this Media request)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+            return new MediaDto
+            {
+                Id = request.Id,
+                AltText = request.AltText,
+                FileName = request.FileName,
+                ContentType = request.ContentType,
+                SizeInBytes = request.SizeInBytes,
+                UUID = request.UUID,
+                Url = request.Url,
             };
         }
     }

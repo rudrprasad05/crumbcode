@@ -93,7 +93,12 @@ namespace CrumbCodeBackend.Controllers
             var media = await _mediaRepository.GetAll(queryObject);
             if (media == null)
             {
-                return BadRequest();
+                return BadRequest(new ApiResponse<List<CakeType>>
+                    {
+                        Success = false,
+                        StatusCode = 400,   
+                    }
+                );
             }
 
             return Ok(media);

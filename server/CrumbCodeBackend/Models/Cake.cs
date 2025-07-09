@@ -20,8 +20,8 @@ namespace CrumbCodeBackend.Models
         // fk
         public int? MediaId { get; set; }   // FK to Media (nullable)
         public Media? Media { get; set; }
-        public int CakeTypeId { get; set; }
-        public CakeType CakeType { get; set; } = new CakeType();
+        public int? CakeTypeId { get; set; }
+        public CakeType? CakeType { get; set; }
         public ICollection<Allergen> Allergens { get; set; } = [];
     }
 }

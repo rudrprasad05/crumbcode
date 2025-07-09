@@ -1,4 +1,4 @@
-import { Cake, Media } from "@/types";
+import { Cake, CakeType, Media } from "@/types";
 import React, {
   createContext,
   useContext,
@@ -10,6 +10,7 @@ import React, {
 import hash from "object-hash";
 import { SaveCake } from "@/actions/Cake";
 import { toast } from "sonner";
+import { GetAllCakeTypes } from "@/actions/CakeType";
 
 let defaultMedia: Partial<Media> = {
   url: "/default-img.jpeg",
@@ -39,6 +40,7 @@ let defaultCakeData: Partial<Cake> = {
 // Create context
 const CakeContext = createContext<{
   cake: Partial<Cake>;
+  cakeTypes: Partial<CakeType[]> | undefined;
   setInitialCakeState: (cake: Partial<Cake>) => void;
   changeMedia: (media: Media) => void;
   updateCakeValues: <K extends keyof Cake>(key: K, value: Cake[K]) => void;
@@ -47,6 +49,7 @@ const CakeContext = createContext<{
   setHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   cake: defaultCakeData,
+  cakeTypes: undefined,
   setInitialCakeState: (cake: Partial<Cake>) => {},
   changeMedia: (media: Media) => {},
   updateCakeValues: () => {},
@@ -58,8 +61,19 @@ const CakeContext = createContext<{
 // Provider
 export const CakeProvider = ({ children }: { children: ReactNode }) => {
   const [cake, setCake] = useState<Partial<Cake>>(defaultCakeData);
+  const [cakeTypes, setCakeTypes] = useState<Partial<CakeType[]> | undefined>(
+    undefined
+  );
   const [hasChanged, setHasChanged] = useState(false);
   const initialHashRef = useRef<string>(null);
+
+  useEffect(() => {
+    const getData = async () => {
+      const res = await GetAllCakeTypes();
+      setCakeTypes(res.data || []);
+    };
+    getData();
+  }, []);
 
   useEffect(() => {
     const currentHash = hash(cake);
@@ -92,6 +106,10 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   async function saveCakeContext() {
     initialHashRef.current = hash(cake);
     setHasChanged(false);
+    cake.cakeTypeId = cake.cakeType?.id;
+    cake.mediaId = cake.media?.id;
+    console.dir(cake);
+    // return;
     await SaveCake(cake, cake.uuid);
     toast.success("Saved successfully");
   }
@@ -100,6 +118,7 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
     <CakeContext.Provider
       value={{
         cake,
+        cakeTypes,
         setInitialCakeState,
         updateCakeValues,
         saveCakeContext,

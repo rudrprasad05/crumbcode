@@ -12,9 +12,10 @@ namespace CrumbCodeBackend.DTO
         public bool IsAvailable { get; set; } = true;
         public string Description { get; set; } = string.Empty;
         public decimal Price { get; set; }
-        public int CakeTypeId { get; set; }
+
         public string UUID { get; set; } = string.Empty;
         public MediaDto? Media { get; set; }
+        public CakeTypeDto? CakeType { get; set; }
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn {get; set;} = DateTime.Now;
     }

@@ -1,8 +1,15 @@
 "use client";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import { GetMedia } from "@/actions/Media";
 import NewMediaForm from "@/components/admin/media/NewMediaForm";
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
-import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
 import { Button } from "@/components/ui/button";
 import {
@@ -21,18 +28,19 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { SidebarHeader } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { CakeProvider, useCake } from "@/context/CakeContext";
 import { cn } from "@/lib/utils";
-import { Cake, Media, MetaData } from "@/types";
-import { ArrowLeft, Check, CloudOff, CloudUpload } from "lucide-react";
+import { Cake, CakeType, Media, MetaData } from "@/types";
+import { ArrowLeft, Check, CloudOff, CloudUpload, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import CakeCardCreation from "./CakeCardCreation";
-import { Skeleton } from "@/components/ui/skeleton";
+import { stringify } from "qs";
 
 export default function CakeEditor({ cake }: { cake?: Cake }) {
   return (
@@ -109,7 +117,7 @@ function Header() {
 }
 
 function SideBar() {
-  const { cake, changeMedia, updateCakeValues } = useCake();
+  const { cake, cakeTypes, updateCakeValues } = useCake();
   const [isMediaImageLoaded, setIsMediaImageLoaded] = useState(true);
 
   return (
@@ -135,6 +143,38 @@ function SideBar() {
               value={cake.description ?? ""}
               onChange={(e) => updateCakeValues("description", e.target.value)}
             />
+          </div>
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="Category">Category</Label>
+            <Select
+              value={(cake.cakeType?.id as unknown as string) ?? ""}
+              onValueChange={(val) => {
+                const selectedType = cakeTypes?.find(
+                  (ct) => (ct?.id as unknown as string) === val
+                );
+                updateCakeValues("cakeType", selectedType as CakeType);
+              }}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a cake category" />
+              </SelectTrigger>
+              <SelectContent>
+                {!cakeTypes && (
+                  <div className="flex gap-2 justify-center items-center text-sm">
+                    Loading <Loader2 className="animate-spin" />
+                  </div>
+                )}
+                {cakeTypes?.length == 0 && <>No dats</>}
+                {cakeTypes?.map((type) => (
+                  <SelectItem
+                    key={type?.id}
+                    value={type?.id as unknown as string}
+                  >
+                    {type?.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex flex-col gap-2">
@@ -227,7 +267,7 @@ function MediaListTab({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) {
-  const { changeMedia, cake } = useCake();
+  const { changeMedia, cake, cakeTypes } = useCake();
   const [isImageLoading, setIsImageLoading] = useState<boolean[]>([]);
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
   const [isLoading, setisLoading] = useState(true);

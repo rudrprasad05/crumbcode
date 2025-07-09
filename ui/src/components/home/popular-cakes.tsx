@@ -16,7 +16,7 @@ export default function PopularCakes() {
     const getData = async () => {
       try {
         const data = await GetAllCakes();
-        setcakes(data);
+        setcakes(data.data as Cake[]);
         seterror(null);
         setIsLoading(false);
       } catch (error: any) {

@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 
 interface ICakeTypesSection {
   data: Cake[];
+  isLoading: boolean;
 }
 
 export default function CakeSection() {
@@ -31,7 +32,7 @@ export default function CakeSection() {
 
   const [pagination, setPagination] = useState<MetaData>({
     pageNumber: 1,
-    totalCount: 1,
+    totalCount: 0,
     pageSize: 8,
     totalPages: 0,
   });
@@ -60,7 +61,7 @@ export default function CakeSection() {
   return (
     <div>
       <Header />
-      <HandleDataSection data={cakeItems} />
+      <HandleDataSection isLoading={loading} data={cakeItems} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}
@@ -126,8 +127,11 @@ function Header() {
   );
 }
 
-function HandleDataSection({ data }: ICakeTypesSection) {
-  if (data.length === 0) {
+function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
+  if (data.length === 0 && !isLoading) {
+    return <NoDataContainer />;
+  }
+  if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
         {Array.from({ length: 8 }, (_, i) => (
@@ -139,7 +143,7 @@ function HandleDataSection({ data }: ICakeTypesSection) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
-        <div className="bg-white rounded-xl shadow-md overflow-hidden">
+        <div className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden">
           <div className="h-48 overflow-hidden">
             <img
               src={i.media?.url as string}
@@ -147,7 +151,7 @@ function HandleDataSection({ data }: ICakeTypesSection) {
               className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
             />
           </div>
-          <div className="p-4">
+          <div className="p-4 flex-1/2">
             <div className="flex justify-between">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {i.name as string}
@@ -157,12 +161,15 @@ function HandleDataSection({ data }: ICakeTypesSection) {
               </div>
             </div>
             <p className="text-gray-600 mb-4">{i.description as string}</p>
-            <Link
-              href={`/admin/cakes/edit/cake/${i.uuid}`}
-              className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
-            >
-              Edit
-            </Link>
+            <div className="mt-auto">
+              <Link
+                href={`/admin/cakes/edit/cake/${i.uuid}`}
+                className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
+              >
+                Edit
+              </Link>
+              {/* <Badge>{i.cakeType.name}</Badge> */}
+            </div>
           </div>
         </div>
       ))}

@@ -22,6 +22,7 @@ export default function PaginationSection({
   pagination,
   setPagination,
 }: IPagination) {
+  console.log(pagination);
   const handleChangePage = (i: number) => {
     setPagination((prev) => ({ ...prev, pageNumber: i }));
   };
@@ -52,6 +53,9 @@ export default function PaginationSection({
         return true;
     }
   };
+  if (pagination.totalCount === 0) {
+    return;
+  }
   return (
     <Pagination className="col-span-3">
       <PaginationContent>

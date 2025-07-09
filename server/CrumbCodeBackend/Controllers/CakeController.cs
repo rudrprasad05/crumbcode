@@ -12,6 +12,7 @@ using CrumbCodeBackend.Models.Response;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using static CrumbCodeBackend.Models.Requests.CakeRequestObject;
+using static CrumbCodeBackend.Models.Response.CakeResonse;
 
 
 namespace CrumbCodeBackend.Controllers
@@ -66,65 +67,27 @@ namespace CrumbCodeBackend.Controllers
 
         }
 
-        [HttpPost("create")]
-        public async Task<IActionResult> CreateAsync([FromBody] NewCakeRequest newCakeRequest)
-        {
-            var dto = newCakeRequest.FromNewCakeRequestToModel();
-            var model = await _cakeRepository.CreateAsync(dto);
-
-            if (model == null)
-            {
-                return BadRequest("model not created");
-            }
-
-            var result = new CakeDto
-            {
-                Id = model.Id,
-                Name = model.Name,
-                Price = model.Price,
-                CakeTypeId = model.CakeTypeId,
-                Description = model.Description
-            };
-
-            return Ok(result);
-
-        }
-        
         [HttpPost("upsert")]
+        [ProducesResponseType(typeof(CreateNewCakeResponse), 200)]
+        
         public async Task<IActionResult> UpsertAsync([FromQuery] string uuid, [FromBody] NewCakeRequest newCakeRequest)
         {
             var dto = newCakeRequest.FromNewCakeRequestToModel();
             var exists = await _cakeRepository.Exists(uuid);
-            var result = new CakeDto();
+            var model = new ApiResponse<CakeDto>();
 
             if (exists != null) // update
             {
-                var model = await _cakeRepository.UpdateAsync(uuid, dto);
-                result = new CakeDto
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Price = model.Price,
-                    CakeTypeId = model.CakeTypeId,
-                    Description = model.Description
-                };
+                model = await _cakeRepository.UpdateAsync(uuid, dto);
             }
             else // create new
             {
-                var model = await _cakeRepository.CreateAsync(dto);
-                result = new CakeDto
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Price = model.Price,
-                    CakeTypeId = model.CakeTypeId,
-                    Description = model.Description
-                };
+                model = await _cakeRepository.CreateAsync(dto);
             }
 
 
-            return Ok(result);
-            
+            return Ok(model);
+
         }
 
     }

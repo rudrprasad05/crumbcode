@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CrumbCodeBackend.Data;
 using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Interfaces;
+using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Requests;
 using CrumbCodeBackend.Models.Response;
@@ -24,14 +25,28 @@ namespace CrumbCodeBackend.Repository
 
         }
 
-        public async Task<Cake> CreateAsync(Cake cake)
+        public async Task<ApiResponse<CakeDto>> CreateAsync(Cake cake)
         {
-            await _context.Cakes.AddAsync(cake);
+            var model = await _context.Cakes.AddAsync(cake);
             await _context.SaveChangesAsync();
-            return cake;
+            var result = new CakeDto
+            {
+                Id = model.Entity.Id,
+                Name = model.Entity.Name,
+                Price = model.Entity.Price,
+                CakeType = model.Entity.CakeType?.FromModelToDto(),
+                Description = model.Entity.Description
+            };
+
+            return new ApiResponse<CakeDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = result,
+            };
         }
 
-        public async Task<Cake> UpdateAsync(string uuid, Cake updatedCake)
+        public async Task<ApiResponse<CakeDto>> UpdateAsync(string uuid, Cake updatedCake)
         {
             var existingCake = await _context.Cakes.FirstOrDefaultAsync(c => c.UUID == uuid);
 
@@ -49,7 +64,21 @@ namespace CrumbCodeBackend.Repository
 
             await _context.SaveChangesAsync();
 
-            return existingCake;
+            var result = new CakeDto
+            {
+                Id = existingCake.Id,
+                Name = existingCake.Name,
+                Price = existingCake.Price,
+                CakeType = existingCake.CakeType?.FromModelToDto(),
+                Description = existingCake.Description
+            };
+
+            return new ApiResponse<CakeDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = result,
+            };
         }
 
         public Task<Cake?> Exists(string uuid)
@@ -65,6 +94,7 @@ namespace CrumbCodeBackend.Repository
 
             var res = await cakes
                 .Include(c => c.Media)
+                .Include(c => c.CakeType)
                 .Skip(skip)
                 .Take(queryObject.PageSize)
                 .ToListAsync();

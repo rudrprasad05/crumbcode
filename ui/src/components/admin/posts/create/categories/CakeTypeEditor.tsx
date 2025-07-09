@@ -1,3 +1,5 @@
+"use client";
+
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,10 +10,12 @@ import { CakeTypeProvider, useCakeType } from "@/context/CakeTypeContext";
 import { cn } from "@/lib/utils";
 import { ArrowLeft, Check, CloudOff, CloudUpload } from "lucide-react";
 import { useRouter } from "next/navigation";
-import CakeTypeCreation from "./CakeTypeCreation";
 import { CakeTypeColorClasses, CakeTypeColors } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 export default function CakeTypeEditor() {
+  const { data } = useCakeType();
+
   return (
     <CakeTypeProvider>
       <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
@@ -19,7 +23,14 @@ export default function CakeTypeEditor() {
         <div className="flex-1 min-h-screen flex flex-row">
           <main className=" flex-1 p-6">
             <div className="w-full h-full grid grid-cols-1 place-items-center">
-              <CakeTypeCreation />
+              <Badge
+                className={cn(
+                  "text-white",
+                  CakeTypeColorClasses[data.color as string]
+                )}
+              >
+                {data.name}
+              </Badge>
             </div>
           </main>
           <SideBar />

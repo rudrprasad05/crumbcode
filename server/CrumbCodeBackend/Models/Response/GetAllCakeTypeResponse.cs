@@ -5,15 +5,15 @@ using System.Threading.Tasks;
 
 namespace CrumbCodeBackend.Models.Response
 {
-    public class GetAllCakeReponse
+    public class GetAllCakeTypeResponse
     {
-        public GetAllCakeReponse(List<Cake> _cakes, int _totalLength)
+        public GetAllCakeTypeResponse(List<CakeType> _cakeTypes, int _totalLength)
         {
-            Cakes = _cakes;
+            CakeTypes = _cakeTypes;
             TotalLength = _totalLength;
         }
 
-        public List<Cake> Cakes { get; set; } = [];
+        public List<CakeType> CakeTypes { get; set; } = [];
         public int TotalLength { get; set; } = 0;
     }
 }

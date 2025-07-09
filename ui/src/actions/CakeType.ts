@@ -1,13 +1,32 @@
 "use server";
 
 import { axiosGlobal } from "@/lib/axios";
-import { CakeType, Media, NewCakeTypeRequest, NewMediaRequest } from "@/types";
+import {
+  ApiResponse,
+  CakeType,
+  Media,
+  MediaQueryObject,
+  NewCakeTypeRequest,
+  NewMediaRequest,
+} from "@/types";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { GetToken } from "./User";
+import { headers } from "next/headers";
+import { buildMediaQueryParams } from "@/lib/params";
 
-export async function GetAllCakeTypes(token?: string): Promise<CakeType[]> {
-  const res = await axiosGlobal.get<CakeType[]>("caketype/get-all");
+export async function GetAllCakeTypes(
+  query?: MediaQueryObject
+): Promise<ApiResponse<CakeType[]>> {
+  const token = await GetToken();
+  const params = buildMediaQueryParams(query);
+
+  const res = await axiosGlobal.get<ApiResponse<CakeType[]>>(
+    `caketype/get-all?${params}`,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return res.data;
 }
 
@@ -20,13 +39,16 @@ export async function CreateCakeType(form: NewCakeTypeRequest) {
   }
 }
 
-export async function GetStarMedia() {
+export async function DeleteCakeType(
+  uuid: string
+): Promise<ApiResponse<CakeType>> {
   const token = await GetToken();
   if (!token) {
     return redirect("/");
   }
-  const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsStarred=true"
+  const res = await axiosGlobal.delete<ApiResponse<CakeType>>(
+    `caketype/delete/${uuid}`,
+    { headers: { Authorization: `Bearer ${token}` } }
   );
 
   return res.data;

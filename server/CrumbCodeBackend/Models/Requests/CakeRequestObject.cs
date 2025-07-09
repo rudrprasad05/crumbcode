@@ -15,7 +15,7 @@ namespace CrumbCodeBackend.Models.Requests
             public bool IsAvailable { get; set; }
             public decimal Price { get; set; }
             public int? MediaId { get; set; } 
-            public int CakeTypeId { get; set; }
+            public int? CakeTypeId { get; set; }
         }
     }
 }

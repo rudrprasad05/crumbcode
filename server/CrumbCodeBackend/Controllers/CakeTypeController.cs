@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using CrumbCodeBackend.Controllers;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Models;
+using CrumbCodeBackend.Models.Requests;
+using CrumbCodeBackend.Models.Response;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Mvc;
 using static CrumbCodeBackend.Models.Requests.CakeTypeRequestObject;
@@ -37,11 +39,11 @@ namespace CrumbCodeBackend.Controllers
             return Ok(model);
 
         }
-        
-        [HttpGet("get-all")]
-        public async Task<IActionResult> GetAll()
+
+        [HttpDelete("delete/{uuid}")]
+        public async Task<IActionResult> Delete([FromRoute] string uuid)
         {
-            var model = await _cakeTypeRepository.GetAllAsync();
+            var model = await _cakeTypeRepository.DeleteAsync(uuid);
 
             if (model == null)
             {
@@ -49,7 +51,23 @@ namespace CrumbCodeBackend.Controllers
             }
 
             return Ok(model);
-            
+
+        }
+
+        [HttpGet("get-all")]
+        [ProducesResponseType(typeof(GetAllCakeTypeResponse), 200)]
+        
+        public async Task<IActionResult> GetAll([FromQuery] MediaQueryObject queryObject)
+        {
+            var model = await _cakeTypeRepository.GetAllAsync(queryObject);
+
+            if (model == null)
+            {
+                return BadRequest("model not created");
+            }
+
+            return Ok(model);
+
         }
 
     }
