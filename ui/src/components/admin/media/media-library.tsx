@@ -20,7 +20,7 @@ export function MediaLibrary() {
   const [pagination, setPagination] = useState<MetaData>({
     pageNumber: 1,
     totalCount: 1,
-    pageSize: 5,
+    pageSize: 10,
     totalPages: 0,
   });
 

@@ -51,6 +51,13 @@ export interface Notification extends BaseModel {
   userId?: number;
 }
 
+export interface SocialMedia extends BaseModel {
+  name: string;
+  icon: string;
+  url: string;
+  isActive: boolean;
+}
+
 export interface User {
   username: string;
   id: string;

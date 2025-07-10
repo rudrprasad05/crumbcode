@@ -44,6 +44,7 @@ namespace CrumbCodeBackend.Data
         public DbSet<Allergen> Allergens { get; set; }
         public DbSet<Media> Medias { get; set; }
         public DbSet<Notification> Notifications { get; set; }
-        
+        public DbSet<SocialMedia> SocialMedias { get; set; }
+
     }
 }

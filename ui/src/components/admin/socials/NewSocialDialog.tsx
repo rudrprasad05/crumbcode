@@ -18,6 +18,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { NewSocialLinkForm, NewSocialLinkType } from "@/types/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
@@ -26,8 +27,7 @@ import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { IconPicker } from "./IconPicker";
-import { SocialIcons } from "@/components/svg/icons";
-import { Switch } from "@/components/ui/switch";
+import { CreateSocialMedia } from "@/actions/SocialMedia";
 
 export default function NewSocialDialog({
   children,
@@ -55,6 +55,7 @@ export default function NewSocialDialog({
     data.icon = selectedIcon;
     setIsLoading(true);
     try {
+      const res = await CreateSocialMedia(data);
       toast.success("Uploaded successfully");
       router.refresh();
       setIsOpen(false);

@@ -25,6 +25,8 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();
+builder.Services.AddScoped<ISocialMediaRepository, SocialMediaRepository>();
+
 
 
 var app = builder.Build();

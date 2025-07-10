@@ -1,6 +1,6 @@
 "use client";
 
-import { GetAllCakes } from "@/actions/Cake";
+import { GetAllSocialMedia } from "@/actions/SocialMedia";
 import { LoadingCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
@@ -13,20 +13,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Cake, MetaData } from "@/types";
+import { MetaData, SocialMedia } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import NewSocialDialog from "./NewSocialDialog";
 
-interface ICakeTypesSection {
-  data: Cake[];
+interface ISocialSection {
+  data: SocialMedia[];
   isLoading: boolean;
 }
 
-export default function CakeSection() {
-  const [cakeItems, setCakeItems] = useState<Cake[]>([]);
+export default function SocialSection() {
+  const [socialItems, setSocialItems] = useState<SocialMedia[]>([]);
   const [loading, setLoading] = useState(true);
-
   const [pagination, setPagination] = useState<MetaData>({
     pageNumber: 1,
     totalCount: 0,
@@ -35,14 +35,14 @@ export default function CakeSection() {
   });
 
   useEffect(() => {
-    setCakeItems([]);
+    setSocialItems([]);
     const getData = async () => {
-      const data = await GetAllCakes({
+      const data = await GetAllSocialMedia({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
       });
 
-      setCakeItems(data.data as Cake[]);
+      setSocialItems(data.data as SocialMedia[]);
       setPagination((prev) => ({
         ...prev,
         totalPages: Math.ceil(
@@ -58,7 +58,7 @@ export default function CakeSection() {
   return (
     <div>
       <Header />
-      <HandleDataSection isLoading={loading} data={cakeItems} />
+      <HandleDataSection isLoading={loading} data={socialItems} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}
@@ -73,8 +73,8 @@ function Header() {
   return (
     <>
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Cakes</h1>
-        <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
+        <h1 className="text-3xl font-bold text-gray-900">Social Links</h1>
+        <p className="text-gray-600 mt-2">Create and manage your links here</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
@@ -109,7 +109,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/cakes/create?type=cake"}>
+        <Link href={"/admin/social-media/create"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -124,7 +124,7 @@ function Header() {
   );
 }
 
-function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
+function HandleDataSection({ data, isLoading }: ISocialSection) {
   if (data.length === 0 && !isLoading) {
     return <NoDataContainer />;
   }
@@ -141,23 +141,13 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
         <div className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden">
-          <div className="h-48 overflow-hidden">
-            <img
-              src={i.media?.url as string}
-              alt={""}
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-            />
-          </div>
+          <div className="h-48 overflow-hidden"></div>
           <div className="p-4 flex-1/2">
             <div className="flex justify-between">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {i.name as string}
               </h3>
-              <div className="text-xs text-rose-600 font-bold">
-                {"$" + i.price}
-              </div>
             </div>
-            <p className="text-gray-600 mb-4">{i.description as string}</p>
             <div className="mt-auto">
               <Link
                 href={`/admin/cakes/edit/cake/${i.uuid}`}

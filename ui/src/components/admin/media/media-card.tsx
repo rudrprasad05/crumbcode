@@ -7,6 +7,8 @@ import { Media } from "@/types";
 import { Ban, Edit, FileText, ImageIcon, Trash2, Video } from "lucide-react";
 import { useState } from "react";
 import { DeleteMediaDialoge } from "./delete-media-dialoge";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 interface MediaCardProps {
   item: Media;
@@ -16,6 +18,7 @@ interface MediaCardProps {
 export function MediaCard({ item, onDelete }: MediaCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -59,15 +62,30 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
       <CardContent className="p-0 bg-white">
         <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
           {item.contentType.includes("image") && isImageValid ? (
-            <img
-              src={item.url || "/image.svg"}
-              onError={(e) => {
-                e.currentTarget.onerror = null; // prevent infinite loop
-                setIsImageValid(false);
-              }}
-              alt={item.altText || item.fileName}
-              className="w-full h-full object-cover"
-            />
+            <>
+              <Image
+                width={100}
+                height={100}
+                src={item.url || "/image.svg"}
+                onError={(e) => {
+                  e.currentTarget.onerror = null; // prevent infinite loop
+                  setIsImageValid(false);
+                }}
+                onLoad={() => setIsImageLoaded(true)}
+                alt={item.altText || item.fileName}
+                className={cn(
+                  "w-full h-full object-cover",
+                  isImageLoaded ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {!isImageLoaded && (
+                <div
+                  className={cn(
+                    "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                  )}
+                ></div>
+              )}
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-50">
               {getTypeIcon()}

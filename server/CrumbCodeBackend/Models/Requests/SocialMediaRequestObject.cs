@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace CrumbCodeBackend.Models
+namespace CrumbCodeBackend.Models.Requests
 {
-    public class SocialMedia : BaseModel
+    public class SocialMediaRequestObject
     {
         public string Name { get; set; } = string.Empty;
         public string Icon { get; set; } = string.Empty;      
