@@ -1,7 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Search } from "lucide-react";
-import NotificationBell from "../global/NotificationBell";
+import { NotificationBell } from "../global/NotificationBell";
 
 export function AdminHeader() {
   return (

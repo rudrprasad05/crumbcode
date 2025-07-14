@@ -23,6 +23,11 @@ export interface Cake extends BaseModel {
   //   allergens: Allergen[];
 }
 
+export interface IconType {
+  name: string;
+  Icon: any;
+}
+
 export interface CakeType extends BaseModel {
   name: string;
   color: string;
@@ -38,12 +43,28 @@ export interface Media extends BaseModel {
   sizeInBytes: number;
 }
 
+export enum NotificationTypes {
+  "INFO",
+  "WARNING",
+  "ERROR",
+  "SUCCESS",
+}
+
 export interface Notification extends BaseModel {
   title: string;
   message: string;
   isRead: boolean;
-  type: "info" | "warning" | "error";
+  type: NotificationTypes;
   userId?: number;
+  user?: User;
+  actionUrl: string;
+}
+
+export interface SocialMedia extends BaseModel {
+  name: string;
+  icon: string;
+  url: string;
+  isActive: boolean;
 }
 
 export interface User {

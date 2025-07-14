@@ -60,6 +60,8 @@ namespace CrumbCodeBackend.Repository
             existingCake.Description = updatedCake.Description;
             existingCake.Price = updatedCake.Price;
             existingCake.MediaId = updatedCake.MediaId;
+            existingCake.CakeTypeId = updatedCake.CakeTypeId;
+            existingCake.UpdatedOn = DateTime.UtcNow;
             // ... copy other fields as needed
 
             await _context.SaveChangesAsync();
@@ -103,23 +105,11 @@ namespace CrumbCodeBackend.Repository
 
             foreach (var cake in res)
             {
-                var media = cake.Media;
-
                 MediaDto? mediaDto = null;
-                if (media != null)
+                if (cake.Media != null)
                 {
-                    var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
-                    mediaDto = new MediaDto
-                    {
-                        Url = signedUrl,
-                        Id = media.Id,
-                        UUID = media.UUID,
-                        ObjectKey = media.ObjectKey,
-                        AltText = media.AltText,
-                        FileName = media.FileName,
-                        ContentType = media.ContentType,
-                        SizeInBytes = media.SizeInBytes
-                    };
+                    var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media?.ObjectKey ?? "");
+                    mediaDto = cake.Media?.FromModelToDTO(signedUrl);
                 }
 
                 result.Add(new CakeDto
@@ -128,9 +118,10 @@ namespace CrumbCodeBackend.Repository
                     Name = cake.Name,
                     Price = cake.Price,
                     IsAvailable = cake.IsAvailable,
-                    Media = mediaDto,
+                    Media = mediaDto ?? null,
                     UUID = cake.UUID,
                     Description = cake.Description,
+                    CakeType = cake.CakeType?.FromModelToDto() ?? null,
                 });
             }
 
@@ -154,29 +145,18 @@ namespace CrumbCodeBackend.Repository
         {
             var cake = await _context.Cakes
             .Include(c => c.Media)
+            .Include(c => c.CakeType)
             .FirstOrDefaultAsync(c => c.UUID == uuid);
 
             if (cake == null) {
                 return null;
             }
             
-            var media = cake.Media;
-
             MediaDto? mediaDto = null;
-            if (media != null)
+            if (cake.Media != null)
             {
-                var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
-                mediaDto = new MediaDto
-                {
-                    Url = signedUrl,
-                    Id = media.Id,
-                    UUID = media.UUID,
-                    ObjectKey = media.ObjectKey,
-                    AltText = media.AltText,
-                    FileName = media.FileName,
-                    ContentType = media.ContentType,
-                    SizeInBytes = media.SizeInBytes
-                };
+                var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media?.ObjectKey ?? "");
+                mediaDto = cake.Media?.FromModelToDTO(signedUrl);
             }
 
             var dto = new CakeDto
@@ -188,10 +168,27 @@ namespace CrumbCodeBackend.Repository
                 Media = mediaDto,
                 UUID = cake.UUID,
                 CreatedOn = cake.CreatedOn,
-                Description = cake.Description
+                Description = cake.Description,
+                CakeType = cake.CakeType?.FromModelToDto() ?? null
             };
         
             return dto;
+        }
+
+        public async Task<ApiResponse<CakeDto>> SafeDelete(string uuid)
+        {
+            var model = await _context.Cakes.FirstOrDefaultAsync((c) => c.UUID == uuid) ?? throw new KeyNotFoundException("Cake not found");
+
+            model.IsDeleted = true;
+            await _context.SaveChangesAsync();
+
+            var result = model.FromModelToDto();
+            return new ApiResponse<CakeDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = result,
+            };
         }
     }
 }

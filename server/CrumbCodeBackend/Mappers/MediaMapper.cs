@@ -26,7 +26,7 @@ namespace CrumbCodeBackend.Mappers
             };
         }
 
-        public static MediaDto FromModelToDTO(this Media request)
+        public static MediaDto FromModelToDTO(this Media request, string? url = null)
         {
             ArgumentNullException.ThrowIfNull(request);
             return new MediaDto
@@ -37,7 +37,7 @@ namespace CrumbCodeBackend.Mappers
                 ContentType = request.ContentType,
                 SizeInBytes = request.SizeInBytes,
                 UUID = request.UUID,
-                Url = request.Url,
+                Url = url ?? request.Url,
             };
         }
     }

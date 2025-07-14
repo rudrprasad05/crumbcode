@@ -16,6 +16,8 @@ namespace CrumbCodeBackend.Interfaces
         public Task<CakeDto?> GetOneAsync(string uuid);
         public Task<Cake?> Exists(string uuid);
         public Task<ApiResponse<CakeDto>> UpdateAsync(string uuid, Cake cake);
+        public Task<ApiResponse<CakeDto>> SafeDelete(string uuid);
+
 
     }
 }

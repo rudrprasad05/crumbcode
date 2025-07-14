@@ -36,3 +36,18 @@ export async function SaveCake(
 
   return res.data;
 }
+
+export async function SafeDeleteCake(uuid: string): Promise<ApiResponse<Cake>> {
+  const token = await GetToken();
+  //   if (!token) {
+  //     return redirect("/");
+  //   }
+  const res = await axiosGlobal.delete<ApiResponse<Cake>>(
+    "cake/safe-delete/" + uuid,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+
+  return res.data;
+}
