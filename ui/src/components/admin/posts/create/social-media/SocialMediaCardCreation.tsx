@@ -1,18 +1,22 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
-import { useCake } from "@/context/CakeContext";
+import { Default, SocialIcons } from "@/components/svg/icons";
+import { Card, CardContent } from "@/components/ui/card";
 import { useSocialMedia } from "@/context/SocialMediaContext";
-import { cn } from "@/lib/utils";
-import { Cake, CakeTypeColorClasses, SocialMedia } from "@/types";
+import { parseSocialLink } from "@/lib/link-parse";
+import { SocialMedia } from "@/types";
 import Link from "next/link";
-import { useEffect } from "react";
+import { FC, SVGProps, useEffect, useState } from "react";
+
+type IconType = FC<SVGProps<SVGSVGElement>>;
 
 export default function SocialMediaCardCreation({
   data,
 }: {
-  data?: SocialMedia;
+  data: SocialMedia;
 }) {
+  const [username, setUsername] = useState<string>("");
+  const [Icon, setIcon] = useState<IconType>(() => Default);
   const { socialMedia, setInitialCakeState } = useSocialMedia();
 
   useEffect(() => {
@@ -21,24 +25,49 @@ export default function SocialMediaCardCreation({
     }
   }, [data]);
 
+  useEffect(() => {
+    setUsername(parseSocialLink(socialMedia.url as string).username as string);
+  }, [socialMedia.url]);
+
+  useEffect(() => {
+    const foundIcon = SocialIcons.find(
+      (icon) => icon.name.toLowerCase() === socialMedia?.icon?.toLowerCase()
+    )?.Icon;
+
+    setIcon(() => foundIcon || Default);
+  }, [socialMedia.icon]);
+
   return (
-    <div className="bg-white rounded-xl w-[340px] shadow-md overflow-hidden">
-      <div className="h-48 overflow-hidden"></div>
-      <div className="p-6">
-        <div className="flex">
-          <h3 className="grow text-xl font-semibold text-gray-900 mb-2">
-            {socialMedia.name as string}
-          </h3>
+    <Card
+      className={`grow w-full max-w-sm transition-colors cursor-pointer border-0 shadow-sm hover:shadow-md`}
+    >
+      <CardContent className="flex justify-between">
+        <div className="flex items-center space-x-4">
+          <div className={`p-2 rounded-full bg-white shadow-sm`}>
+            <Icon className="w-4 h-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {socialMedia.name}
+            </p>
+            <p className="text-sm text-gray-500 truncate">@{username}</p>
+          </div>
         </div>
-        <div className="flex justify-between">
+        <div className="text-end text-sm flex flex-col">
           <Link
-            href="#"
-            className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
+            className="underline-offset-4 hover:underline"
+            href={"/admin/socials/edit/" + socialMedia.uuid}
           >
-            Order Online
+            Edit
+          </Link>
+          <Link
+            className="underline-offset-4 hover:underline"
+            href={"//" + socialMedia.url}
+          >
+            Open
           </Link>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }

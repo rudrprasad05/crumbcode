@@ -1,25 +1,8 @@
 "use client";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
-import { GetMedia } from "@/actions/Media";
-import NewMediaForm from "@/components/admin/media/NewMediaForm";
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
-import PaginationSection from "@/components/global/PaginationSection";
+import { IconPicker } from "@/components/admin/socials/IconPicker";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -28,29 +11,29 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { SidebarHeader } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { CakeProvider, useCake } from "@/context/CakeContext";
-import { cn } from "@/lib/utils";
-import { CakeType, Media, MetaData, SocialMedia } from "@/types";
-import { ArrowLeft, Check, CloudOff, CloudUpload, Loader2 } from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import SocialMediaCardCreation from "./SocialMediaCardCreation";
 import {
   SocialMediaProvider,
   useSocialMedia,
 } from "@/context/SocialMediaContext";
-import { IconPicker } from "@/components/admin/socials/IconPicker";
+import { SocialMedia } from "@/types";
+import { ArrowLeft, CloudOff, CloudUpload, Loader2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import SocialMediaCardCreation from "./SocialMediaCardCreation";
 
 export default function SocialMediaEditor({
   socialMedia,
 }: {
   socialMedia?: SocialMedia;
 }) {
+  const { setInitialCakeState } = useSocialMedia();
+
+  useEffect(() => {
+    if (socialMedia) setInitialCakeState(socialMedia);
+  }, [socialMedia]);
+
   return (
     <SocialMediaProvider>
       <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
@@ -63,7 +46,7 @@ export default function SocialMediaEditor({
             <ResizablePanel defaultSize={60} minSize={30}>
               <main className="w-full h-full p-6">
                 <div className="w-full h-full grid place-items-center">
-                  <SocialMediaCardCreation data={socialMedia} />
+                  <SocialMediaCardCreation data={socialMedia as SocialMedia} />
                 </div>
               </main>
             </ResizablePanel>
@@ -82,7 +65,7 @@ export default function SocialMediaEditor({
 
 function Header() {
   const router = useRouter();
-  const { saveSocialMediaContext, hasChanged } = useSocialMedia();
+  const { saveSocialMediaContext, hasChanged, isSaving } = useSocialMedia();
 
   return (
     <div className="w-full flex items-center border border-gray-200 p-4">
@@ -112,7 +95,14 @@ function Header() {
           onClick={saveSocialMediaContext}
           variant={"outline"}
         >
-          Save
+          {isSaving ? (
+            <div className="flex gap-2 items-center">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Saving
+            </div>
+          ) : (
+            <div>Save</div>
+          )}
         </Button>
       </div>
       <SidebarHeader className="ml-5">
@@ -124,12 +114,16 @@ function Header() {
 
 function SideBar() {
   const { socialMedia, updateSocialMediaValues } = useSocialMedia();
-  const [selectedIcon, setSelectedIcon] = useState<string>("");
-  const [isMediaImageLoaded, setIsMediaImageLoaded] = useState(true);
+  console.log(socialMedia);
+  const [selectedIcon, setSelectedIcon] = useState<string>(
+    socialMedia.icon || "default"
+  );
+
+  useEffect(() => {}, [selectedIcon]);
 
   useEffect(() => {
-    updateSocialMediaValues("icon", selectedIcon);
-  }, [selectedIcon]);
+    setSelectedIcon(socialMedia.icon as string);
+  }, [socialMedia]);
 
   return (
     <div className="overflow-hidden relative h-screen p-6 border border-gray-200 border-t-0 flex flex-col">

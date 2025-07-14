@@ -5,6 +5,7 @@ import { LoadingCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
 import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -16,8 +17,11 @@ import {
 import { MetaData, SocialMedia } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { FC, SVGProps, useEffect, useState } from "react";
 import NewSocialDialog from "./NewSocialDialog";
+import SocialMediaCardCreation from "../posts/create/social-media/SocialMediaCardCreation";
+import { Default, SocialIcons } from "@/components/svg/icons";
+import { parseSocialLink } from "@/lib/link-parse";
 
 interface ISocialSection {
   data: SocialMedia[];
@@ -41,6 +45,7 @@ export default function SocialSection() {
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
       });
+      console.log(data);
 
       setSocialItems(data.data as SocialMedia[]);
       setPagination((prev) => ({
@@ -109,7 +114,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/social-media/create"}>
+        <Link href={"/admin/socials/create"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -124,42 +129,78 @@ function Header() {
   );
 }
 
+type IconType = FC<SVGProps<SVGSVGElement>>;
+
 function HandleDataSection({ data, isLoading }: ISocialSection) {
   if (data.length === 0 && !isLoading) {
     return <NoDataContainer />;
   }
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
         {Array.from({ length: 8 }, (_, i) => (
           <LoadingCard key={i} />
         ))}
       </div>
     );
   }
+  console.log("sm123", data);
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
-      {data.map((i) => (
-        <div className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden">
-          <div className="h-48 overflow-hidden"></div>
-          <div className="p-4 flex-1/2">
-            <div className="flex justify-between">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {i.name as string}
-              </h3>
-            </div>
-            <div className="mt-auto">
-              <Link
-                href={`/admin/cakes/edit/cake/${i.uuid}`}
-                className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
-              >
-                Edit
-              </Link>
-              {/* <Badge>{i.cakeType.name}</Badge> */}
-            </div>
-          </div>
-        </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-2">
+      {data.map((i, index) => (
+        <SocialMediaCard data={i} key={index} />
       ))}
     </div>
+  );
+}
+
+export function SocialMediaCard({ data }: { data: SocialMedia }) {
+  const [username, setUsername] = useState<string>("");
+  const [Icon, setIcon] = useState<IconType>(() => Default);
+
+  useEffect(() => {
+    setUsername(parseSocialLink(data.url as string).username as string);
+  }, [data.url]);
+
+  useEffect(() => {
+    const foundIcon = SocialIcons.find(
+      (icon) => icon.name.toLowerCase() === data?.icon?.toLowerCase()
+    )?.Icon;
+
+    setIcon(() => foundIcon || Default);
+  }, [data.icon]);
+
+  return (
+    <Card
+      className={`grow w-full max-w-sm transition-colors cursor-pointer border-0 shadow-sm hover:shadow-md`}
+    >
+      <CardContent className="flex justify-between">
+        <div className="flex items-center space-x-4">
+          <div className={`p-2 rounded-full bg-white shadow-sm`}>
+            <Icon className="w-4 h-4" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-medium text-gray-900 truncate">
+              {data.name}
+            </p>
+            <p className="text-sm text-gray-500 truncate">@{username}</p>
+          </div>
+        </div>
+        <div className="text-end text-sm flex flex-col">
+          <Link
+            className="underline-offset-4 hover:underline"
+            href={"/admin/socials/edit/" + data.uuid}
+          >
+            Edit
+          </Link>
+          <Link
+            className="underline-offset-4 hover:underline"
+            href={"//" + data.url}
+          >
+            Open
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

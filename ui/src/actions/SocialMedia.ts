@@ -32,3 +32,13 @@ export async function CreateSocialMedia(
 
   return res.data;
 }
+
+export async function GetOneSocialMedia(
+  uuid?: string
+): Promise<ApiResponse<SocialMedia>> {
+  const res = await axiosGlobal.get<ApiResponse<SocialMedia>>(
+    "social-media/get-one?uuid=" + uuid
+  );
+  console.log(res);
+  return res.data;
+}

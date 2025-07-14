@@ -37,6 +37,9 @@ namespace CrumbCodeBackend.Data
             .HasForeignKey(n => n.UserId)
             .OnDelete(DeleteBehavior.SetNull);
 
+            modelBuilder.Entity<Notification>()
+            .Property(n => n.Type)
+            .HasConversion<string>();
 
         }
         public DbSet<Cake> Cakes { get; set; }

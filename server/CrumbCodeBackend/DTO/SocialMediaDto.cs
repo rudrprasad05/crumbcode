@@ -9,7 +9,12 @@ namespace CrumbCodeBackend.DTO
     {
         public string Name { get; set; } = string.Empty;
         public string Icon { get; set; } = string.Empty;      
-        public string Url { get; set; } = string.Empty;        
+        public string Url { get; set; } = string.Empty;    
+        public string UUID { get; set; } = string.Empty;
+        public int Id { get; set; } = 0;  
+        public DateTime CreatedOn { get; set; } = DateTime.Now;
+        public DateTime UpdatedOn { get; set; } = DateTime.Now;
+        public bool IsDeleted { get; set; } = false;      
         public bool IsActive { get; set; } = true;
     }
 }

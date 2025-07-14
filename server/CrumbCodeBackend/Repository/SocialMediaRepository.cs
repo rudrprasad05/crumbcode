@@ -82,6 +82,9 @@ namespace CrumbCodeBackend.Repository
                     Icon = item.Icon,
                     Url = item.Url,
                     IsActive = item.IsActive,
+                    UUID = item.UUID,
+                    CreatedOn = item.CreatedOn,
+                    UpdatedOn = item.UpdatedOn
                 };
 
                 dtos.Add(temp);
@@ -103,19 +106,31 @@ namespace CrumbCodeBackend.Repository
             };
         }
 
-        public Task<SocialMediaDto?> GetOneAsync(string uuid)
+        public async Task<ApiResponse<SocialMediaDto>> GetOneAsync(string uuid)
         {
-            throw new NotImplementedException();
+            var model = await _context.SocialMedias.FirstOrDefaultAsync(i => i.UUID == uuid);
+
+            if (model == null)
+            {
+                return new ApiResponse<SocialMediaDto>
+                {
+                    Success = false,
+                    StatusCode = 404,
+                };
+            }
+
+            var dto = model.FromModelToDto();
+            return new ApiResponse<SocialMediaDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = dto
+            }; 
         }
 
         public async Task<ApiResponse<SocialMediaDto>> UpdateAsync(string uuid, SocialMedia sm)
         {
-            var existing = await _context.SocialMedias.FirstOrDefaultAsync(c => c.UUID == uuid);
-
-            if (existing == null)
-            {
-                throw new KeyNotFoundException("Cake not found");
-            }
+            var existing = await _context.SocialMedias.FirstOrDefaultAsync(c => c.UUID == uuid) ?? throw new KeyNotFoundException("Cake not found");
 
             existing.Name = sm.Name;
             existing.Icon = sm.Icon;

@@ -4,6 +4,7 @@ using CrumbCodeBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrumbCodeBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250712012903_isdeleted")]
+    partial class isdeleted
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -285,10 +288,6 @@ namespace CrumbCodeBackend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ActionUrl")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
 
@@ -396,13 +395,13 @@ namespace CrumbCodeBackend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "c118412e-1073-4687-9f69-3f93b4f97dc0",
+                            Id = "aa779f48-c8d8-4af8-8c7a-4583a7b37cb3",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "7c90fefa-5b3d-4202-bc23-2a42873cde39",
+                            Id = "094c8b26-8337-46d7-b0e3-eb5f47a8d26e",
                             Name = "User",
                             NormalizedName = "USER"
                         });

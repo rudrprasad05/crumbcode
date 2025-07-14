@@ -69,5 +69,13 @@ namespace CrumbCodeBackend.Controllers
             return Ok(model);
 
         }
+
+        [HttpGet("get-one")]
+        public async Task<IActionResult> GetOne([FromQuery] string uuid)
+        {
+            var model = await _socialMediaRepository.GetOneAsync(uuid);
+            return Ok(model);
+        }
+
     }
 }

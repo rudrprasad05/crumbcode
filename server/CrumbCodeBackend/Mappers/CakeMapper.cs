@@ -22,6 +22,8 @@ namespace CrumbCodeBackend.Mappers
                 Price = request.Price,
                 MediaId = request.MediaId,
                 CakeTypeId = request.CakeTypeId,
+                CreatedOn = DateTime.UtcNow,
+                UpdatedOn = DateTime.UtcNow,
             };
         }
 
@@ -36,6 +38,9 @@ namespace CrumbCodeBackend.Mappers
                 Price = cake.Price,
                 Media = cake.Media?.FromModelToDTO(),
                 CakeType = cake.CakeType?.FromModelToDto(),
+                CreatedOn = cake.CreatedOn,
+                UpdatedOn = cake.UpdatedOn,
+                IsDeleted = cake.IsDeleted
             };
         }
     }

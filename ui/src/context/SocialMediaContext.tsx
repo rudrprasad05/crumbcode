@@ -1,27 +1,27 @@
-import { CakeType, Media, SocialMedia } from "@/types";
+import { CreateSocialMedia } from "@/actions/SocialMedia";
+import { SocialMedia } from "@/types";
+import hash from "object-hash";
 import React, {
   createContext,
-  useContext,
-  useState,
   ReactNode,
+  useContext,
   useEffect,
   useRef,
+  useState,
 } from "react";
-import hash from "object-hash";
 import { toast } from "sonner";
-import { GetAllCakeTypes } from "@/actions/CakeType";
-import { CreateSocialMedia } from "@/actions/SocialMedia";
 
 let defaultData: Partial<SocialMedia> = {
   name: "example",
   url: "example.com",
-  icon: "default",
+  icon: "Default",
   isActive: true,
 };
 
 // Create context
 const SocialMediaContext = createContext<{
   socialMedia: Partial<SocialMedia>;
+  isSaving: boolean;
   setInitialCakeState: (socialMedia: Partial<SocialMedia>) => void;
   updateSocialMediaValues: <K extends keyof SocialMedia>(
     key: K,
@@ -32,6 +32,7 @@ const SocialMediaContext = createContext<{
   setHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   socialMedia: defaultData,
+  isSaving: false,
   setInitialCakeState: (socialMedia: Partial<SocialMedia>) => {},
   updateSocialMediaValues: () => {},
   saveSocialMediaContext: () => {},
@@ -44,6 +45,7 @@ export const SocialMediaProvider = ({ children }: { children: ReactNode }) => {
   const [socialMedia, setSocialMedia] =
     useState<Partial<SocialMedia>>(defaultData);
   const [hasChanged, setHasChanged] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const initialHashRef = useRef<string>(null);
 
   useEffect(() => {
@@ -54,35 +56,45 @@ export const SocialMediaProvider = ({ children }: { children: ReactNode }) => {
     setHasChanged(currentHash !== initialHashRef.current);
   }, [socialMedia]);
 
-  function setInitialCakeState(socialMedia: Partial<SocialMedia>) {
-    setSocialMedia(socialMedia);
-    initialHashRef.current = hash(socialMedia);
+  function setInitialCakeState(data: Partial<SocialMedia>) {
+    setSocialMedia(data);
+    initialHashRef.current = hash(data);
+    console.log("fired", data);
   }
 
   function updateSocialMediaValues<K extends keyof SocialMedia>(
     key: K,
     value: SocialMedia[K]
   ) {
-    setSocialMedia((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+    console.log("first");
+    setSocialMedia((prev) => {
+      const newState = { ...prev, [key]: value };
+      console.log("Updated State:", newState);
+      return newState;
+    });
   }
 
   async function saveSocialMediaContext() {
-    initialHashRef.current = hash(socialMedia);
-    setHasChanged(false);
+    setIsSaving(true);
+    try {
+      await CreateSocialMedia(socialMedia, socialMedia.uuid);
+      initialHashRef.current = hash(socialMedia);
+      setHasChanged(false);
 
-    console.dir(socialMedia);
-    // return;
-    await CreateSocialMedia(socialMedia, socialMedia.uuid);
-    toast.success("Saved successfully");
+      console.dir("save media context", socialMedia);
+      toast.success("Saved successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Error ocured. Changes not saved");
+    }
+    setIsSaving(false);
   }
 
   return (
     <SocialMediaContext.Provider
       value={{
         socialMedia,
+        isSaving,
         setInitialCakeState,
         updateSocialMediaValues,
         saveSocialMediaContext,

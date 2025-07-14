@@ -31,6 +31,11 @@ namespace CrumbCodeBackend.Mappers
                 Icon = cake.Icon,
                 Url = cake.Url,
                 IsActive = cake.IsActive,
+                CreatedOn = cake.CreatedOn,
+                UpdatedOn = cake.UpdatedOn,
+                UUID = cake.UUID,
+                Id = cake.Id,
+                IsDeleted = cake.IsDeleted
             };
         }
     }

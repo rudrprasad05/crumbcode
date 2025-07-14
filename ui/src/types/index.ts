@@ -43,12 +43,21 @@ export interface Media extends BaseModel {
   sizeInBytes: number;
 }
 
+export enum NotificationTypes {
+  "INFO",
+  "WARNING",
+  "ERROR",
+  "SUCCESS",
+}
+
 export interface Notification extends BaseModel {
   title: string;
   message: string;
   isRead: boolean;
-  type: "info" | "warning" | "error";
+  type: NotificationTypes;
   userId?: number;
+  user?: User;
+  actionUrl: string;
 }
 
 export interface SocialMedia extends BaseModel {

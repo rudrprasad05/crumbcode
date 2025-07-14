@@ -33,13 +33,15 @@ export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
           <div className="text-lg text-rose-600 font-bold">$ {cake.price}</div>
         </div>
         <p className="text-gray-600 mb-4">{cake.description as string}</p>
-        <div className="flex justify-between">
-          <Link
-            href="#"
-            className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
-          >
-            Order Online
-          </Link>
+        <div className="flex justify-between w-full">
+          <div>
+            <Link
+              href="#"
+              className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
+            >
+              Order Online
+            </Link>
+          </div>
           <Badge
             className={cn(
               "text-white",

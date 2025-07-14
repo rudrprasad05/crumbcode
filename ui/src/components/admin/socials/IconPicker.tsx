@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { SocialIcons } from "@/components/svg/icons";
 import { Label } from "@/components/ui/label";
+import { useSocialMedia } from "@/context/SocialMediaContext";
 
 // Type of each icon item
 type IconOption = {
@@ -33,9 +34,16 @@ export function IconPicker({
   setValue: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [open, setOpen] = React.useState(false);
+  const { updateSocialMediaValues } = useSocialMedia();
 
-  const selectedIcon = SocialIcons.find((icon) => icon.name === value);
+  const selectedIcon = SocialIcons.find(
+    (icon) => icon.name.toLowerCase() === value.toLowerCase()
+  );
 
+  const changeIcon = (i: string) => {
+    updateSocialMediaValues("icon", i);
+    setValue(i);
+  };
   return (
     <div className="flex flex-col gap-2">
       <Label>Icon</Label>
@@ -66,7 +74,7 @@ export function IconPicker({
                     key={icon.name}
                     value={icon.name}
                     onSelect={(currentValue) => {
-                      setValue(currentValue === value ? "" : currentValue);
+                      changeIcon(currentValue === value ? "" : currentValue);
                       setOpen(false);
                     }}
                   >
@@ -76,7 +84,7 @@ export function IconPicker({
                         value === icon.name ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    <icon.Icon className="mr-2 h-4 w-4" />
+                    <icon.Icon key={icon.name} className="mr-2 h-4 w-4" />
                     {icon.name}
                   </CommandItem>
                 ))}

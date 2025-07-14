@@ -4,9 +4,10 @@ import type { SVGProps } from "react";
 export const Pinterest = (props: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
+    width="24"
+    height="24"
     viewBox="0 0 256 256"
+    key={props.key || 0}
     {...props}
   >
     <path
@@ -18,9 +19,10 @@ export const Pinterest = (props: SVGProps<SVGSVGElement>) => (
 
 export const Instagram = (props: SVGProps<SVGSVGElement>) => (
   <svg
+    key={props.key || 0}
     xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
+    width="24"
+    height="24"
     preserveAspectRatio="xMidYMid"
     viewBox="0 0 256 256"
     {...props}
@@ -37,8 +39,9 @@ export const Facebook = (props: SVGProps<SVGSVGElement>) => (
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 36 36"
     fill="url(#a)"
-    height="1em"
-    width="1em"
+    key={props.key || 0}
+    width="24"
+    height="24"
     {...props}
   >
     <defs>
@@ -58,8 +61,9 @@ export const Facebook = (props: SVGProps<SVGSVGElement>) => (
 export const YouTube = (props: SVGProps<SVGSVGElement>) => (
   <svg
     viewBox="0 0 256 180"
-    width="1em"
-    height="1em"
+    key={props.key || 0}
+    width="24"
+    height="24"
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="xMidYMid"
     {...props}
@@ -76,9 +80,10 @@ export const TikTok = (props: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     preserveAspectRatio="xMidYMid"
+    key={props.key || 0}
     viewBox="0 0 256 290"
-    width="1em"
-    height="1em"
+    width="24"
+    height="24"
     {...props}
   >
     <path
@@ -96,8 +101,9 @@ export const TikTok = (props: SVGProps<SVGSVGElement>) => (
 export const Twitter = (props: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
+    width="24"
+    height="24"
+    key={props.key || 0}
     fill="none"
     viewBox="0 0 1200 1227"
     {...props}
@@ -109,7 +115,28 @@ export const Twitter = (props: SVGProps<SVGSVGElement>) => (
   </svg>
 );
 
+export const Default = (props: SVGProps<SVGSVGElement>) => (
+  <svg
+    key={props.key || 0}
+    xmlns="http://www.w3.org/2000/svg"
+    width="24"
+    height="24"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className="lucide lucide-circle-off-icon lucide-circle-off"
+    {...props}
+  >
+    <path d="m2 2 20 20" />
+    <path d="M8.35 2.69A10 10 0 0 1 21.3 15.65" />
+    <path d="M19.08 19.08A10 10 0 1 1 4.92 4.92" />
+  </svg>
+);
 export const SocialIcons = [
+  { name: "Default", Icon: Default },
   { name: "Pinterest", Icon: Pinterest },
   { name: "Instagram", Icon: Instagram },
   { name: "Facebook", Icon: Facebook },

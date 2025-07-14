@@ -4,8 +4,10 @@ import { GetAllCakes } from "@/actions/Cake";
 import { LoadingCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import {
   Select,
   SelectContent,
@@ -13,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Cake, MetaData } from "@/types";
+import { cn } from "@/lib/utils";
+import { Cake, CakeTypeColorClasses, MetaData } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -42,9 +45,12 @@ export default function CakeSection() {
         pageSize: pagination.pageSize,
       });
 
+      console.log(data);
+
       setCakeItems(data.data as Cake[]);
       setPagination((prev) => ({
         ...prev,
+        totalCount: data.meta?.totalCount as number,
         totalPages: Math.ceil(
           (data.meta?.totalCount as number) / pagination.pageSize
         ),
@@ -109,7 +115,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/cakes/create?type=cake"}>
+        <Link href={"/admin/cakes/create"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -125,6 +131,8 @@ function Header() {
 }
 
 function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
+  const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   if (data.length === 0 && !isLoading) {
     return <NoDataContainer />;
   }
@@ -141,14 +149,39 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
         <div className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden">
-          <div className="h-48 overflow-hidden">
-            <img
-              src={i.media?.url as string}
-              alt={""}
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-            />
+          <div className="relative aspect-square h-48 bg-gray-100 rounded-t-lg overflow-hidden">
+            {isImageValid ? (
+              <>
+                <Image
+                  width={100}
+                  height={100}
+                  src={i.media?.url || "/image.svg"}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null; // prevent infinite loop
+                    setIsImageValid(false);
+                  }}
+                  onLoad={() => setIsImageLoaded(true)}
+                  alt={(i.media?.altText || i.media?.fileName) as string}
+                  className={cn(
+                    "w-full h-full object-cover",
+                    isImageLoaded ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {!isImageLoaded && (
+                  <div
+                    className={cn(
+                      "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                    )}
+                  ></div>
+                )}
+              </>
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-gray-50">
+                invali image url
+              </div>
+            )}
           </div>
-          <div className="p-4 flex-1/2">
+          <div className="p-4 flex-1/2 flex flex-col">
             <div className="flex justify-between">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {i.name as string}
@@ -158,14 +191,21 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
               </div>
             </div>
             <p className="text-gray-600 mb-4">{i.description as string}</p>
-            <div className="mt-auto">
+            <div className="mt-auto flex justify-between items-center">
               <Link
-                href={`/admin/cakes/edit/cake/${i.uuid}`}
+                href={`/admin/cakes/edit/${i.uuid}`}
                 className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
               >
                 Edit
               </Link>
-              {/* <Badge>{i.cakeType.name}</Badge> */}
+              <Badge
+                className={cn(
+                  "text-white",
+                  CakeTypeColorClasses[i.cakeType?.color as string]
+                )}
+              >
+                {i.cakeType?.name || "no tag"}
+              </Badge>
             </div>
           </div>
         </div>

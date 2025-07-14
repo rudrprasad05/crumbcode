@@ -25,9 +25,9 @@ namespace CrumbCodeBackend.Controllers
 
         public CakeController(
             ICakeRepository cakeRepository,
-            IConfiguration configuration, 
+            IConfiguration configuration,
             ITokenService tokenService
-        )  : base(configuration, tokenService)
+        ) : base(configuration, tokenService)
         {
             _cakeRepository = cakeRepository;
         }
@@ -41,11 +41,10 @@ namespace CrumbCodeBackend.Controllers
             if (model == null)
             {
                 return BadRequest(new ApiResponse<List<CakeDto>>
-                    {
-                        Success = false,
-                        StatusCode = 400,
-                        
-                    }
+                {
+                    Success = false,
+                    StatusCode = 400,
+                }
                 );
             }
 
@@ -69,25 +68,39 @@ namespace CrumbCodeBackend.Controllers
 
         [HttpPost("upsert")]
         [ProducesResponseType(typeof(CreateNewCakeResponse), 200)]
-        
+
         public async Task<IActionResult> UpsertAsync([FromQuery] string uuid, [FromBody] NewCakeRequest newCakeRequest)
         {
-            var dto = newCakeRequest.FromNewCakeRequestToModel();
+            var cake = newCakeRequest.FromNewCakeRequestToModel();
             var exists = await _cakeRepository.Exists(uuid);
             var model = new ApiResponse<CakeDto>();
 
             if (exists != null) // update
             {
-                model = await _cakeRepository.UpdateAsync(uuid, dto);
+                model = await _cakeRepository.UpdateAsync(uuid, cake);
             }
             else // create new
             {
-                model = await _cakeRepository.CreateAsync(dto);
+                model = await _cakeRepository.CreateAsync(cake);
             }
 
 
             return Ok(model);
 
+        }
+
+        [HttpDelete("safe-delete/{uuid}")]
+        [ProducesResponseType(typeof(CreateNewCakeResponse), 200)]
+        public override async Task<IActionResult> SafeDelete([FromRoute] string uuid)
+        {
+            var model = await _cakeRepository.SafeDelete(uuid);
+
+            if (model == null)
+            {
+                return BadRequest("model not gotten");
+            }
+
+            return Ok(model);
         }
 
     }

@@ -13,7 +13,7 @@ namespace CrumbCodeBackend.Interfaces
     {
         public Task<ApiResponse<SocialMediaDto>> CreateAsync(SocialMedia cake);
         public Task<ApiResponse<List<SocialMediaDto>>> GetAllAsync(CakeQueryObject queryObject);
-        public Task<SocialMediaDto?> GetOneAsync(string uuid);
+        public Task<ApiResponse<SocialMediaDto>> GetOneAsync(string uuid);
         public Task<ApiResponse<SocialMediaDto>> Exists(string uuid);
         public Task<ApiResponse<SocialMediaDto>> UpdateAsync(string uuid, SocialMedia cake);
     }
