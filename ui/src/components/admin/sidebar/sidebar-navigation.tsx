@@ -18,6 +18,7 @@ import {
   Tag,
   Cake,
   Bell,
+  Globe,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,11 +38,11 @@ const navigationItems = [
     href: "/admin/categories",
     icon: Tag,
   },
-  //   {
-  //     title: "Reviews",
-  //     href: "/admin/reviews",
-  //     icon: Star,
-  //   },
+  {
+    title: "Site",
+    href: "/admin/site",
+    icon: Globe,
+  },
   {
     title: "Socials",
     href: "/admin/socials",
