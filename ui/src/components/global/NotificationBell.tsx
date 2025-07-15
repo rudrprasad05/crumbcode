@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bell,
   Clock,
@@ -21,109 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import Link from "next/link";
 
 import { Notification, NotificationTypes } from "@/types";
-
-const mockNotifications: Partial<Notification>[] = [
-  {
-    id: 2,
-    uuid: "q",
-    title: "New User Registration",
-    message: "John Doe has registered as a new user and is pending approval.",
-    type: NotificationTypes.SUCCESS,
-    isRead: false,
-    createdOn: new Date(Date.now() - 5 * 60 * 1000).toDateString(), // 5 minutes ago
-    actionUrl: "/admin/users/john-doe",
-  },
-  {
-    id: 2,
-    title: "System Maintenance",
-    message: "Scheduled maintenance will begin at 2:00 AM UTC tomorrow.",
-    type: NotificationTypes.ERROR,
-    isRead: false,
-    createdOn: new Date(Date.now() - 15 * 60 * 1000).toDateString(), // 15 minutes ago
-  },
-  {
-    id: 2,
-    title: "Payment Failed",
-    message: "Payment processing failed for subscription #12345.",
-    type: NotificationTypes.INFO,
-    isRead: true,
-    createdOn: new Date(Date.now() - 30 * 60 * 1000).toDateString(), // 30 minutes ago
-    actionUrl: "/admin/payments/12345",
-  },
-  {
-    id: 2,
-    title: "Backup Completed",
-    message: "Daily database backup completed successfully.",
-    type: NotificationTypes.WARNING,
-    isRead: true,
-    createdOn: new Date(Date.now() - 60 * 60 * 1000).toDateString(), // 1 hour ago
-  },
-  {
-    id: 2,
-    title: "Security Alert",
-    message: "Multiple failed login attempts detected from IP 192.168.1.100.",
-    type: NotificationTypes.SUCCESS,
-    isRead: false,
-    createdOn: new Date(Date.now() - 2 * 60 * 60 * 1000).toDateString(), // 2 hours ago
-    actionUrl: "/admin/security/alerts",
-  },
-  {
-    id: 2,
-    title: "New Feature Released",
-    message: "Analytics dashboard v2.0 is now available.",
-    type: NotificationTypes.SUCCESS,
-    isRead: true,
-    createdOn: new Date(Date.now() - 3 * 60 * 60 * 1000).toDateString(), // 3 hours ago
-  },
-  {
-    id: 2,
-    title: "Storage Warning",
-    message: "Storage usage is at 85%. Consider upgrading your plan.",
-    type: NotificationTypes.SUCCESS,
-    isRead: false,
-    createdOn: new Date(Date.now() - 4 * 60 * 60 * 1000).toDateString(), // 4 hours ago
-  },
-  {
-    id: 2,
-    title: "API Rate Limit",
-    message: 'API rate limit exceeded for client app "Mobile App".',
-    type: NotificationTypes.SUCCESS,
-    isRead: true,
-    createdOn: new Date(Date.now() - 6 * 60 * 60 * 1000).toDateString(), // 6 hours ago
-  },
-  {
-    id: 2,
-    title: "User Feedback",
-    message: "New 5-star review received from premium user.",
-    type: NotificationTypes.SUCCESS,
-    isRead: true,
-    createdOn: new Date(Date.now() - 8 * 60 * 60 * 1000).toDateString(), // 8 hours ago
-  },
-  {
-    id: 2,
-    title: "Server Update",
-    message: "Server infrastructure updated to latest version.",
-    type: NotificationTypes.SUCCESS,
-    isRead: true,
-    createdOn: new Date(Date.now() - 12 * 60 * 60 * 1000).toDateString(), // 12 hours ago
-  },
-  {
-    id: 2,
-    title: "License Expiring",
-    message: "Your premium license will expire in 7 days.",
-    type: NotificationTypes.SUCCESS,
-    isRead: false,
-    createdOn: new Date(Date.now() - 24 * 60 * 60 * 1000).toDateString(), // 1 day ago
-  },
-  {
-    id: 2,
-    title: "Data Export Ready",
-    message: "Your requested data export is ready for download.",
-    type: NotificationTypes.SUCCESS,
-    isRead: true,
-    createdOn: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toDateString(), // 2 days ago
-  },
-];
+import { GetAllNotifications } from "@/actions/Notifications";
 
 function getNotificationIcon(type: Notification["type"]) {
   switch (type) {
@@ -157,8 +55,30 @@ function formatTimeAgo(str: string) {
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const unreadCount = mockNotifications.filter((n) => !n.isRead).length;
-  const recentNotifications = mockNotifications.slice(0, 10);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    //  const recentNotifications = mockNotifications.slice(0, 10);
+  }, []);
+
+  useEffect(() => {
+    setNotifications([]);
+    const getData = async () => {
+      const data = await GetAllNotifications({
+        pageNumber: 1,
+        pageSize: 10,
+      });
+
+      setNotifications(data.data as Notification[]);
+      setUnreadCount(
+        (data.data as Notification[]).filter((n) => !n.isRead).length
+      );
+      setLoading(false);
+    };
+    getData();
+  }, []);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -182,7 +102,7 @@ export function NotificationBell() {
         </div>
         <ScrollArea className="h-96">
           <div className="p-2">
-            {recentNotifications.map((notification, index) => (
+            {notifications.map((notification, index) => (
               <div key={notification.id}>
                 <Link
                   href={`/admin/notifications/${notification.id}`}
@@ -219,7 +139,7 @@ export function NotificationBell() {
                     </div>
                   </div>
                 </Link>
-                {index < recentNotifications.length - 1 && (
+                {index < notifications.length - 1 && (
                   <Separator className="my-1" />
                 )}
               </div>

@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import CakeCardCreation from "./CakeCardCreation";
 import SideBarConfigTab from "./SideBarConfigTab";
 import SidebarDetailsTab from "./SidebarDetailsTab";
+import { EditorSaveButton } from "@/components/global/EditorSaveButton";
 
 export default function CakeEditor({ cake }: { cake?: Cake }) {
   return (
@@ -52,7 +53,7 @@ export default function CakeEditor({ cake }: { cake?: Cake }) {
 
 function Header() {
   const router = useRouter();
-  const { saveCakeContext, hasChanged } = useCake();
+  const { saveCakeContext, hasChanged, isSaving } = useCake();
 
   useEffect(() => {}, [hasChanged]);
 
@@ -67,26 +68,11 @@ function Header() {
       <div className="ml-5 text-lg font-bold">
         <h1>Cake Editor</h1>
       </div>
-      <div className="flex gap-2 items-center ml-auto">
-        <div className="text-sm text-gray-500 ">
-          {hasChanged ? (
-            <div className="flex items-center gap-2">
-              <CloudOff className="w-4 h-4 " /> Changes not saved
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <CloudUpload className="w-4 h-4 " /> Saved to Cloud
-            </div>
-          )}
-        </div>
-        <Button
-          disabled={!hasChanged}
-          onClick={saveCakeContext}
-          variant={"outline"}
-        >
-          Save
-        </Button>
-      </div>
+      <EditorSaveButton
+        hasChanged={hasChanged}
+        isSaving={isSaving}
+        save={saveCakeContext}
+      />
       <SidebarHeader className="ml-5">
         <PostSidebarLogo />
       </SidebarHeader>

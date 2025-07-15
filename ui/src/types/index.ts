@@ -5,6 +5,7 @@ export interface BaseModel {
   uuid: string;
   createdOn: string;
   updatedOn: string;
+  isDeleted: boolean;
 }
 
 export interface Cake extends BaseModel {

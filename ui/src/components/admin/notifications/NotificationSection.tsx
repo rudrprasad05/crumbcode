@@ -1,13 +1,16 @@
 "use client";
 
-import { GetAllSocialMedia } from "@/actions/SocialMedia";
-import { LoadingCard } from "@/components/global/LoadingContainer";
+import { GetAllCakes } from "@/actions/Cake";
+import {
+  LoadingCard,
+  LoadingHorizontialCard,
+} from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
-import { Default, SocialIcons } from "@/components/svg/icons";
+import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import {
   Select,
   SelectContent,
@@ -15,20 +18,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { parseSocialLink } from "@/lib/link-parse";
-import { MetaData, SocialMedia } from "@/types";
+import { cn } from "@/lib/utils";
+import { Cake, CakeTypeColorClasses, MetaData } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
-import { FC, SVGProps, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { GetAllNotifications } from "@/actions/Notifications";
+import { Notification } from "@/types";
+import { NotificationCard } from "./NotificationCard";
 
-interface ISocialSection {
-  data: SocialMedia[];
+interface ICakeTypesSection {
+  data: Notification[];
   isLoading: boolean;
 }
 
-export default function SocialSection() {
-  const [socialItems, setSocialItems] = useState<SocialMedia[]>([]);
+export default function NotificationSection() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
+
   const [pagination, setPagination] = useState<MetaData>({
     pageNumber: 1,
     totalCount: 0,
@@ -37,17 +44,19 @@ export default function SocialSection() {
   });
 
   useEffect(() => {
-    setSocialItems([]);
+    setNotifications([]);
     const getData = async () => {
-      const data = await GetAllSocialMedia({
+      const data = await GetAllNotifications({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
       });
+
       console.log(data);
 
-      setSocialItems(data.data as SocialMedia[]);
+      setNotifications(data.data as Notification[]);
       setPagination((prev) => ({
         ...prev,
+        totalCount: data.meta?.totalCount as number,
         totalPages: Math.ceil(
           (data.meta?.totalCount as number) / pagination.pageSize
         ),
@@ -61,7 +70,7 @@ export default function SocialSection() {
   return (
     <div>
       <Header />
-      <HandleDataSection isLoading={loading} data={socialItems} />
+      <HandleDataSection isLoading={loading} data={notifications} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}
@@ -76,8 +85,8 @@ function Header() {
   return (
     <>
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Social Links</h1>
-        <p className="text-gray-600 mt-2">Create and manage your links here</p>
+        <h1 className="text-3xl font-bold text-gray-900">Cakes</h1>
+        <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
@@ -112,7 +121,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/socials/create"}>
+        <Link href={"/admin/cakes/create"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -127,78 +136,26 @@ function Header() {
   );
 }
 
-type IconType = FC<SVGProps<SVGSVGElement>>;
-
-function HandleDataSection({ data, isLoading }: ISocialSection) {
+function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
+  const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   if (data.length === 0 && !isLoading) {
     return <NoDataContainer />;
   }
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-2">
+      <div className="grid grid-cols-1 gap-4 py-2">
         {Array.from({ length: 8 }, (_, i) => (
-          <LoadingCard key={i} />
+          <LoadingHorizontialCard key={i} />
         ))}
       </div>
     );
   }
-  console.log("sm123", data);
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-2">
-      {data.map((i, index) => (
-        <SocialMediaCard data={i} key={index} />
+    <div className="grid grid-cols-1 gap-4 py-2">
+      {data.map((i) => (
+        <NotificationCard key={i.uuid} data={i} />
       ))}
     </div>
-  );
-}
-
-export function SocialMediaCard({ data }: { data: SocialMedia }) {
-  const [username, setUsername] = useState<string>("");
-  const [Icon, setIcon] = useState<IconType>(() => Default);
-
-  useEffect(() => {
-    setUsername(parseSocialLink(data.url as string).username as string);
-  }, [data.url]);
-
-  useEffect(() => {
-    const foundIcon = SocialIcons.find(
-      (icon) => icon.name.toLowerCase() === data?.icon?.toLowerCase()
-    )?.Icon;
-
-    setIcon(() => foundIcon || Default);
-  }, [data.icon]);
-
-  return (
-    <Card
-      className={`grow w-full max-w-sm transition-colors cursor-pointer border-0 shadow-sm hover:shadow-md`}
-    >
-      <CardContent className="flex justify-between">
-        <div className="flex items-center space-x-4">
-          <div className={`p-2 rounded-full bg-white shadow-sm`}>
-            <Icon className="w-4 h-4" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {data.name}
-            </p>
-            <p className="text-sm text-gray-500 truncate">@{username}</p>
-          </div>
-        </div>
-        <div className="text-end text-sm flex flex-col">
-          <Link
-            className="underline-offset-4 hover:underline"
-            href={"/admin/socials/edit/" + data.uuid}
-          >
-            Edit
-          </Link>
-          <Link
-            className="underline-offset-4 hover:underline"
-            href={"//" + data.url}
-          >
-            Open
-          </Link>
-        </div>
-      </CardContent>
-    </Card>
   );
 }
