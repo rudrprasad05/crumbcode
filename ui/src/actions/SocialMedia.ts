@@ -4,6 +4,7 @@ import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
 import { ApiResponse, Cake, MediaQueryObject, SocialMedia } from "@/types";
 import { GetToken } from "./User";
+import { redirect } from "next/dist/server/api-utils";
 
 export async function GetAllSocialMedia(
   query?: MediaQueryObject
@@ -11,14 +12,26 @@ export async function GetAllSocialMedia(
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
 
-  const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
-    `social-media/get-all?${params}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
+  console.log(token, params);
 
-  return res.data;
+  try {
+    const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
+      `social-media/get-all?${params}`,
+      {
+        headers: { Authorization: `Bearer ${token}` },
+      }
+    );
+
+    return res.data;
+  } catch (error) {
+    let tmp: ApiResponse<SocialMedia[]> = {
+      success: false,
+      statusCode: 400,
+      timestamp: Date.now().toLocaleString(),
+      data: [],
+    };
+    return tmp;
+  }
 }
 
 export async function CreateSocialMedia(

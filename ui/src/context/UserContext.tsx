@@ -70,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token: res.data.token,
         role: res.data.role,
       };
+      router.push("/admin/dashboard");
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Invalid credentials");
@@ -120,18 +121,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let tempUser: User;
     console.log("trigger 1");
 
-    try {
-      let res = await axiosGlobal.get<LoginResponse>("auth/me");
-      tempUser = {
-        id: res.data.id,
-        username: res.data.username,
-        email: res.data.email,
-        token: res.data.token,
-        role: res.data.role,
-      };
-    } catch (error) {
-      console.log(error);
-    }
+    if (isAdmin)
+      try {
+        let res = await axiosGlobal.get<LoginResponse>("auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        tempUser = {
+          id: res.data.id,
+          username: res.data.username,
+          email: res.data.email,
+          token: res.data.token,
+          role: res.data.role,
+        };
+      } catch (error) {
+        console.log(error);
+      }
   };
 
   return (

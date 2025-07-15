@@ -44,10 +44,6 @@ export default function LoginPage() {
 
   async function onSubmit(values: SignInFormType) {
     setIsLoading(true);
-    console.log(values);
-
-    // Simulate API call
-    setIsLoading(true);
     try {
       await login(values.email, values.password);
     } catch (error) {

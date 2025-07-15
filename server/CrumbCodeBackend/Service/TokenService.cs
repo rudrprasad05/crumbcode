@@ -26,16 +26,16 @@ namespace CrumbCodeBackend.Service
                 throw new InvalidOperationException("No jwt signing key")
             ));
         }
-        public string CreateToken(AppUser user)
+        public string CreateToken(AppUser user, IList<string> roles)
         {
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
-                new(JwtRegisteredClaimNames.UniqueName, user.UserName ?? string.Empty),
-                new(JwtRegisteredClaimNames.NameId, user.Id)
+                new("ID", user.Id),
+                new(ClaimTypes.Email, user.Email ?? throw new InvalidOperationException()),
+                new(ClaimTypes.Name, user.UserName ?? throw new InvalidOperationException()),
             };
 
-            var roles = _userManager.GetRolesAsync(user).Result;
+            // Include roles
             foreach (var role in roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role));
@@ -45,7 +45,7 @@ namespace CrumbCodeBackend.Service
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(7),
+                Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = creds,
                 Issuer = _config["JWT:Issuer"],
                 Audience = _config["JWT:Audience"]

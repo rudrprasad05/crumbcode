@@ -40,7 +40,8 @@ namespace CrumbCodeBackend.Mappers
                 CakeType = cake.CakeType?.FromModelToDto(),
                 CreatedOn = cake.CreatedOn,
                 UpdatedOn = cake.UpdatedOn,
-                IsDeleted = cake.IsDeleted
+                IsDeleted = cake.IsDeleted,
+                UUID = cake.UUID
             };
         }
     }

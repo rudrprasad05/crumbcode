@@ -22,6 +22,7 @@ import { ArrowLeft, CloudOff, CloudUpload, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import SocialMediaCardCreation from "./SocialMediaCardCreation";
+import { EditorSaveButton } from "@/components/global/EditorSaveButton";
 
 export default function SocialMediaEditor({
   socialMedia,
@@ -78,33 +79,11 @@ function Header() {
       <div className="ml-5 text-lg font-bold">
         <h1>Links Editor</h1>
       </div>
-      <div className="flex gap-2 items-center ml-auto">
-        <div className="text-sm text-gray-500 ">
-          {hasChanged ? (
-            <div className="flex items-center gap-2">
-              <CloudOff className="w-4 h-4 " /> Changes not saved
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <CloudUpload className="w-4 h-4 " /> Saved to Cloud
-            </div>
-          )}
-        </div>
-        <Button
-          disabled={!hasChanged}
-          onClick={saveSocialMediaContext}
-          variant={"outline"}
-        >
-          {isSaving ? (
-            <div className="flex gap-2 items-center">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Saving
-            </div>
-          ) : (
-            <div>Save</div>
-          )}
-        </Button>
-      </div>
+      <EditorSaveButton
+        hasChanged={hasChanged}
+        isSaving={isSaving}
+        save={saveSocialMediaContext}
+      />
       <SidebarHeader className="ml-5">
         <PostSidebarLogo />
       </SidebarHeader>

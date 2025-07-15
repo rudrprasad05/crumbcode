@@ -7,6 +7,7 @@ using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models.Requests;
 using CrumbCodeBackend.Models.Response;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static CrumbCodeBackend.Models.Requests.CakeRequestObject;
 using static CrumbCodeBackend.Models.Response.SocialMediaResponse;
@@ -15,7 +16,7 @@ namespace CrumbCodeBackend.Controllers
 {
     [Route("api/social-media")]
     [ApiController]
-
+    [Authorize]
     public class SocialMediaController : BaseController
     {
         private readonly ISocialMediaRepository _socialMediaRepository;
