@@ -83,17 +83,17 @@ export default function NotificationSection() {
 
 function Header() {
   return (
-    <>
+    <div className="flex flex-col gap-1">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Cakes</h1>
-        <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
+        <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
+        <p className="text-gray-600 mt-2">Manage your notifications here</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search posts..."
+              placeholder="Search notifications..."
               className="pl-10 bg-white border-gray-200"
             />
           </div>
@@ -120,19 +120,8 @@ function Header() {
             </SelectContent>
           </Select>
         </div>
-
-        <Link href={"/admin/cakes/create"}>
-          <div
-            className={`${buttonVariants({
-              variant: "default",
-            })} w-full text-start justify-start px-2 my-2`}
-          >
-            <Plus />
-            New Cake
-          </div>
-        </Link>
       </div>
-    </>
+    </div>
   );
 }
 
@@ -144,7 +133,7 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
   }
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-4 py-2">
+      <div className="grid grid-cols-1 gap-4 py-4">
         {Array.from({ length: 8 }, (_, i) => (
           <LoadingHorizontialCard key={i} />
         ))}
@@ -152,7 +141,7 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
     );
   }
   return (
-    <div className="grid grid-cols-1 gap-4 py-2">
+    <div className="grid grid-cols-1 gap-4 py-4">
       {data.map((i) => (
         <NotificationCard key={i.uuid} data={i} />
       ))}
