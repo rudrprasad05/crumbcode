@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Image, Loader2, Trash, Upload } from "lucide-react";
+import { Image as ImageIcon, Loader2, Trash, Upload } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { NewMediaFormSchema, NewMediaFormType } from "@/types/zod";
 import { UploadOneFile } from "@/actions/Media";
@@ -125,7 +125,7 @@ export default function NewMediaModal({
             </label>
           ) : (
             <div className="flex items-center gap-2 w-full">
-              <Image className="w-6 h-6" />
+              <ImageIcon className="w-6 h-6" />
               <div className="truncate w-full">{file.name}</div>
               <Button variant="destructive" onClick={removeFile} type="button">
                 <Trash className="w-4 h-4" />

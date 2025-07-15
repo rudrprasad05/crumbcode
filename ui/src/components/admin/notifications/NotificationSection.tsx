@@ -65,7 +65,7 @@ export default function NotificationSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <div>

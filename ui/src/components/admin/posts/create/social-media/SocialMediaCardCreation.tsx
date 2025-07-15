@@ -23,7 +23,7 @@ export default function SocialMediaCardCreation({
     if (data) {
       setInitialCakeState(data);
     }
-  }, [data]);
+  }, [data, setInitialCakeState]);
 
   useEffect(() => {
     setUsername(parseSocialLink(socialMedia.url as string).username as string);

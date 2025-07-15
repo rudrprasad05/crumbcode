@@ -31,7 +31,7 @@ export async function SaveCake(
   cake: Partial<Cake>,
   uuid?: string
 ): Promise<Cake> {
-  let dto = FromModelToNewRequestDTO(cake as Cake);
+  const dto = FromModelToNewRequestDTO(cake as Cake);
   const res = await axiosGlobal.post<Cake>("cake/upsert?uuid=" + uuid, dto);
 
   return res.data;

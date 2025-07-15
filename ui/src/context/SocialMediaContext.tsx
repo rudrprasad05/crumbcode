@@ -11,7 +11,7 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 
-let defaultData: Partial<SocialMedia> = {
+const defaultData: Partial<SocialMedia> = {
   name: "example",
   url: "example.com",
   icon: "Default",

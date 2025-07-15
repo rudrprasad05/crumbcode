@@ -43,7 +43,7 @@ export function MediaLibrary() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   const handleDelete = (id: number) => {
     const updatedItems = mediaItems.filter((item) => item.id !== id);

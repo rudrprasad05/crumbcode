@@ -59,7 +59,7 @@ export default function CakeSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <div>

@@ -33,7 +33,7 @@ export default function SocialMediaEditor({
 
   useEffect(() => {
     if (socialMedia) setInitialCakeState(socialMedia);
-  }, [socialMedia]);
+  }, [socialMedia, setInitialCakeState]);
 
   return (
     <SocialMediaProvider>

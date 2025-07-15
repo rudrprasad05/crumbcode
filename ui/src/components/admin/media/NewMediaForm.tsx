@@ -1,24 +1,16 @@
 "use client";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import React, { useState } from "react";
+import { GetOneMedia, UploadOneFile } from "@/actions/Media";
+import { Button } from "@/components/ui/button";
+import { useCake } from "@/context/CakeContext";
+import { cn } from "@/lib/utils";
+import { NewMediaFormSchema, NewMediaFormType } from "@/types/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Image as ImageIcon, Loader2, Trash, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Image, Loader2, Trash, Upload } from "lucide-react";
-import { useParams, useRouter } from "next/navigation";
-import { NewMediaFormSchema, NewMediaFormType } from "@/types/zod";
-import { GetOneMedia, UploadOneFile } from "@/actions/Media";
-import { cn } from "@/lib/utils";
-import { useCake } from "@/context/CakeContext";
 
 export default function NewMediaForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -122,7 +114,7 @@ export default function NewMediaForm() {
         </label>
       ) : (
         <div className="flex items-center gap-2 w-full">
-          <Image className="w-6 h-6" />
+          <ImageIcon className="w-6 h-6" />
           <div className="truncate w-full">{file.name}</div>
           <Button variant="destructive" onClick={removeFile} type="button">
             <Trash className="w-4 h-4" />

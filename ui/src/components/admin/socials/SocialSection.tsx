@@ -56,7 +56,7 @@ export default function SocialSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <div>

@@ -31,7 +31,6 @@ import { toast } from "sonner";
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
   const { login } = useAuth();
 
   const form = useForm<SignInFormType>({
@@ -153,7 +152,7 @@ export default function LoginPage() {
               </Button>
 
               <div className="text-center text-sm text-slate-600">
-                {"Don't have an account? "}
+                <>Don&apos;'t have an account?</>
                 <Link
                   href="/auth/register"
                   className="text-blue-600 hover:text-blue-500 font-medium hover:underline"

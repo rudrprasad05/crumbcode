@@ -1,19 +1,17 @@
 "use server";
 
 import { axiosGlobal } from "@/lib/axios";
+import { buildMediaQueryParams } from "@/lib/params";
 import {
   ApiResponse,
   CakeType,
   Media,
   MediaQueryObject,
   NewCakeTypeRequest,
-  NewMediaRequest,
 } from "@/types";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { GetToken } from "./User";
-import { headers } from "next/headers";
-import { buildMediaQueryParams } from "@/lib/params";
 
 export async function GetAllCakeTypes(
   query?: MediaQueryObject
@@ -99,7 +97,9 @@ export async function DeleteForever(id: string) {
   //   if (!token) {
   //     return redirect("/");
   //   }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id);
+  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   return res.data;
 }

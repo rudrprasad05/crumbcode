@@ -204,13 +204,13 @@ function MediaListTab({
       }));
     };
     if (open) getData();
-  }, [open, pagination.pageNumber]);
+  }, [open, pagination.pageNumber, pagination.pageSize]);
 
   if (mediaItems.length === 0) {
     return (
       <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-visible w-full">
         {Array.from({ length: 6 }, (_, i) => (
-          <LoadingCard />
+          <LoadingCard key={i} />
         ))}
       </div>
     );

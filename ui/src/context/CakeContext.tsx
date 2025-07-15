@@ -12,7 +12,7 @@ import { SaveCake } from "@/actions/Cake";
 import { toast } from "sonner";
 import { GetAllCakeTypes } from "@/actions/CakeType";
 
-let defaultMedia: Partial<Media> = {
+const defaultMedia: Partial<Media> = {
   url: "/default-img.jpeg",
   objectKey: "crumbcode/d6dab80c-3acd-4e6a-a750-506c7243991f.jpeg",
   altText: "default image placeholder",
@@ -25,7 +25,7 @@ let defaultMedia: Partial<Media> = {
   updatedOn: "2025-06-28T22:41:32.499489",
 };
 
-let defaultCakeData: Partial<Cake> = {
+const defaultCakeData: Partial<Cake> = {
   name: "Default cake name",
   description: "Default cake desc",
   price: 10,

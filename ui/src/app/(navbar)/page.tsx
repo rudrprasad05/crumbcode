@@ -1,3 +1,5 @@
+"use client";
+
 import Footer from "../../components/global/footer";
 import Header from "../../components/global/header";
 import AboutSection from "../../components/home/about-section";

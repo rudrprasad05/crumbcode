@@ -9,6 +9,7 @@ import { destroyCookie } from "nookies";
 import {
   createContext,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -29,15 +30,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
-  const redirect = searchParams.get("redirect");
-
   // 🔹 Load session from cookies on mount
-  useEffect(() => {
-    checkAuth();
-    console.log("user", user);
-  }, [pathname, searchParams, router]);
 
   const helperHandleRedirectAfterLogin = (tmp: User) => {
     // if (!tmp) {
@@ -49,9 +43,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       description: "Redirecting shortly",
     });
     if (tmp.role == "Admin") {
-      router.push(redirect || "/admin");
+      router.push("/admin");
     } else {
-      router.push(redirect || "/");
+      router.push("/");
     }
   };
 
@@ -115,15 +109,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     router.push("/");
   };
 
-  const checkAuth = async () => {
-    let token = localStorage.getItem("token");
-    let isAdmin = pathname.includes("admin");
+  const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    const isAdmin = pathname.includes("admin");
     let tempUser: User;
     console.log("trigger 1");
 
     if (isAdmin)
       try {
-        let res = await axiosGlobal.get<LoginResponse>("auth/me", {
+        const res = await axiosGlobal.get<LoginResponse>("auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         tempUser = {
@@ -136,7 +130,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       } catch (error) {
         console.log(error);
       }
-  };
+  }, [pathname]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [pathname, router, checkAuth]);
 
   return (
     <AuthContext.Provider

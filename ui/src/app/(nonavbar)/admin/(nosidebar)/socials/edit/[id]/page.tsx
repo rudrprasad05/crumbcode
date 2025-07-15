@@ -15,7 +15,7 @@ type PageProps = {
   params: Promise<{ id: string }>; // important!
 };
 
-export default function page({ params }: PageProps) {
+export default function SocialEditPage({ params }: PageProps) {
   const { id } = React.use(params);
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<SocialMedia | undefined>(undefined);

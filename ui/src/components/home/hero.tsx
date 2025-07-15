@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function Hero() {
@@ -24,7 +25,9 @@ export default function Hero() {
       </div>
       <div className="absolute right-0 bottom-10 w-1/2 h-full hidden lg:block">
         <div className="relative w-full h-full">
-          <img
+          <Image
+            width={1000}
+            height={1000}
             src="https://bucket.procyonfiji.com/procyon/cc-hero-1.png"
             alt="Delicious cake showcase"
             className="absolute right-0 bottom-0 object-cover rounded-tl-3xl"

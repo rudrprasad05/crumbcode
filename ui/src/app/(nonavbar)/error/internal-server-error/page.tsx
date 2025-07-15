@@ -23,8 +23,8 @@ export default function InternalServerError() {
             500 - Internal Server Error
           </CardTitle>
           <CardDescription className="text-gray-600">
-            We're experiencing some technical difficulties. Our team has been
-            notified and is working to resolve the issue.
+            We&apos;'re experiencing some technical difficulties. Our team has
+            been notified and is working to resolve the issue.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

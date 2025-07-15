@@ -2,9 +2,8 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, Cake, MediaQueryObject, SocialMedia } from "@/types";
+import { ApiResponse, MediaQueryObject, SocialMedia } from "@/types";
 import { GetToken } from "./User";
-import { redirect } from "next/dist/server/api-utils";
 
 export async function GetAllSocialMedia(
   query?: MediaQueryObject
@@ -24,7 +23,8 @@ export async function GetAllSocialMedia(
 
     return res.data;
   } catch (error) {
-    let tmp: ApiResponse<SocialMedia[]> = {
+    console.log(error);
+    const tmp: ApiResponse<SocialMedia[]> = {
       success: false,
       statusCode: 400,
       timestamp: Date.now().toLocaleString(),
