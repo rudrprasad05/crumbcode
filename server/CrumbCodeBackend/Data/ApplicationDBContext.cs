@@ -41,6 +41,10 @@ namespace CrumbCodeBackend.Data
             .Property(n => n.Type)
             .HasConversion<string>();
 
+            modelBuilder.Entity<ContactMessage>()
+            .Property(n => n.Type)
+            .HasConversion<string>();
+
         }
         public DbSet<Cake> Cakes { get; set; }
         public DbSet<CakeType> CakeTypes { get; set; }
@@ -48,6 +52,7 @@ namespace CrumbCodeBackend.Data
         public DbSet<Media> Medias { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<SocialMedia> SocialMedias { get; set; }
+        public DbSet<ContactMessage> ContactMessages { get; set; }
 
     }
 }

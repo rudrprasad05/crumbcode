@@ -24,6 +24,20 @@ export interface Cake extends BaseModel {
   //   allergens: Allergen[];
 }
 
+export interface ContactMessage extends BaseModel {
+  user: User;
+  name: string;
+  email: string;
+  message: string;
+  type: ContactMessageTypes;
+}
+
+export enum ContactMessageTypes {
+  INFO = "INFO",
+  ORDER = "ORDER",
+  UPDATE = "UPDATE",
+}
+
 export interface IconType {
   name: string;
   Icon: any;

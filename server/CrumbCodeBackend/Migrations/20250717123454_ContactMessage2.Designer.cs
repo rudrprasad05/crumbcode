@@ -4,6 +4,7 @@ using CrumbCodeBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrumbCodeBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717123454_ContactMessage2")]
+    partial class ContactMessage2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -257,9 +260,8 @@ namespace CrumbCodeBackend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("UUID")
                         .IsRequired()
@@ -447,13 +449,13 @@ namespace CrumbCodeBackend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a564800b-2a82-4aa6-a6bf-e88f9cf39871",
+                            Id = "e2ff5de0-fa3c-47d0-9455-f7d06f2b49ec",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "7724609c-4bbd-495d-aca2-cc0b12b24219",
+                            Id = "c2340c12-71af-423a-a5ea-cf8433ad066e",
                             Name = "User",
                             NormalizedName = "USER"
                         });

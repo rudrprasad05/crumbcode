@@ -4,6 +4,7 @@ using CrumbCodeBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CrumbCodeBackend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250717123129_ContactMessage")]
+    partial class ContactMessage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -246,9 +249,6 @@ namespace CrumbCodeBackend.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Message")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -257,9 +257,8 @@ namespace CrumbCodeBackend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("UUID")
                         .IsRequired()
@@ -276,7 +275,7 @@ namespace CrumbCodeBackend.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("ContactMessages");
+                    b.ToTable("ContactMessage");
                 });
 
             modelBuilder.Entity("CrumbCodeBackend.Models.Media", b =>
@@ -447,13 +446,13 @@ namespace CrumbCodeBackend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "a564800b-2a82-4aa6-a6bf-e88f9cf39871",
+                            Id = "1baec8a3-3ea0-4155-94dc-9f7d696f5acf",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "7724609c-4bbd-495d-aca2-cc0b12b24219",
+                            Id = "373f59fe-bbb9-4124-9438-70eaec2dd7f9",
                             Name = "User",
                             NormalizedName = "USER"
                         });

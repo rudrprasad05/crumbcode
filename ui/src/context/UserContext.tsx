@@ -31,6 +31,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const redirect = searchParams.get("redirect");
+
   // 🔹 Load session from cookies on mount
 
   const helperHandleRedirectAfterLogin = (tmp: User) => {
@@ -47,6 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     let tempUser: User;
+    console.log(redirect);
     try {
       const res = await axiosGlobal.post<LoginResponse>("auth/login", {
         email,
@@ -60,13 +64,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token: res.data.token,
         role: res.data.role,
       };
-      router.push("/admin/dashboard");
+      console.log(redirect);
+
+      if (redirect && redirect.trim().length > 0) {
+        console.log("hit");
+        router.push("/" + redirect);
+      } else {
+        console.log("hit2");
+        helperHandleRedirectAfterLogin(tempUser);
+      }
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Invalid credentials");
     }
-
-    helperHandleRedirectAfterLogin(tempUser);
   };
 
   const register = async (data: RegisterFormType) => {
@@ -92,7 +102,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       throw new Error("Invalid credentials");
     }
 
-    helperHandleRedirectAfterLogin(tempUser);
+    // helperHandleRedirectAfterLogin(tempUser);
   };
 
   // 🔹 Logout function
