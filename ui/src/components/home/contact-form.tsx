@@ -7,8 +7,14 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Label } from "@radix-ui/react-label";
+import { useAuth } from "@/context/UserContext";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function ContactForm() {
+  const { user } = useAuth();
+  const router = useRouter();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -24,10 +30,15 @@ export default function ContactForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission logic here
-    // Reset form
+    if (user == null) {
+      toast.error("Login first");
+      router.push(
+        `/auth/login?page=contact&state=${formData.name}+${formData.email}+${formData.message}`
+      );
+      return;
+    }
+
     setFormData({ name: "", email: "", message: "" });
-    alert("Thank you for your message! We'll get back to you soon.");
   };
 
   return (

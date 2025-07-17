@@ -40,10 +40,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, [pathname, searchParams, router]);
 
   const helperHandleRedirectAfterLogin = (tmp: User) => {
-    // if (!tmp) {
-    //   router.push(redirect || "/");
-    //   return;
-    // }
     setUser(tmp);
     toast.success("Successfully logged in", {
       description: "Redirecting shortly",

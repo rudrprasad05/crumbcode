@@ -1,3 +1,6 @@
+"use client";
+
+import { AuthProvider } from "@/context/UserContext";
 import Footer from "../../components/global/footer";
 import Header from "../../components/global/header";
 import AboutSection from "../../components/home/about-section";
@@ -15,7 +18,9 @@ export default function Home() {
       <AboutSection />
       <GotOccasionComingUp />
       <FeaturesSection />
-      <ContactSection />
+      <AuthProvider>
+        <ContactSection />
+      </AuthProvider>
       <Footer />
     </main>
   );

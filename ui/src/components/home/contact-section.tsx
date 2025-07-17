@@ -1,3 +1,6 @@
+"use client";
+
+import { useAuth } from "@/context/UserContext";
 import ContactForm from "./contact-form";
 import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
 
