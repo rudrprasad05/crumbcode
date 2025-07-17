@@ -6,6 +6,8 @@ import { cn } from "@/lib/utils";
 import { Cake, CakeTypeColorClasses } from "@/types";
 import Link from "next/link";
 import { useEffect } from "react";
+import  Image  from "next/image";
+
 
 export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
   const { cake, setInitialCakeState } = useCake();
@@ -14,14 +16,16 @@ export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
     if (cakeData) {
       setInitialCakeState(cakeData);
     }
-  }, [cakeData]);
+  }, [cakeData, setInitialCakeState]);
 
   return (
     <div className="bg-white rounded-xl w-[340px] shadow-md overflow-hidden">
       <div className="h-48 overflow-hidden">
-        <img
+        <Image
           src={cake.media?.url as string}
           alt={""}
+          width={100}
+          height={100}
           className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
         />
       </div>

@@ -6,6 +6,7 @@ using CrumbCodeBackend.Data;
 using Microsoft.EntityFrameworkCore;
 using CrumbCodeBackend.Service;
 using CrumbCodeBackend.Middleware;
+using Microsoft.AspNetCore.Authorization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,14 +21,16 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
 builder.Services.AddSingleton<IUserContextService, UserContextService>();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationMiddlewareResultHandler>();
+
 
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<INotificationRepository, NotificationRepository>();
 builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();
 builder.Services.AddScoped<ISocialMediaRepository, SocialMediaRepository>();
-
-
 
 var app = builder.Build();
 

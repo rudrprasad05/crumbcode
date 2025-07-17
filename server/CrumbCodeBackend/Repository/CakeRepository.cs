@@ -17,11 +17,13 @@ namespace CrumbCodeBackend.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly IAmazonS3Service _amazonS3Service;
+        private readonly INotificationService _notificationService;
 
-        public CakeRepository(ApplicationDbContext applicationDbContext, IAmazonS3Service amazonS3Service)
+        public CakeRepository(INotificationService notificationService, ApplicationDbContext applicationDbContext, IAmazonS3Service amazonS3Service)
         {
             _context = applicationDbContext;
             _amazonS3Service = amazonS3Service;
+            _notificationService = notificationService;
 
         }
 
@@ -29,14 +31,15 @@ namespace CrumbCodeBackend.Repository
         {
             var model = await _context.Cakes.AddAsync(cake);
             await _context.SaveChangesAsync();
-            var result = new CakeDto
-            {
-                Id = model.Entity.Id,
-                Name = model.Entity.Name,
-                Price = model.Entity.Price,
-                CakeType = model.Entity.CakeType?.FromModelToDto(),
-                Description = model.Entity.Description
-            };
+
+            var result = model.Entity.FromModelToDto();
+
+            await _notificationService.CreateNotificationAsync(
+                title: "New Cake",
+                message: "The cake " + result.Name + " was created",
+                type: NotificationType.INFO,
+                actionUrl: "/admin/cake/" + result.UUID
+            );
 
             return new ApiResponse<CakeDto>
             {
@@ -111,18 +114,9 @@ namespace CrumbCodeBackend.Repository
                     var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media?.ObjectKey ?? "");
                     mediaDto = cake.Media?.FromModelToDTO(signedUrl);
                 }
-
-                result.Add(new CakeDto
-                {
-                    Id = cake.Id,
-                    Name = cake.Name,
-                    Price = cake.Price,
-                    IsAvailable = cake.IsAvailable,
-                    Media = mediaDto ?? null,
-                    UUID = cake.UUID,
-                    Description = cake.Description,
-                    CakeType = cake.CakeType?.FromModelToDto() ?? null,
-                });
+                var dto = cake.FromModelToDto();
+                dto.Media = mediaDto;
+                result.Add(dto);
             }
 
             var totalCount = await _context.Cakes.CountAsync();
@@ -159,19 +153,7 @@ namespace CrumbCodeBackend.Repository
                 mediaDto = cake.Media?.FromModelToDTO(signedUrl);
             }
 
-            var dto = new CakeDto
-            {
-                Id = cake.Id,
-                Name = cake.Name,
-                Price = cake.Price,
-                IsAvailable = cake.IsAvailable,
-                Media = mediaDto,
-                UUID = cake.UUID,
-                CreatedOn = cake.CreatedOn,
-                Description = cake.Description,
-                CakeType = cake.CakeType?.FromModelToDto() ?? null
-            };
-        
+            var dto = cake.FromModelToDto();
             return dto;
         }
 

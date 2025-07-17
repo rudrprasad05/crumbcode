@@ -57,14 +57,13 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpPost("register")]
-        [ProducesResponseType(typeof(LoginResponse), 200)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest model)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
             // Determine role type from email domain
-            var roleType = model.Email.Contains("@procyonfiji.com") ? "admin" : "user";
+            var roleType = model.Email.Contains("@procyonfiji.com") ? "Admin" : "User";
 
             try
             {
@@ -74,42 +73,44 @@ namespace CrumbCodeBackend.Controllers
                     Email = model.Email
                 };
 
+                // Create user
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (!result.Succeeded)
                     return BadRequest(result.Errors);
 
-                // Ensure the role exists
+                // Ensure role exists
                 if (!await _roleManager.RoleExistsAsync(roleType))
                 {
                     await _roleManager.CreateAsync(new IdentityRole(roleType));
                 }
 
+                // Assign role
                 var roleResult = await _userManager.AddToRoleAsync(user, roleType);
                 if (!roleResult.Succeeded)
                     return BadRequest(roleResult.Errors);
 
-                // Create JWT token
-                var token = _tokenService.CreateToken(user);
+                // Include role(s) in JWT
+                var roles = await _userManager.GetRolesAsync(user);
+                var token = _tokenService.CreateToken(user, roles); 
 
+                // Set cookie
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    Secure = _env.IsDevelopment() ? false : true,
+                    Secure = !_env.IsDevelopment(),
                     SameSite = SameSiteMode.None,
                     Expires = DateTime.UtcNow.AddDays(7)
                 };
 
                 Response.Cookies.Append("token", token, cookieOptions);
 
-                var roles = await _userManager.GetRolesAsync(user);
-                var userRole = roles.FirstOrDefault() ?? "user"; // Get the assigned role
-
+                // Return login response
                 return Ok(new LoginResponse
                 {
-                    Username = user.UserName,
-                    Email = user.Email,
+                    Username = user.UserName ?? "",
+                    Email = user.Email ?? "",
                     Token = token,
-                    Role = userRole
+                    Role = roles.FirstOrDefault() ?? "User"
                 });
             }
             catch (Exception ex)
@@ -117,6 +118,7 @@ namespace CrumbCodeBackend.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
@@ -137,8 +139,8 @@ namespace CrumbCodeBackend.Controllers
                 {
                     return Unauthorized("Username or password is incorrect");
                 }
-
-                var tokenString = _tokenService.CreateToken(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                var tokenString = _tokenService.CreateToken(user, roles);
 
                 Response.Cookies.Append("token", tokenString, new CookieOptions
                 {
@@ -148,7 +150,6 @@ namespace CrumbCodeBackend.Controllers
                     Expires = DateTime.UtcNow.AddHours(1)
                 });
 
-                var roles = await _userManager.GetRolesAsync(user);
                 var userRole = roles.FirstOrDefault() ?? "user";
                 
                 return Ok(

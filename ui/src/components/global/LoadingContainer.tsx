@@ -33,6 +33,21 @@ export function LoadingCard() {
   );
 }
 
+export function LoadingHorizontialCard() {
+  return (
+    <div className="flex gap-4 my-4">
+      <div>
+        <Skeleton className="h-8 rounded-full w-8  bg-gray-300" />
+      </div>
+      <div className="grow flex flex-col gap-2">
+        <Skeleton className="h-4  bg-gray-300" />
+        <Skeleton className="h-4  bg-gray-300" />
+        <Skeleton className="h-4 w-3/5  bg-gray-300" />
+      </div>
+    </div>
+  );
+}
+
 interface TableSkeletonProps {
   rows?: number;
   columns?: number;

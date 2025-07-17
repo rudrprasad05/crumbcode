@@ -1,6 +1,6 @@
 import { CreateCakeType } from "@/actions/CakeType";
 import { FromModelToNewRequestDTO } from "@/mappers/CaketypeMapper";
-import { Cake, CakeType } from "@/types";
+import { CakeType } from "@/types";
 import hash from "object-hash";
 import React, {
   createContext,
@@ -12,7 +12,7 @@ import React, {
 } from "react";
 import { toast } from "sonner";
 
-let defaultData: Partial<CakeType> = {
+const defaultData: Partial<CakeType> = {
   name: "Default cake name",
   description: "Default cake desc",
   color: "gray-600",

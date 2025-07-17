@@ -59,7 +59,7 @@ export default function CakeSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <div>
@@ -148,7 +148,10 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
-        <div className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden">
+        <div
+          key={i.uuid}
+          className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden"
+        >
           <div className="relative aspect-square h-48 bg-gray-100 rounded-t-lg overflow-hidden">
             {isImageValid ? (
               <>

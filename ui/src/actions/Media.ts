@@ -27,7 +27,9 @@ export async function GetOneMedia(
   uuid: string,
   token?: string
 ): Promise<Media> {
-  const res = await axiosGlobal.get<Media>("media/get-one/" + uuid);
+  const res = await axiosGlobal.get<Media>("media/get-one/" + uuid, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 }
 
@@ -97,7 +99,9 @@ export async function DeleteForever(id: string) {
   //   if (!token) {
   //     return redirect("/");
   //   }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id);
+  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   return res.data;
 }

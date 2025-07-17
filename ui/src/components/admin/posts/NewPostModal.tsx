@@ -59,7 +59,7 @@ export default function NewPostModal({
           </SelectTrigger>
           <SelectContent>
             {selVal.map((i) => (
-              <SelectItem value={i}>
+              <SelectItem value={i} key={i}>
                 {i.charAt(0).toUpperCase() + i.slice(1)}
               </SelectItem>
             ))}

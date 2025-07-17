@@ -4,6 +4,7 @@ import { GetAllSocialMedia } from "@/actions/SocialMedia";
 import { LoadingCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
+import { Default, SocialIcons } from "@/components/svg/icons";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,14 +15,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { parseSocialLink } from "@/lib/link-parse";
 import { MetaData, SocialMedia } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { FC, SVGProps, useEffect, useState } from "react";
-import NewSocialDialog from "./NewSocialDialog";
-import SocialMediaCardCreation from "../posts/create/social-media/SocialMediaCardCreation";
-import { Default, SocialIcons } from "@/components/svg/icons";
-import { parseSocialLink } from "@/lib/link-parse";
 
 interface ISocialSection {
   data: SocialMedia[];
@@ -58,7 +56,7 @@ export default function SocialSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <div>

@@ -115,7 +115,7 @@ function HandleDataSection() {
       setLoading(false);
     };
     getData();
-  }, [router, pagination.pageNumber]);
+  }, [router, pagination.pageNumber, pagination.pageSize, setList]);
 
   if (loading) {
     return <TableSkeleton columns={3} rows={8} showHeader />;

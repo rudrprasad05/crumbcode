@@ -12,7 +12,7 @@ import { SaveCake } from "@/actions/Cake";
 import { toast } from "sonner";
 import { GetAllCakeTypes } from "@/actions/CakeType";
 
-let defaultMedia: Partial<Media> = {
+const defaultMedia: Partial<Media> = {
   url: "/default-img.jpeg",
   objectKey: "crumbcode/d6dab80c-3acd-4e6a-a750-506c7243991f.jpeg",
   altText: "default image placeholder",
@@ -25,7 +25,7 @@ let defaultMedia: Partial<Media> = {
   updatedOn: "2025-06-28T22:41:32.499489",
 };
 
-let defaultCakeData: Partial<Cake> = {
+const defaultCakeData: Partial<Cake> = {
   name: "Default cake name",
   description: "Default cake desc",
   price: 10,
@@ -40,6 +40,7 @@ let defaultCakeData: Partial<Cake> = {
 // Create context
 const CakeContext = createContext<{
   cake: Partial<Cake>;
+  isSaving: boolean;
   cakeTypes: Partial<CakeType[]> | undefined;
   setInitialCakeState: (cake: Partial<Cake>) => void;
   changeMedia: (media: Media) => void;
@@ -49,6 +50,7 @@ const CakeContext = createContext<{
   setHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   cake: defaultCakeData,
+  isSaving: false,
   cakeTypes: undefined,
   setInitialCakeState: (cake: Partial<Cake>) => {},
   changeMedia: (media: Media) => {},
@@ -66,6 +68,7 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   );
   const [hasChanged, setHasChanged] = useState(false);
   const initialHashRef = useRef<string>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -104,20 +107,27 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function saveCakeContext() {
-    initialHashRef.current = hash(cake);
-    setHasChanged(false);
-    cake.cakeTypeId = cake.cakeType?.id;
-    cake.mediaId = cake.media?.id;
-    console.dir(cake);
-    // return;
-    await SaveCake(cake, cake.uuid);
-    toast.success("Saved successfully");
+    setIsSaving(true);
+    try {
+      cake.cakeTypeId = cake.cakeType?.id;
+      cake.mediaId = cake.media?.id;
+      await SaveCake(cake, cake.uuid);
+      initialHashRef.current = hash(cake);
+      setHasChanged(false);
+
+      toast.success("Saved successfully");
+    } catch (error) {
+      console.log(error);
+      toast.error("Error ocured. Changes not saved");
+    }
+    setIsSaving(false);
   }
 
   return (
     <CakeContext.Provider
       value={{
         cake,
+        isSaving,
         cakeTypes,
         setInitialCakeState,
         updateCakeValues,
