@@ -14,7 +14,7 @@ namespace CrumbCodeBackend.DTO
         public DateTime CreatedOn { get; set; } = DateTime.Now;
         public DateTime UpdatedOn {get; set;} = DateTime.Now;
         public bool IsDeleted { get; set; }
-        public AppUser User { get; set; } = null!;
+        public UserDto User { get; set; } = null!;
         public string Name { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;

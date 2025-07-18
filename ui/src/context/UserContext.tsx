@@ -64,13 +64,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token: res.data.token,
         role: res.data.role,
       };
-      console.log(redirect);
+      localStorage.setItem("user", JSON.stringify(tempUser));
 
       if (redirect && redirect.trim().length > 0) {
-        console.log("hit");
         router.push("/" + redirect);
       } else {
-        console.log("hit2");
         helperHandleRedirectAfterLogin(tempUser);
       }
     } catch (error) {
@@ -96,6 +94,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: res.data.role,
       };
       setUser(tempUser);
+      localStorage.setItem("user", JSON.stringify(tempUser));
+
       toast.success("Successfully registered");
     } catch (error) {
       console.error("Login failed:", error);
@@ -109,6 +109,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = (unAuth = false) => {
     destroyCookie(null, "token");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     setUser(null);
 
     toast.info("Logging out");
@@ -118,8 +120,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const checkAuth = useCallback(async () => {
     const token = localStorage.getItem("token");
     const isAdmin = pathname.includes("admin");
-    let tempUser: User;
-    console.log("trigger 1");
+    let tempUser: User = JSON.parse(localStorage.getItem("user") ?? "");
+
+    if (tempUser) {
+      console.log("pre-exit", tempUser);
+      setUser(tempUser);
+      return;
+    }
 
     if (isAdmin)
       try {

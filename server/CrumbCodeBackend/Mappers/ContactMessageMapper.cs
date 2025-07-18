@@ -34,7 +34,7 @@ namespace CrumbCodeBackend.Mappers
                 UUID = data.UUID,
                 CreatedOn = data.CreatedOn,
                 UpdatedOn = data.UpdatedOn,
-                User = data.User,
+                User = data.User.FromModelToDto(),
                 Name = data.Name,
                 Email = data.Email,
                 Message = data.Message,

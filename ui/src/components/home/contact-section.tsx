@@ -3,8 +3,46 @@
 import { useAuth } from "@/context/UserContext";
 import ContactForm from "./contact-form";
 import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
+import { MetaData, SocialMedia } from "@/types";
+import { useEffect, useState } from "react";
+import { GetAllSocialMedia } from "@/actions/SocialMedia";
+import { SocialMediaCard } from "../admin/socials/SocialSection";
 
 export default function ContactSection() {
+  const [socialIcons, setSocialIcons] = useState<SocialMedia[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [pagination, setPagination] = useState<MetaData>({
+    pageNumber: 1,
+    totalCount: 0,
+    pageSize: 5,
+    totalPages: 0,
+  });
+
+  useEffect(() => {
+    setSocialIcons([]);
+    const getData = async () => {
+      const data = await GetAllSocialMedia({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+      });
+
+      console.log(data);
+
+      setSocialIcons(data.data as SocialMedia[]);
+      setPagination((prev) => ({
+        ...prev,
+        totalCount: data.meta?.totalCount as number,
+        totalPages: Math.ceil(
+          (data.meta?.totalCount as number) / pagination.pageSize
+        ),
+      }));
+
+      setLoading(false);
+    };
+    getData();
+  }, [pagination.pageNumber, pagination.pageSize]);
+
   return (
     <section className="py-16 bg-white" id="contact">
       <div className="container mx-auto px-4">
@@ -20,55 +58,9 @@ export default function ContactSection() {
 
           <div className="flex flex-col justify-center">
             <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Facebook className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Facebook</h3>
-                  <p className="text-gray-600">@crumbcode</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Instagram className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Instagram</h3>
-                  <p className="text-gray-600">@crumbcode</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Mail className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Email</h3>
-                  <p className="text-gray-600">cakes@crumbcodefiji.com</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Phone className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Phone</h3>
-                  <p className="text-gray-600">679 999 9999</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <MapPin className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Address</h3>
-                  <p className="text-gray-600">123 Street Road, Nakasi</p>
-                </div>
-              </div>
+              {socialIcons.map((i) => (
+                <SocialMediaCard data={i} />
+              ))}
             </div>
           </div>
         </div>

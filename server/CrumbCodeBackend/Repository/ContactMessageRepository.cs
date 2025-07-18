@@ -35,10 +35,10 @@ namespace CrumbCodeBackend.Repository
             var result = model.Entity.FromModelToDto();
 
             await _notificationService.CreateNotificationAsync(
-                title: "New Cake",
-                message: "The cake " + result.Name + " was created",
+                title: "New Message",
+                message: "A user sent a message",
                 type: NotificationType.INFO,
-                actionUrl: "/admin/cake/" + result.UUID
+                actionUrl: "/admin/messages/" + result.UUID
             );
 
             return new ApiResponse<ContactMessageDto>

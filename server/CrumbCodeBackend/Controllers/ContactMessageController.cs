@@ -69,12 +69,10 @@ namespace CrumbCodeBackend.Controllers
         [HttpPost("upsert")]
         [ProducesResponseType(typeof(CreateNewCakeResponse), 200)]
 
-        public async Task<IActionResult> UpsertAsync([FromQuery] string uuid, [FromBody] NewContactMessageRequest newCakeRequest)
+        public async Task<IActionResult> UpsertAsync([FromBody] NewContactMessageRequest request)
         {
-            var cake = newCakeRequest.FromNewRequestToModel();
-            var model = new ApiResponse<ContactMessageDto>();
-
-            model = await _contactMessage.CreateAsync(cake);
+            var cake = request.FromNewRequestToModel();
+            var model = await _contactMessage.CreateAsync(cake);
 
             return Ok(model);
 

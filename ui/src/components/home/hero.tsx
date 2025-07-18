@@ -28,7 +28,7 @@ export default function Hero() {
           <Image
             width={1000}
             height={1000}
-            src="https://bucket.procyonfiji.com/procyon/cc-hero-1.png"
+            src="/cc-hero-1.png"
             alt="Delicious cake showcase"
             className="absolute right-0 bottom-0 object-cover rounded-tl-3xl"
           />

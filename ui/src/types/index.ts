@@ -25,7 +25,7 @@ export interface Cake extends BaseModel {
 }
 
 export interface ContactMessage extends BaseModel {
-  user: User;
+  user: Partial<User>;
   name: string;
   email: string;
   message: string;

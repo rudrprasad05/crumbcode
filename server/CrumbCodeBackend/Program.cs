@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using CrumbCodeBackend.Service;
 using CrumbCodeBackend.Middleware;
 using Microsoft.AspNetCore.Authorization;
+using System.Text.Json.Serialization;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +18,11 @@ builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddIdentityService();
 builder.Services.AddAuthentication(builder.Configuration);
 builder.Services.AddAuthorization();
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
 builder.Services.AddSingleton<IUserContextService, UserContextService>();
@@ -31,6 +36,8 @@ builder.Services.AddScoped<ICakeRepository, CakeRepository>();
 builder.Services.AddScoped<IMediaRepository, MediaRepository>();
 builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();
 builder.Services.AddScoped<ISocialMediaRepository, SocialMediaRepository>();
+builder.Services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
+
 
 var app = builder.Build();
 

@@ -10,7 +10,7 @@ export default function AboutSection() {
             <Image
               width={200}
               height={200}
-              src="https://bucket.procyonfiji.com/procyon/cc-pop-5.png"
+              src="/cc-pop-5.png"
               alt="Freshly baked cakes"
               className="rounded-xl w-full"
             />
