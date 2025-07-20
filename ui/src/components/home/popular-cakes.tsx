@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import ErrorContainer from "../global/ErrorContainer";
 import { LoadingContainer } from "../global/LoadingContainer";
 import CakeCard from "./cake-card";
+import { GetAllCakesSite } from "@/actions/Site";
 
 export default function PopularCakes() {
   const [isLoading, setIsLoading] = useState(true);
@@ -22,7 +23,7 @@ export default function PopularCakes() {
   useEffect(() => {
     const getData = async () => {
       try {
-        const data = await GetAllCakes({
+        const data = await GetAllCakesSite({
           pageNumber: pagination.pageNumber,
           pageSize: pagination.pageSize,
         });

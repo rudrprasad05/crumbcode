@@ -108,6 +108,14 @@ export const CakeTypeColorClasses: Record<string, string> = {
   "yellow-600": "bg-yellow-600 border-yellow-600/50",
 };
 
+export interface DashboardData {
+  totalCakes: number;
+  totalMessages: number;
+  totalUsers: number;
+  totalMedia: number;
+  notifications: Notification[];
+}
+
 export interface NewCakeTypeRequest {
   name: string;
   description: string;

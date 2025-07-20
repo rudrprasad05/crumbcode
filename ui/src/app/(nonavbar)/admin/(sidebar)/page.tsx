@@ -1,6 +1,4 @@
 import { DashboardStats } from "@/components/admin/dashboard/dashboard-stats";
-import { RecentActivity } from "@/components/admin/dashboard/recent-activity";
-import { QuickActions } from "@/components/admin/dashboard/quick-actions";
 
 export default function AdminDashboard() {
   return (
@@ -13,11 +11,6 @@ export default function AdminDashboard() {
       </div>
 
       <DashboardStats />
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <RecentActivity />
-        <QuickActions />
-      </div>
     </div>
   );
 }

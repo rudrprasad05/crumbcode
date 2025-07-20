@@ -48,6 +48,20 @@ export function LoadingHorizontialCard() {
   );
 }
 
+export function SmallLoadingHorizontialCard() {
+  return (
+    <div className="flex gap-4 my-4">
+      <div>
+        <Skeleton className="h-6 rounded-full w-6  bg-gray-300" />
+      </div>
+      <div className="grow flex flex-col gap-2">
+        <Skeleton className="h-3  bg-gray-300" />
+        <Skeleton className="h-3 w-3/5  bg-gray-300" />
+      </div>
+    </div>
+  );
+}
+
 interface TableSkeletonProps {
   rows?: number;
   columns?: number;

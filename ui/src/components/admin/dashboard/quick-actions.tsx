@@ -1,31 +1,38 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Star, MessageSquare } from "lucide-react";
+import {
+  Plus,
+  FileText,
+  Star,
+  MessageSquare,
+  Cake,
+  Database,
+} from "lucide-react";
 
 const actions = [
   {
-    title: "New Post",
-    description: "Create a new blog post",
-    icon: FileText,
-    href: "/admin/cakes/new",
-  },
-  {
-    title: "Add Product",
-    description: "Add a new cake to menu",
+    title: "New Cake",
+    description: "Create a new cake",
     icon: Plus,
-    href: "/admin/products/new",
+    href: "/admin/cakes/create",
   },
   {
-    title: "View Reviews",
-    description: "Manage customer reviews",
-    icon: Star,
+    title: "View Cakes",
+    description: "View current cakes",
+    icon: Cake,
+    href: "/admin/cakes",
+  },
+  {
+    title: "View Messages",
+    description: "Manage customer messages",
+    icon: MessageSquare,
     href: "/admin/reviews",
   },
   {
-    title: "Messages",
-    description: "Check customer messages",
-    icon: MessageSquare,
-    href: "/admin/messages",
+    title: "View Media",
+    description: "Create and edit media images",
+    icon: Database,
+    href: "/admin/media",
   },
 ];
 
