@@ -20,37 +20,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { QuickActions } from "./quick-actions";
 
-const stats = [
-  {
-    title: "Total Cakes",
-    value: "1,234",
-    change: "+12%",
-    changeType: "positive" as const,
-    icon: TrendingUp,
-  },
-  {
-    title: "Active Users",
-    value: "856",
-    change: "+8%",
-    changeType: "positive" as const,
-    icon: Users,
-  },
-  {
-    title: "Blog Posts",
-    value: "42",
-    change: "+3",
-    changeType: "positive" as const,
-    icon: FileText,
-  },
-  {
-    title: "Reviews",
-    value: "4.8",
-    change: "+0.2",
-    changeType: "positive" as const,
-    icon: Star,
-  },
-];
-
 export function DashboardStats() {
   const [data, setdata] = useState<DashboardData>();
   const [loading, setLoading] = useState<boolean>(true);
@@ -173,7 +142,10 @@ export function DashboardStats() {
           </CardContent>
           <div className="border-t">
             <Link href="/admin/notifications">
-              <Button variant="ghost" className="w-full justify-center text-sm">
+              <Button
+                variant="ghost"
+                className="cursor-pointer w-full justify-center text-xs"
+              >
                 See All Notifications
               </Button>
             </Link>

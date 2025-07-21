@@ -38,11 +38,11 @@ const navigationItems = [
     href: "/admin/categories",
     icon: Tag,
   },
-  {
-    title: "Site",
-    href: "/admin/site",
-    icon: Globe,
-  },
+  //   {
+  //     title: "Site",
+  //     href: "/admin/site",
+  //     icon: Globe,
+  //   },
   {
     title: "Socials",
     href: "/admin/socials",

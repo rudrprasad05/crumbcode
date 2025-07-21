@@ -21,7 +21,7 @@ export default function UnauthorizedPage() {
             401 - Unauthorized
           </CardTitle>
           <CardDescription className="text-gray-600">
-            You don&apos;'t have permission to access this resource. Please log
+            You don&apos;t have permission to access this resource. Please log
             in or contact an administrator.
           </CardDescription>
         </CardHeader>

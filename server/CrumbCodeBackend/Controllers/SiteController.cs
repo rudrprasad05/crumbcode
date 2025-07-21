@@ -12,7 +12,7 @@ namespace CrumbCodeBackend.Controllers
 {
     [Route("api/site")]
     [ApiController]
-    public class SiteController : BaseController
+    public class SiteController : UnprotectedController
     {
         private readonly ICakeRepository _cakeRepository;
 

@@ -16,7 +16,7 @@ WORKDIR /app
 COPY --from=build /out ./
 
 # Set the port the container will listen on
-ENV ASPNETCORE_URLS=http://+:5193
-EXPOSE 5193
+ENV ASPNETCORE_URLS=http://+:5080
+EXPOSE 5080
 
 ENTRYPOINT ["dotnet", "CrumbCodeBackend.dll"]

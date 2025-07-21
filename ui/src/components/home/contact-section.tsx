@@ -1,12 +1,14 @@
 "use client";
 
-import { useAuth } from "@/context/UserContext";
-import ContactForm from "./contact-form";
-import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
-import { MetaData, SocialMedia } from "@/types";
-import { useEffect, useState } from "react";
 import { GetAllSocialMedia } from "@/actions/SocialMedia";
-import { SocialMediaCard } from "../admin/socials/SocialSection";
+import { Default, SocialIcons } from "@/components/svg/icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { parseSocialLink } from "@/lib/link-parse";
+import { MetaData, SocialMedia } from "@/types";
+import Link from "next/link";
+import { FC, SVGProps, useEffect, useState } from "react";
+import ContactForm from "./contact-form";
+type IconType = FC<SVGProps<SVGSVGElement>>;
 
 export default function ContactSection() {
   const [socialIcons, setSocialIcons] = useState<SocialMedia[]>([]);
@@ -51,20 +53,59 @@ export default function ContactSection() {
           <p className="text-gray-700 mt-2">Reach Out for a Custom Cake</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div className="">
             <ContactForm />
           </div>
 
           <div className="flex flex-col justify-center">
-            <div className="space-y-6">
+            <div className="space-y-4 flex flex-col">
               {socialIcons.map((i) => (
-                <SocialMediaCard data={i} />
+                <SocialCard data={i} />
               ))}
             </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function SocialCard({ data }: { data: SocialMedia }) {
+  const [username, setUsername] = useState<string>("");
+  const [Icon, setIcon] = useState<IconType>(() => Default);
+
+  useEffect(() => {
+    setUsername(parseSocialLink(data.url as string).username as string);
+  }, [data.url]);
+
+  useEffect(() => {
+    const foundIcon = SocialIcons.find(
+      (icon) => icon.name.toLowerCase() === data?.icon?.toLowerCase()
+    )?.Icon;
+
+    setIcon(() => foundIcon || Default);
+  }, [data.icon]);
+
+  return (
+    <Link href={data.url} className="">
+      <Card
+        className={`grow w-full max-w-sm transition-colors cursor-pointer border-0 shadow-sm hover:shadow-md`}
+      >
+        <CardContent className="flex justify-between">
+          <div className="flex items-center space-x-4">
+            <div className={`p-2 rounded-full bg-white shadow-sm`}>
+              <Icon className="w-4 h-4" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {data.name}
+              </p>
+              <p className="text-sm text-gray-500 truncate">@{username}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 }

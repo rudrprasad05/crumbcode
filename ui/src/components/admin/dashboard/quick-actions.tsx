@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,6 +10,7 @@ import {
   Cake,
   Database,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const actions = [
   {
@@ -26,7 +29,7 @@ const actions = [
     title: "View Messages",
     description: "Manage customer messages",
     icon: MessageSquare,
-    href: "/admin/reviews",
+    href: "/admin/messages",
   },
   {
     title: "View Media",
@@ -37,6 +40,7 @@ const actions = [
 ];
 
 export function QuickActions() {
+  const router = useRouter();
   return (
     <Card className="border-gray-200">
       <CardHeader>
@@ -49,6 +53,7 @@ export function QuickActions() {
           {actions.map((action) => (
             <Button
               key={action.title}
+              onClick={() => router.push(action.href)}
               variant="outline"
               className="h-auto p-4 flex flex-col items-center gap-2 border-gray-200 hover:bg-rose-50 hover:border-rose-200"
             >
