@@ -1,9 +1,14 @@
-import NotificationSection from "@/components/admin/notifications/NotificationSection";
+"use client";
 
-export default async function NotificationsPage() {
+import NotificationSection from "@/components/admin/notifications/NotificationSection";
+import { NotificationProvider } from "@/context/NotificationContext";
+
+export default function NotificationsPage() {
   return (
     <div className="space-y-6">
-      <NotificationSection />
+      <NotificationProvider>
+        <NotificationSection />
+      </NotificationProvider>
     </div>
   );
 }

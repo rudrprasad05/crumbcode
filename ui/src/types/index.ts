@@ -24,6 +24,20 @@ export interface Cake extends BaseModel {
   //   allergens: Allergen[];
 }
 
+export interface ContactMessage extends BaseModel {
+  user: Partial<User>;
+  name: string;
+  email: string;
+  message: string;
+  type: ContactMessageTypes;
+}
+
+export enum ContactMessageTypes {
+  INFO = "INFO",
+  ORDER = "ORDER",
+  UPDATE = "UPDATE",
+}
+
 export interface IconType {
   name: string;
   Icon: any;
@@ -93,6 +107,14 @@ export const CakeTypeColorClasses: Record<string, string> = {
   "purple-600": "bg-purple-600 border-purple-600/50",
   "yellow-600": "bg-yellow-600 border-yellow-600/50",
 };
+
+export interface DashboardData {
+  totalCakes: number;
+  totalMessages: number;
+  totalUsers: number;
+  totalMedia: number;
+  notifications: Notification[];
+}
 
 export interface NewCakeTypeRequest {
   name: string;

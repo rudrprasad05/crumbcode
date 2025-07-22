@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Search } from "lucide-react";
 import { NotificationBell } from "../global/NotificationBell";
+import { NotificationProvider } from "@/context/NotificationContext";
 
 export function AdminHeader() {
   return (
@@ -16,7 +17,9 @@ export function AdminHeader() {
           />
         </div>
         <div className="ml-auto">
-          <NotificationBell />
+          <NotificationProvider>
+            <NotificationBell />
+          </NotificationProvider>
         </div>
       </div>
     </header>

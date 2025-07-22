@@ -1,35 +1,46 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Plus, FileText, Star, MessageSquare } from "lucide-react";
+import {
+  Plus,
+  FileText,
+  Star,
+  MessageSquare,
+  Cake,
+  Database,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const actions = [
   {
-    title: "New Post",
-    description: "Create a new blog post",
-    icon: FileText,
-    href: "/admin/cakes/new",
-  },
-  {
-    title: "Add Product",
-    description: "Add a new cake to menu",
+    title: "New Cake",
+    description: "Create a new cake",
     icon: Plus,
-    href: "/admin/products/new",
+    href: "/admin/cakes/create",
   },
   {
-    title: "View Reviews",
-    description: "Manage customer reviews",
-    icon: Star,
-    href: "/admin/reviews",
+    title: "View Cakes",
+    description: "View current cakes",
+    icon: Cake,
+    href: "/admin/cakes",
   },
   {
-    title: "Messages",
-    description: "Check customer messages",
+    title: "View Messages",
+    description: "Manage customer messages",
     icon: MessageSquare,
     href: "/admin/messages",
+  },
+  {
+    title: "View Media",
+    description: "Create and edit media images",
+    icon: Database,
+    href: "/admin/media",
   },
 ];
 
 export function QuickActions() {
+  const router = useRouter();
   return (
     <Card className="border-gray-200">
       <CardHeader>
@@ -42,6 +53,7 @@ export function QuickActions() {
           {actions.map((action) => (
             <Button
               key={action.title}
+              onClick={() => router.push(action.href)}
               variant="outline"
               className="h-auto p-4 flex flex-col items-center gap-2 border-gray-200 hover:bg-rose-50 hover:border-rose-200"
             >

@@ -9,6 +9,7 @@ import { destroyCookie } from "nookies";
 import {
   createContext,
   ReactNode,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -18,7 +19,7 @@ import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, redirect?: string) => Promise<void>;
   register: (data: RegisterFormType) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -31,13 +32,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+
   // 🔹 Load session from cookies on mount
 
   const helperHandleRedirectAfterLogin = (tmp: User) => {
-    // if (!tmp) {
-    //   router.push(redirect || "/");
-    //   return;
-    // }
     setUser(tmp);
     toast.success("Successfully logged in", {
       description: "Redirecting shortly",
@@ -49,7 +47,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirect?: string) => {
     let tempUser: User;
     try {
       const res = await axiosGlobal.post<LoginResponse>("auth/login", {
@@ -64,13 +62,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token: res.data.token,
         role: res.data.role,
       };
-      router.push("/admin/dashboard");
+      localStorage.setItem("user", JSON.stringify(tempUser));
+
+      if (redirect && redirect.trim().length > 0) {
+        router.push("/" + redirect);
+      } else {
+        helperHandleRedirectAfterLogin(tempUser);
+      }
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Invalid credentials");
     }
-
-    helperHandleRedirectAfterLogin(tempUser);
   };
 
   const register = async (data: RegisterFormType) => {
@@ -90,19 +92,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: res.data.role,
       };
       setUser(tempUser);
+      localStorage.setItem("user", JSON.stringify(tempUser));
+
       toast.success("Successfully registered");
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Invalid credentials");
     }
 
-    helperHandleRedirectAfterLogin(tempUser);
+    // helperHandleRedirectAfterLogin(tempUser);
   };
 
   // 🔹 Logout function
   const logout = (unAuth = false) => {
     destroyCookie(null, "token");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     setUser(null);
 
     toast.info("Logging out");
@@ -112,8 +118,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const checkAuth = useCallback(async () => {
     const token = localStorage.getItem("token");
     const isAdmin = pathname.includes("admin");
-    let tempUser: User;
-    console.log("trigger 1");
+    let tempUser: User = JSON.parse(localStorage.getItem("user") ?? "");
+
+    if (tempUser) {
+      console.log("pre-exit", tempUser);
+      setUser(tempUser);
+      return;
+    }
 
     if (isAdmin)
       try {
