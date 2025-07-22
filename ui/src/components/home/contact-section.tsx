@@ -60,8 +60,8 @@ export default function ContactSection() {
 
           <div className="flex flex-col justify-center">
             <div className="space-y-4 flex flex-col">
-              {socialIcons.map((i) => (
-                <SocialCard data={i} />
+              {socialIcons.map((i, index) => (
+                <SocialCard key={index} data={i} />
               ))}
             </div>
           </div>

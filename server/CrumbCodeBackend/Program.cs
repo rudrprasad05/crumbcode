@@ -68,6 +68,10 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     try
     {
+        var connection = dbContext.Database.GetDbConnection();
+        Console.WriteLine("🔍 Connection string being used:");
+        Console.WriteLine(connection.ConnectionString);
+        
         dbContext.Database.OpenConnection(); // Test the connection
         dbContext.Database.CloseConnection();
         Console.WriteLine("Database connection successful.");

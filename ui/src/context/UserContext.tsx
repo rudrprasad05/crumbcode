@@ -9,6 +9,7 @@ import { destroyCookie } from "nookies";
 import {
   createContext,
   ReactNode,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -18,7 +19,7 @@ import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, redirect?: string) => Promise<void>;
   register: (data: RegisterFormType) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -31,8 +32,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const redirect = searchParams.get("redirect");
 
   // 🔹 Load session from cookies on mount
 
@@ -48,9 +47,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirect?: string) => {
     let tempUser: User;
-    console.log(redirect);
     try {
       const res = await axiosGlobal.post<LoginResponse>("auth/login", {
         email,

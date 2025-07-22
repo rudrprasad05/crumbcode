@@ -44,7 +44,7 @@ export default function PopularCakes() {
       }
     };
     getData();
-  }, []);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   return (
     <section className="py-16 bg-white">

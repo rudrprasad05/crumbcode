@@ -1,14 +1,28 @@
 version: "3.8"
 
 services:
+  db-migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: "server=db;port=3306;database=CrumbCode;user=root;password=NewStrongPassword123!"
+    command: ["dotnet", "ef", "database", "update"]
+    networks:
+      - crumbcode
+    restart: "no" # Run once and exit
+
   web:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5080:5080" # Only your API is exposed to host on port 5080
+      - "5080:5080"
     depends_on:
-      - db
+      - db-migrate # Wait for migrations to complete
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__Default=server=db;port=3306;database=CrumbCode;user=root;password=NewStrongPassword123!
