@@ -11,7 +11,7 @@ namespace CrumbCodeBackend.Config
     {
         public static void AddDatabaseContext(this IServiceCollection services, IConfiguration configuration)
         {
-            var conn = configuration.GetConnectionString("Local") ?? throw new InvalidOperationException("Invlaid");
+            var conn = configuration.GetConnectionString("Dev") ?? throw new InvalidOperationException("Invlaid");
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(
                     conn,

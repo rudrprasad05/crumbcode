@@ -17,9 +17,10 @@ export async function middleware(req: NextRequest) {
         "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE,PATCH,OPTIONS",
       },
     });
+    console.dir(res);
 
     if (!res.ok) {
-      console.error("qqqqq Auth check failed  md.ts:", res.status); // ⬅️ optional debug
+      console.error("qqqqq Auth check failed  md.ts:", res.status);
       return NextResponse.redirect(new URL("/md", req.url));
     }
 

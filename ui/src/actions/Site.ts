@@ -2,52 +2,41 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { FromModelToNewRequestDTO } from "@/mappers/CakeMapper";
-import { ApiResponse, Cake, MediaQueryObject } from "@/types";
+import { ApiResponse, Cake, MediaQueryObject, SocialMedia } from "@/types";
 import { GetToken } from "./User";
 import { buildMediaQueryParams } from "@/lib/params";
 
 export async function GetAllCakesSite(
   query?: MediaQueryObject
 ): Promise<ApiResponse<Cake[]>> {
-  const token = await GetToken();
   const params = buildMediaQueryParams(query);
 
   const res = await axiosGlobal.get<ApiResponse<Cake[]>>(
-    `site/get-all-cakes?${params}`,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
+    `site/get-all-cakes?${params}`
   );
 
   return res.data;
 }
 
-export async function GetOneCake(uuid?: string): Promise<Cake> {
-  const res = await axiosGlobal.get<Cake>("cake/get-one?uuid=" + uuid);
-  return res.data;
-}
+export async function GetAllSocialMediaSite(
+  query?: MediaQueryObject
+): Promise<ApiResponse<SocialMedia[]>> {
+  const params = buildMediaQueryParams(query);
 
-export async function SaveCake(
-  cake: Partial<Cake>,
-  uuid?: string
-): Promise<Cake> {
-  const dto = FromModelToNewRequestDTO(cake as Cake);
-  const res = await axiosGlobal.post<Cake>("cake/upsert?uuid=" + uuid, dto);
+  try {
+    const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
+      `site/get-all-social-media?${params}`
+    );
 
-  return res.data;
-}
-
-export async function SafeDeleteCake(uuid: string): Promise<ApiResponse<Cake>> {
-  const token = await GetToken();
-  //   if (!token) {
-  //     return redirect("/");
-  //   }
-  const res = await axiosGlobal.delete<ApiResponse<Cake>>(
-    "cake/safe-delete/" + uuid,
-    {
-      headers: { Authorization: `Bearer ${token}` },
-    }
-  );
-
-  return res.data;
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    const tmp: ApiResponse<SocialMedia[]> = {
+      success: false,
+      statusCode: 400,
+      timestamp: Date.now().toLocaleString(),
+      data: [],
+    };
+    return tmp;
+  }
 }

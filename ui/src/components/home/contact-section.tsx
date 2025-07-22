@@ -8,6 +8,7 @@ import { MetaData, SocialMedia } from "@/types";
 import Link from "next/link";
 import { FC, SVGProps, useEffect, useState } from "react";
 import ContactForm from "./contact-form";
+import { GetAllSocialMediaSite } from "@/actions/Site";
 type IconType = FC<SVGProps<SVGSVGElement>>;
 
 export default function ContactSection() {
@@ -24,7 +25,7 @@ export default function ContactSection() {
   useEffect(() => {
     setSocialIcons([]);
     const getData = async () => {
-      const data = await GetAllSocialMedia({
+      const data = await GetAllSocialMediaSite({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
       });

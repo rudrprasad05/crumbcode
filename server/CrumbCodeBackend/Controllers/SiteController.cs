@@ -15,14 +15,17 @@ namespace CrumbCodeBackend.Controllers
     public class SiteController : UnprotectedController
     {
         private readonly ICakeRepository _cakeRepository;
+        private readonly ISocialMediaRepository _socialMediaRepository;
 
         public SiteController(
             ICakeRepository cakeRepository,
+            ISocialMediaRepository socialMediaRepository,
             IConfiguration configuration,
             ITokenService tokenService
         ) : base(configuration, tokenService)
         {
             _cakeRepository = cakeRepository;
+            _socialMediaRepository = socialMediaRepository;
 
         }
 
@@ -43,6 +46,24 @@ namespace CrumbCodeBackend.Controllers
 
             return Ok(model);
 
+        }
+
+        [HttpGet("get-all-social-media")]
+        public async Task<IActionResult> GetAlSM([FromQuery] CakeQueryObject queryObject)
+        {
+            var model = await _socialMediaRepository.GetAllAsync(queryObject);
+
+            if (model == null)
+            {
+                return BadRequest(new ApiResponse<List<SocialMediaDto>>
+                {
+                    Success = false,
+                    StatusCode = 400,
+
+                }
+                );
+            }
+            return Ok(model);
         }
     }
 }

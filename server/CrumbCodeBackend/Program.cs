@@ -56,10 +56,10 @@ app
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage(); // gives full stack trace in browser
+    app.UseDeveloperExceptionPage(); 
 }
 
-app.UseMiddleware<TokenMiddleware>();
+// app.UseMiddleware<TokenMiddleware>();
 app.UseMiddleware<Log>();
 app.MapControllers();
 

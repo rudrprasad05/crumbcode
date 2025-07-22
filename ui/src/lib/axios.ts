@@ -7,7 +7,7 @@ const agent = new http.Agent({
 });
 
 export const axiosGlobal = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: "http://localhost:5080/api/", //process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 100000, // 10 seconds timeout
   headers: {
     "Access-Control-Allow-Origin": "*",
@@ -17,6 +17,7 @@ export const axiosGlobal = axios.create({
 });
 
 axiosGlobal.interceptors.request.use((config) => {
+  console.log(config);
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
     if (token) {
