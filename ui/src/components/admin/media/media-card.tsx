@@ -9,6 +9,7 @@ import { useState } from "react";
 import { DeleteMediaDialoge } from "./delete-media-dialoge";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface MediaCardProps {
   item: Media;
@@ -19,6 +20,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageValid, setIsImageValid] = useState(true);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const router = useRouter();
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -94,14 +96,14 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
 
           {isHovered && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-12 text-black transition-all bg-white/50 backdrop-blur-sm group-hover:opacity-100">
-              <Button variant="outline" className="w-full">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
+              <Button
+                variant="outline"
+                onClick={() => router.push("/admin/media/edit/" + item.uuid)}
+                className="w-full flex items-center justify-between"
+              >
+                Edit <Edit className="" />
               </Button>
-              <Button variant="outline" className="w-full">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
+
               <DeleteMediaDialoge id={item.uuid} />
             </div>
           )}

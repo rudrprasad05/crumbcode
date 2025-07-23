@@ -9,8 +9,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Box, CloudUpload, Search } from "lucide-react";
+import { Box, CloudUpload, Plus, Search } from "lucide-react";
 import NewMediaModal from "./NewMediaModal";
+import Link from "next/link";
 
 interface MediaHeaderProps {
   onUpload: () => void;
@@ -30,16 +31,16 @@ export function MediaHeader({ onUpload, totalItems }: MediaHeaderProps) {
         </div>
       </div>
 
-      <NewMediaModal>
+      <Link href={"/admin/media/create"}>
         <div
           className={`${buttonVariants({
             variant: "default",
           })} w-full text-start justify-start px-2 my-2`}
         >
-          <CloudUpload />
-          Upload
+          <Plus />
+          New Media
         </div>
-      </NewMediaModal>
+      </Link>
     </div>
   );
 }

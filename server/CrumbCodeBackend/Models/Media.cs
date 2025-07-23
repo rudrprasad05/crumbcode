@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CrumbCodeBackend.Models
 {
-    public class Media: BaseModel
+    public class Media : BaseModel
     {
         public string Url { get; set; } = string.Empty;
         public string ObjectKey { get; set; } = string.Empty;
@@ -13,6 +13,7 @@ namespace CrumbCodeBackend.Models
         public string FileName { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;
         public long SizeInBytes { get; set; }
+        public bool ShowInGallery { get; set; } = true;
     }
 
 }

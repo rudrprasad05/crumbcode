@@ -15,6 +15,7 @@ namespace CrumbCodeBackend.Models.Response
         public string AltText { get; set; } = string.Empty;
         public string FileName { get; set; } = string.Empty;
         public string ContentType { get; set; } = string.Empty;
+        public bool ShowInGallery { get; set; } = true;
         public long SizeInBytes { get; set; }
     }
 }

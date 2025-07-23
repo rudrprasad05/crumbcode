@@ -56,6 +56,7 @@ export interface Media extends BaseModel {
   fileName: string;
   contentType: string;
   sizeInBytes: number;
+  showInGallery: boolean;
 }
 
 export enum NotificationTypes {
