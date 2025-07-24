@@ -111,7 +111,7 @@ namespace CrumbCodeBackend.Repository
                 MediaDto? mediaDto = null;
                 if (cake.Media != null)
                 {
-                    var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media?.ObjectKey ?? "");
+                    var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media.ObjectKey);
                     mediaDto = cake.Media?.FromModelToDTO(signedUrl);
                 }
                 var dto = cake.FromModelToDto();

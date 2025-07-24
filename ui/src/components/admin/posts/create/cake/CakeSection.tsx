@@ -16,8 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Cake, CakeTypeColorClasses, MetaData } from "@/types";
-import { Plus, Search } from "lucide-react";
+import { Cake, CakeTypeColorClasses, Media, MetaData } from "@/types";
+import { FileText, ImageIcon, Plus, Search, Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -83,7 +83,7 @@ function Header() {
         <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-4 flex-1">
+        {/* <div className="flex items-center gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
@@ -113,7 +113,7 @@ function Header() {
               <SelectItem value="inactive">Inactive</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+        </div> */}
 
         <Link href={"/admin/cakes/create"}>
           <div
@@ -130,9 +130,91 @@ function Header() {
   );
 }
 
-function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
+function CakeCard({ data }: { data: Cake }) {
   const [isImageValid, setIsImageValid] = useState(true);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const getTypeIcon = (item: Media) => {
+    const type = item.contentType;
+
+    if (type.startsWith("image/")) {
+      return <ImageIcon className="h-4 w-4" />;
+    } else if (type.startsWith("video/")) {
+      return <Video className="h-4 w-4" />;
+    } else if (type.startsWith("application/") || type.startsWith("text/")) {
+      return <FileText className="h-4 w-4" />;
+    } else {
+      return <FileText className="h-4 w-4" />;
+    }
+  };
+  return (
+    <div
+      key={data.uuid}
+      className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden"
+    >
+      <div className="relative aspect-square h-48 bg-gray-100 rounded-t-lg overflow-hidden">
+        {isImageValid ? (
+          <>
+            <Image
+              width={100}
+              height={100}
+              src={data.media?.url || "/image.svg"}
+              onError={(e) => {
+                e.currentTarget.onerror = null; // prevent infinite loop
+                setIsImageValid(false);
+              }}
+              onLoad={() => setIsImageLoaded(true)}
+              alt={(data.media?.altText || data.media?.fileName) as string}
+              className={cn(
+                "w-full h-full object-cover",
+                isImageLoaded ? "opacity-100" : "opacity-0"
+              )}
+            />
+            {!isImageLoaded && (
+              <div
+                className={cn(
+                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                )}
+              ></div>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-50">
+            {getTypeIcon(data.media as Media)}
+          </div>
+        )}
+      </div>
+      <div className="p-4 flex-1/2 flex flex-col">
+        <div className="flex justify-between">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {data.name as string}
+          </h3>
+          <div className="text-xs text-rose-600 font-bold">
+            {"$" + data.price}
+          </div>
+        </div>
+        <p className="text-gray-600 mb-4">{data.description as string}</p>
+        <div className="mt-auto flex justify-between items-center">
+          <Link
+            href={`/admin/cakes/edit/${data.uuid}`}
+            className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
+          >
+            Edit
+          </Link>
+          <Badge
+            className={cn(
+              "text-white",
+              CakeTypeColorClasses[data.cakeType?.color as string]
+            )}
+          >
+            {data.cakeType?.name || "no tag"}
+          </Badge>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
   if (data.length === 0 && !isLoading) {
     return <NoDataContainer />;
   }
@@ -145,73 +227,11 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
       </div>
     );
   }
+  console.log(data);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
-        <div
-          key={i.uuid}
-          className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden"
-        >
-          <div className="relative aspect-square h-48 bg-gray-100 rounded-t-lg overflow-hidden">
-            {isImageValid ? (
-              <>
-                <Image
-                  width={100}
-                  height={100}
-                  src={i.media?.url || "/image.svg"}
-                  onError={(e) => {
-                    e.currentTarget.onerror = null; // prevent infinite loop
-                    setIsImageValid(false);
-                  }}
-                  onLoad={() => setIsImageLoaded(true)}
-                  alt={(i.media?.altText || i.media?.fileName) as string}
-                  className={cn(
-                    "w-full h-full object-cover",
-                    isImageLoaded ? "opacity-100" : "opacity-0"
-                  )}
-                />
-                {!isImageLoaded && (
-                  <div
-                    className={cn(
-                      "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
-                    )}
-                  ></div>
-                )}
-              </>
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gray-50">
-                invali image url
-              </div>
-            )}
-          </div>
-          <div className="p-4 flex-1/2 flex flex-col">
-            <div className="flex justify-between">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {i.name as string}
-              </h3>
-              <div className="text-xs text-rose-600 font-bold">
-                {"$" + i.price}
-              </div>
-            </div>
-            <p className="text-gray-600 mb-4">{i.description as string}</p>
-            <div className="mt-auto flex justify-between items-center">
-              <Link
-                href={`/admin/cakes/edit/${i.uuid}`}
-                className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
-              >
-                Edit
-              </Link>
-              <Badge
-                className={cn(
-                  "text-white",
-                  CakeTypeColorClasses[i.cakeType?.color as string]
-                )}
-              >
-                {i.cakeType?.name || "no tag"}
-              </Badge>
-            </div>
-          </div>
-        </div>
+        <CakeCard data={i} key={i.uuid} />
       ))}
     </div>
   );

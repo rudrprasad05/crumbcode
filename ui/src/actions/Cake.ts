@@ -18,6 +18,7 @@ export async function GetAllCakes(
       headers: { Authorization: `Bearer ${token}` },
     }
   );
+  console.log("sdkjakd", res);
 
   return res.data;
 }
