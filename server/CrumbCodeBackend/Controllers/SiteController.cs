@@ -69,6 +69,24 @@ namespace CrumbCodeBackend.Controllers
             return Ok(model);
         }
 
+        [HttpGet("get-all-media")]
+        public async Task<IActionResult> GetAllMedia([FromQuery] MediaQueryObject queryObject)
+        {
+            var model = await _mediaRepository.GetAll(queryObject);
+
+            if (model == null)
+            {
+                return BadRequest(new ApiResponse<List<SocialMediaDto>>
+                {
+                    Success = false,
+                    StatusCode = 400,
+
+                }
+                );
+            }
+            return Ok(model);
+        }
+
         [HttpGet("get-storage-used")]
         public async Task<IActionResult> GetStorageSum([FromQuery] CakeQueryObject queryObject)
         {

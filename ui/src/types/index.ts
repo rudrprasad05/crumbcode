@@ -145,6 +145,8 @@ export interface NewMediaRequest {
 export interface MediaQueryObject {
   pageNumber?: number;
   pageSize?: number;
+  showInGallery?: boolean;
+  isDeleted?: boolean;
 }
 
 export interface MetaData {

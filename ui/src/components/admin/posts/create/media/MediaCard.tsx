@@ -13,6 +13,8 @@ export default function MediaCard({ data }: { data?: Media }) {
   const { media, previewUrl, setInitialState } = useMedia();
 
   useEffect(() => {
+    if (data?.uuid == media.uuid) return;
+
     if (data) setInitialState(data);
   }, [data, setInitialState]);
 

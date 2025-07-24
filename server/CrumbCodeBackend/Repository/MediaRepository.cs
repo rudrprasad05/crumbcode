@@ -102,8 +102,17 @@ namespace CrumbCodeBackend.Repository
         public async Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject)
         {
             var media = _context.Medias.AsQueryable();
-            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
+            if (queryObject.IsDeleted.HasValue)
+            {
+                media = media.Where(m => m.IsDeleted == queryObject.IsDeleted.Value);
+            }
 
+            if (queryObject.ShowInGallery.HasValue)
+            {
+                media = media.Where(m => m.ShowInGallery == queryObject.ShowInGallery.Value);
+            }
+
+            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
             var res = await media
                 .Skip(skip)
                 .Take(queryObject.PageSize)
@@ -118,7 +127,7 @@ namespace CrumbCodeBackend.Repository
                 signedMedia.Add(item);
             }
 
-            var totalCount = await _context.Medias.CountAsync();
+            var totalCount = signedMedia.Count;
 
             return new ApiResponse<List<Media>>
             {

@@ -2,7 +2,13 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { FromModelToNewRequestDTO } from "@/mappers/CakeMapper";
-import { ApiResponse, Cake, MediaQueryObject, SocialMedia } from "@/types";
+import {
+  ApiResponse,
+  Cake,
+  Media,
+  MediaQueryObject,
+  SocialMedia,
+} from "@/types";
 import { GetToken } from "./User";
 import { buildMediaQueryParams } from "@/lib/params";
 
@@ -60,4 +66,18 @@ export async function GetStorageUsed(
     };
     return tmp;
   }
+}
+
+export async function GetMediaSite(
+  query?: MediaQueryObject
+): Promise<ApiResponse<Media[]>> {
+  const token = await GetToken();
+  const params = buildMediaQueryParams(query);
+
+  console.log(query);
+
+  const res = await axiosGlobal.get<ApiResponse<Media[]>>(
+    `site/get-all-media?${params}`
+  );
+  return res.data;
 }

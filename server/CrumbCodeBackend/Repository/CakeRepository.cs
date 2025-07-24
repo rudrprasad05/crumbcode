@@ -60,7 +60,6 @@ namespace CrumbCodeBackend.Repository
             existingCake.MediaId = updatedCake.MediaId;
             existingCake.CakeTypeId = updatedCake.CakeTypeId;
             existingCake.UpdatedOn = DateTime.UtcNow;
-            // ... copy other fields as needed
 
             await _context.SaveChangesAsync();
 

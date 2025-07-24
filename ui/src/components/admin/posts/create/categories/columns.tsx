@@ -24,6 +24,13 @@ import { cn } from "@/lib/utils";
 
 export const columns: ColumnDef<CakeType>[] = [
   {
+    accessorKey: "number",
+    header: "#",
+    cell: ({ row }) => {
+      return <div className="flex gap-2">{+row.id + 1}</div>;
+    },
+  },
+  {
     accessorKey: "name",
     header: "Name",
   },
