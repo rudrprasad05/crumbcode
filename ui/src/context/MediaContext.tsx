@@ -75,6 +75,7 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   }, [media, file]);
 
   function setInitialState(data: Partial<Media>) {
+    if (data == media) return;
     setMedia(data);
     setPreviewUrl(data.url);
     initialHashRef.current = hash({
@@ -108,13 +109,11 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   };
 
   function updateValues<K extends keyof Media>(key: K, value: Media[K]) {
-    console.log(key, value);
     setMedia((prev) => {
       const tmp = {
         ...prev,
         [key]: value,
       };
-      console.log("finel", tmp);
       return tmp;
     });
   }
@@ -136,12 +135,8 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
         formData.append("file", file);
       }
 
-      console.log(formData, m);
-
       toast.success("Uploaded successfully");
       const res = await UploadOneFile(formData, m.uuid);
-
-      console.log(res);
 
       if (!res) throw new Error("Upload failed");
     } catch (error) {
@@ -162,7 +157,6 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
       });
       setHasChanged(false);
     } catch (error) {
-      console.log(error);
       toast.error("Error ocured. Changes not saved");
     }
     setIsSaving(false);

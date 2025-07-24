@@ -121,7 +121,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let tempUser: User = JSON.parse(localStorage.getItem("user") ?? "");
 
     if (tempUser) {
-      console.log("pre-exit", tempUser);
       setUser(tempUser);
       return;
     }
@@ -138,9 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           token: res.data.token,
           role: res.data.role,
         };
-      } catch (error) {
-        console.log(error);
-      }
+      } catch (error) {}
   }, [pathname]);
 
   useEffect(() => {

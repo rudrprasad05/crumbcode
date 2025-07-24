@@ -17,7 +17,6 @@ export const axiosGlobal = axios.create({
 });
 
 axiosGlobal.interceptors.request.use((config) => {
-  console.log(config);
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("token");
     if (token) {
@@ -31,12 +30,9 @@ axiosGlobal.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error?.response?.status;
-    console.log("axios interceptop");
     console.dir(error);
 
     if (status === 401 || status === 403) {
-      console.log("axios interceptop inside");
-
       // Remove token cookie or localStorage
       destroyCookie(null, "token");
 

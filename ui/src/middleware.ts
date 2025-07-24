@@ -25,8 +25,6 @@ export async function middleware(req: NextRequest) {
     }
 
     const user = await res.json();
-    console.log("qqqqq", res, user);
-
     // Role check
     if (
       req.nextUrl.pathname.startsWith("/admin") &&

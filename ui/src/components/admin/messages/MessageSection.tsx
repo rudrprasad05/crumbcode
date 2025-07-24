@@ -42,8 +42,6 @@ export default function MessageSection() {
         pageSize: pagination.pageSize,
       });
 
-      console.log(data);
-
       setMessages(data.data as ContactMessage[]);
       setPagination((prev) => ({
         ...prev,

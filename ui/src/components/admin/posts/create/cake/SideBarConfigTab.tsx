@@ -15,8 +15,6 @@ import {
 
 export default function SideBarConfigTab() {
   const { cake, updateCakeValues } = useCake();
-  console.log(cake);
-
   const dateFormatOptions: Intl.DateTimeFormatOptions = {
     day: "2-digit",
     month: "2-digit",

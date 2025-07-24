@@ -43,8 +43,6 @@ export default function SocialSection() {
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
       });
-      console.log(data);
-
       setSocialItems(data.data as SocialMedia[]);
       setPagination((prev) => ({
         ...prev,
@@ -142,7 +140,6 @@ function HandleDataSection({ data, isLoading }: ISocialSection) {
       </div>
     );
   }
-  console.log("sm123", data);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 py-2">
       {data.map((i, index) => (

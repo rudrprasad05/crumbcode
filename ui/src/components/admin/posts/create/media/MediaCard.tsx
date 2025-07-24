@@ -13,9 +13,8 @@ export default function MediaCard({ data }: { data?: Media }) {
   const { media, previewUrl, setInitialState } = useMedia();
 
   useEffect(() => {
-    console.log("rerun");
     if (data) setInitialState(data);
-  });
+  }, [data, setInitialState]);
 
   const getTypeIcon = () => {
     const type = media?.contentType as string;

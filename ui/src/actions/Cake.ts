@@ -18,8 +18,6 @@ export async function GetAllCakes(
       headers: { Authorization: `Bearer ${token}` },
     }
   );
-  console.log("sdkjakd", res);
-
   return res.data;
 }
 
@@ -40,7 +38,11 @@ export async function SaveCake(
   uuid?: string
 ): Promise<Cake> {
   const dto = FromModelToNewRequestDTO(cake as Cake);
-  const res = await axiosGlobal.post<Cake>("cake/upsert?uuid=" + uuid, dto);
+  const token = await GetToken();
+
+  const res = await axiosGlobal.post<Cake>("cake/upsert?uuid=" + uuid, dto, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 
   return res.data;
 }

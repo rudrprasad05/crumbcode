@@ -146,25 +146,29 @@ namespace CrumbCodeBackend.Repository
                     StatusCode = 400,
                     Message = "file was null"
                 };
-            }
+            };
 
-            var newMediaObjectKey = Guid.NewGuid().ToString();
-            var fileUrl = file != null ? await _amazonS3Service.UploadFileAsync(file, newMediaObjectKey) : existingMedia.Url;
-            if (fileUrl == null)
+            if (file != null)
             {
-                return new ApiResponse<MediaDto>
+                var newMediaObjectKey = Guid.NewGuid().ToString();
+                var fileUrl = await _amazonS3Service.UploadFileAsync(file, newMediaObjectKey);
+                if (fileUrl == null)
                 {
-                    Success = false,
-                    StatusCode = 400,
-                    Message = "file url not provided"
-                };
+                    return new ApiResponse<MediaDto>
+                    {
+                        Success = false,
+                        StatusCode = 400,
+                        Message = "file url not provided"
+                    };
+                }
+
+                existingMedia.Url = fileUrl;
+                existingMedia.ObjectKey = "crumbcode/" + newMediaObjectKey + "." + fileUrl.Split(".").Last();
             }
 
             existingMedia.AltText = media.AltText;
             existingMedia.FileName = media.FileName;
             existingMedia.ShowInGallery = media.ShowInGallery;
-            existingMedia.Url = fileUrl;
-            existingMedia.ObjectKey = "crumbcode/" + newMediaObjectKey + "." + fileUrl.Split(".").Last();
 
             await _context.SaveChangesAsync();
 

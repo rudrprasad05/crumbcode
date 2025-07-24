@@ -44,7 +44,6 @@ export default function RegisterPage() {
     // Simulate API call
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
-    console.log("Register attempt:", values);
     setIsLoading(false);
   }
 

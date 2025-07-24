@@ -59,8 +59,6 @@ function formatTimeAgo(date: Date) {
 
 export function NotificationCard({ data }: { data: Notification }) {
   const [notification, setNotification] = useState(data);
-  console.log(data);
-
   useEffect(() => {
     setNotification(data);
   }, [data]);

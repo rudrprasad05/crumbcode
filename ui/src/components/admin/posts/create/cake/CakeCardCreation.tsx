@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils";
 import { Cake, CakeTypeColorClasses } from "@/types";
 import Link from "next/link";
 import { useEffect } from "react";
-import  Image  from "next/image";
-
+import Image from "next/image";
 
 export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
   const { cake, setInitialCakeState } = useCake();
 
   useEffect(() => {
+    if (cake.uuid == cakeData?.uuid) return;
     if (cakeData) {
       setInitialCakeState(cakeData);
     }

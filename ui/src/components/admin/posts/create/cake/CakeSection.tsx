@@ -45,8 +45,6 @@ export default function CakeSection() {
         pageSize: pagination.pageSize,
       });
 
-      console.log(data);
-
       setCakeItems(data.data as Cake[]);
       setPagination((prev) => ({
         ...prev,
@@ -227,7 +225,6 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
       </div>
     );
   }
-  console.log(data);
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (

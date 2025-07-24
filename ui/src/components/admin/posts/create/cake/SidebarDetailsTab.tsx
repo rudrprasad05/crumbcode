@@ -193,8 +193,6 @@ function MediaListTab({
         pageSize: pagination.pageSize,
       });
 
-      console.log(data);
-
       setMediaItems(data.data as Media[]);
       setPagination((prev) => ({
         ...prev,
@@ -221,6 +219,7 @@ function MediaListTab({
       {mediaItems.map((media, index) => (
         <div
           onClick={() => {
+            console.log("hit");
             changeMedia(media);
             setOpen(false);
           }}

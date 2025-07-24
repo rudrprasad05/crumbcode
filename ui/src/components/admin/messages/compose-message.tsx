@@ -38,7 +38,6 @@ export function ComposeMessage({ onClose }: ComposeMessageProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Here you would typically send the message to your API
-    console.log("Sending message:", formData);
     onClose();
   };
 

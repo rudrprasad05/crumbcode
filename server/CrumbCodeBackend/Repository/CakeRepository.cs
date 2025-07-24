@@ -51,12 +51,7 @@ namespace CrumbCodeBackend.Repository
 
         public async Task<ApiResponse<CakeDto>> UpdateAsync(string uuid, Cake updatedCake)
         {
-            var existingCake = await _context.Cakes.FirstOrDefaultAsync(c => c.UUID == uuid);
-
-            if (existingCake == null)
-            {
-                throw new KeyNotFoundException("Cake not found");
-            }
+            var existingCake = await _context.Cakes.FirstOrDefaultAsync(c => c.UUID == uuid) ?? throw new KeyNotFoundException("Cake not found");
 
             // Update fields manually
             existingCake.Name = updatedCake.Name;
@@ -159,7 +154,7 @@ namespace CrumbCodeBackend.Repository
 
             var dto = cake.FromModelToDto();
             dto.Media = mediaDto;
-            
+
             return new ApiResponse<CakeDto>
             {
                 Success = true,

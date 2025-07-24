@@ -59,17 +59,14 @@ export const SocialMediaProvider = ({ children }: { children: ReactNode }) => {
   function setInitialCakeState(data: Partial<SocialMedia>) {
     setSocialMedia(data);
     initialHashRef.current = hash(data);
-    console.log("fired", data);
   }
 
   function updateSocialMediaValues<K extends keyof SocialMedia>(
     key: K,
     value: SocialMedia[K]
   ) {
-    console.log("first");
     setSocialMedia((prev) => {
       const newState = { ...prev, [key]: value };
-      console.log("Updated State:", newState);
       return newState;
     });
   }
@@ -84,7 +81,6 @@ export const SocialMediaProvider = ({ children }: { children: ReactNode }) => {
       console.dir("save media context", socialMedia);
       toast.success("Saved successfully");
     } catch (error) {
-      console.log(error);
       toast.error("Error ocured. Changes not saved");
     }
     setIsSaving(false);

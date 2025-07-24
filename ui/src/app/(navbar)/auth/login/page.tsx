@@ -51,7 +51,6 @@ export default function LoginPage() {
       toast.error("Failed login");
     }
 
-    console.log("Login attempt:", values);
     setIsLoading(false);
   }
 

@@ -93,7 +93,6 @@ function Header() {
 
 function SideBar() {
   const { socialMedia, updateSocialMediaValues } = useSocialMedia();
-  console.log(socialMedia);
   const [selectedIcon, setSelectedIcon] = useState<string>(
     socialMedia.icon || "default"
   );

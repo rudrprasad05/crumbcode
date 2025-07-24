@@ -30,7 +30,6 @@ export async function GetAllSocialMediaSite(
 
     return res.data;
   } catch (error) {
-    console.log(error);
     const tmp: ApiResponse<SocialMedia[]> = {
       success: false,
       statusCode: 400,
@@ -53,7 +52,6 @@ export async function GetStorageUsed(
 
     return res.data;
   } catch (error) {
-    console.log(error);
     const tmp: ApiResponse<number> = {
       success: false,
       statusCode: 400,

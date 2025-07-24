@@ -11,8 +11,6 @@ export async function GetAllSocialMedia(
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
 
-  console.log(token, params);
-
   try {
     const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
       `social-media/get-all?${params}`,
@@ -23,7 +21,6 @@ export async function GetAllSocialMedia(
 
     return res.data;
   } catch (error) {
-    console.log(error);
     const tmp: ApiResponse<SocialMedia[]> = {
       success: false,
       statusCode: 400,
@@ -52,6 +49,5 @@ export async function GetOneSocialMedia(
   const res = await axiosGlobal.get<ApiResponse<SocialMedia>>(
     "social-media/get-one?uuid=" + uuid
   );
-  console.log(res);
   return res.data;
 }

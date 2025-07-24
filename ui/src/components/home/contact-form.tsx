@@ -94,7 +94,6 @@ export default function ContactForm() {
       await CreateMessage(data);
       toast.success("Message Sent");
     } catch (error) {
-      console.log(error);
       setIsMessageSent(false);
     }
 

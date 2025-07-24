@@ -13,7 +13,6 @@ export async function GetMedia(
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
 
-  console.log("params:", params);
   const res = await axiosGlobal.get<ApiResponse<Media[]>>(
     `media/get-all?${params}`,
     {
@@ -43,8 +42,6 @@ export async function UploadOneFile(form: FormData, uuid?: string) {
   } else {
     apistr = "media/upsert";
   }
-
-  console.log(apistr);
 
   try {
     const res = await axiosGlobal.post(apistr, form);

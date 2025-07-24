@@ -51,8 +51,6 @@ export default function NotificationSection() {
         pageSize: pagination.pageSize,
       });
 
-      console.log(data);
-
       setNotifications(data.data as Notification[]);
       setPagination((prev) => ({
         ...prev,

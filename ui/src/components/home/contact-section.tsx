@@ -30,8 +30,6 @@ export default function ContactSection() {
         pageSize: pagination.pageSize,
       });
 
-      console.log(data);
-
       setSocialIcons(data.data as SocialMedia[]);
       setPagination((prev) => ({
         ...prev,

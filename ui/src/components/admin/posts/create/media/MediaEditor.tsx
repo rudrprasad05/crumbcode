@@ -33,7 +33,6 @@ import SidebarDetailsTab from "./SidebarDetailsTab";
 import MediaCard from "./MediaCard";
 
 export default function MediaEditor({ media }: { media?: Media }) {
-  console.log(media);
   return (
     <MediaProvider>
       <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
@@ -112,7 +111,6 @@ function SideBar() {
   const [state, setState] = useState<"edit" | "config">("edit");
 
   useEffect(() => {
-    console.log("rerun");
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);

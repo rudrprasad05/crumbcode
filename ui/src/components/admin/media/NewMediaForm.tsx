@@ -43,9 +43,6 @@ export default function NewMediaForm() {
       const res = await UploadOneFile(formData);
       const getMedia = await GetOneMedia(res.uuid);
 
-      console.log("res", res);
-      console.log("getMedia", getMedia);
-
       changeMedia(getMedia.data as Media);
 
       if (!res) throw new Error("Upload failed");

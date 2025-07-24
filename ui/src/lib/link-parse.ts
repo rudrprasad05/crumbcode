@@ -29,7 +29,6 @@ export function parseSocialLink(url: string): ParsedSocialLink {
 
     // === Instagram ===
     if (host === "instagram.com" || host.endsWith(".instagram.com")) {
-      console.log("trigger");
       const match = parsed.pathname.match(
         /^\/@?([^/?]+)(?:\/(reel|p|tv)\/([a-zA-Z0-9_-]+))?/
       );

@@ -16,7 +16,6 @@ export default function EditMediaPage({ params }: PageProps) {
   const [media, setMedia] = useState<Media | undefined>(undefined);
 
   useEffect(() => {
-    console.log("rerun");
     const getData = async () => {
       const cake = await GetOneMedia(id);
       console.dir("media get", cake);
