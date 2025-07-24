@@ -26,16 +26,26 @@ export async function GetMedia(
 export async function GetOneMedia(
   uuid: string,
   token?: string
-): Promise<Media> {
-  const res = await axiosGlobal.get<Media>("media/get-one/" + uuid, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+): Promise<ApiResponse<Media>> {
+  const res = await axiosGlobal.get<ApiResponse<Media>>(
+    "media/get-one/" + uuid,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return res.data;
 }
 
-export async function UploadOneFile(form: FormData) {
+export async function UploadOneFile(form: FormData, uuid?: string) {
+  let apistr = "";
+  if (uuid && uuid.trim().length > 0) {
+    apistr = "media/upsert?uuid" + uuid;
+  } else {
+    apistr = "media/upsert";
+  }
+
   try {
-    const res = await axiosGlobal.post("media/create", form);
+    const res = await axiosGlobal.post(apistr, form);
     return res.data;
   } catch (error) {
     console.dir(error, { depth: null });

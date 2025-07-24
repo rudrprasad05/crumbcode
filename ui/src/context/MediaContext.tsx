@@ -64,16 +64,23 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    const currentHash = hash(media);
+    const currentHash = hash({
+      media,
+      file: file ? { name: file.name, size: file.size, type: file.type } : null,
+    });
     if (!initialHashRef.current) {
       initialHashRef.current = currentHash;
     }
     setHasChanged(currentHash !== initialHashRef.current);
-  }, [media]);
+  }, [media, file]);
 
-  function setInitialState(cake: Partial<Media>) {
-    setMedia(cake);
-    initialHashRef.current = hash(cake);
+  function setInitialState(data: Partial<Media>) {
+    setMedia(data);
+    setPreviewUrl(data.url);
+    initialHashRef.current = hash({
+      media: data,
+      file: file ? { name: file.name, size: file.size, type: file.type } : null,
+    });
   }
 
   const handleFileChange = (
@@ -84,6 +91,13 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
     if (del) {
       setFile(undefined);
       setPreviewUrl(undefined);
+      setMedia((prev) => {
+        let tmp = {
+          ...prev,
+          url: undefined,
+        };
+        return tmp;
+      });
       return;
     }
     if (file) {
@@ -94,34 +108,38 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   };
 
   function updateValues<K extends keyof Media>(key: K, value: Media[K]) {
-    setMedia((prev) => ({
-      ...prev,
-      [key]: value,
-    }));
+    console.log(key, value);
+    setMedia((prev) => {
+      let tmp = {
+        ...prev,
+        [key]: value,
+      };
+      console.log("finel", tmp);
+      return tmp;
+    });
   }
 
   async function handleMediaSave() {
     let m = media as Media;
-    if (!file) {
+    if (!previewUrl) {
       toast.error("No file selected");
-      return;
+      throw new Error();
     }
+
     try {
       const formData = new FormData();
-      formData.append("url", "TEMP");
       formData.append("altText", m.altText);
       formData.append("fileName", m.fileName);
-      formData.append("contentType", file.type);
-      formData.append("sizeInBytes", file.size.toString());
-      formData.append("file", file);
+      formData.append("showInGallery", String(m.showInGallery));
 
-      const res = await UploadOneFile(formData);
-
-      console.log("res", res);
-
-      if (!res) throw new Error("Upload failed");
+      if (file) {
+        formData.append("file", file);
+      }
 
       toast.success("Uploaded successfully");
+      const res = await UploadOneFile(formData, m.uuid);
+
+      if (!res) throw new Error("Upload failed");
     } catch (error) {
       console.error(error);
       toast.error("Upload failed");
@@ -132,10 +150,13 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
     setIsSaving(true);
     try {
       await handleMediaSave();
-      initialHashRef.current = hash(media);
+      initialHashRef.current = hash({
+        media,
+        file: file
+          ? { name: file.name, size: file.size, type: file.type }
+          : null,
+      });
       setHasChanged(false);
-
-      toast.success("Saved successfully");
     } catch (error) {
       console.log(error);
       toast.error("Error ocured. Changes not saved");

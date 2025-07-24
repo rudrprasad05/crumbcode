@@ -4,6 +4,7 @@ import { GetOneMedia, UploadOneFile } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import { useCake } from "@/context/CakeContext";
 import { cn } from "@/lib/utils";
+import { Media } from "@/types";
 import { NewMediaFormSchema, NewMediaFormType } from "@/types/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Image as ImageIcon, Loader2, Trash, Upload } from "lucide-react";
@@ -34,12 +35,10 @@ export default function NewMediaForm() {
     setIsLoading(true);
     try {
       const formData = new FormData();
-      formData.append("url", "TEMP");
       formData.append("altText", data.altText);
       formData.append("fileName", data.fileName);
-      formData.append("contentType", data.file.type);
-      formData.append("sizeInBytes", data.file.size.toString());
       formData.append("file", data.file);
+      //   formData.append("showInGallery", data)
 
       const res = await UploadOneFile(formData);
       const getMedia = await GetOneMedia(res.uuid);
@@ -47,7 +46,7 @@ export default function NewMediaForm() {
       console.log("res", res);
       console.log("getMedia", getMedia);
 
-      changeMedia(getMedia);
+      changeMedia(getMedia.data as Media);
 
       if (!res) throw new Error("Upload failed");
 

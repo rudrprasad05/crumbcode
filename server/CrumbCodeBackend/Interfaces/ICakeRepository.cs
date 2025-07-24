@@ -11,11 +11,11 @@ namespace CrumbCodeBackend.Interfaces
 {
     public interface ICakeRepository
     {
+        public Task<ApiResponse<CakeDto>> UpdateAsync(string uuid, Cake cake);
         public Task<ApiResponse<CakeDto>> CreateAsync(Cake cake);
         public Task<ApiResponse<List<CakeDto>>> GetAllAsync(CakeQueryObject queryObject);
         public Task<CakeDto?> GetOneAsync(string uuid);
         public Task<Cake?> Exists(string uuid);
-        public Task<ApiResponse<CakeDto>> UpdateAsync(string uuid, Cake cake);
         public Task<ApiResponse<CakeDto>> SafeDelete(string uuid);
 
 

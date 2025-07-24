@@ -15,7 +15,7 @@ import { DeleteMedia } from "./DeleteMedia";
 import { useMedia } from "@/context/MediaContext";
 
 export default function SideBarConfigTab() {
-  const { media, updateValues } = useMedia();
+  const { media } = useMedia();
 
   const dateFormatOptions: Intl.DateTimeFormatOptions = {
     day: "2-digit",

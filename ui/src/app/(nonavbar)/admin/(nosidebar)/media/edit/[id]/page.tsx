@@ -1,26 +1,26 @@
 "use client";
 
-import { GetOneCake } from "@/actions/Cake";
-import CakeEditor from "@/components/admin/posts/create/cake/CakeEditor";
+import { GetOneMedia } from "@/actions/Media";
+import MediaEditor from "@/components/admin/posts/create/media/MediaEditor";
 import { LoadingContainer } from "@/components/global/LoadingContainer";
-import { Cake } from "@/types";
-import { Loader2 } from "lucide-react";
-import React from "react";
-import { useEffect, useState } from "react";
+import { Media } from "@/types";
+import React, { useEffect, useState } from "react";
 
 type PageProps = {
   params: Promise<{ id: string }>; // important!
 };
 
-export default function EditCakePage({ params }: PageProps) {
+export default function EditMediaPage({ params }: PageProps) {
   const { id } = React.use(params);
   const [loading, setLoading] = useState(true);
-  const [cake, setCake] = useState<Cake | undefined>(undefined);
+  const [media, setMedia] = useState<Media | undefined>(undefined);
 
   useEffect(() => {
+    console.log("rerun");
     const getData = async () => {
-      const cake = await GetOneCake(id);
-      setCake(cake);
+      const cake = await GetOneMedia(id);
+      console.dir("media get", cake);
+      setMedia(cake.data);
       setLoading(false);
     };
     getData();
@@ -30,9 +30,9 @@ export default function EditCakePage({ params }: PageProps) {
     return <LoadingContainer />;
   }
 
-  if (!cake) {
+  if (!media) {
     return <>Invalid URL</>;
   }
 
-  return <CakeEditor cake={cake} />;
+  return <MediaEditor media={media} />;
 }

@@ -47,8 +47,7 @@ namespace CrumbCodeBackend.Service
                 Expires = DateTime.UtcNow.AddMinutes(15)
             });
 
-            return url;
-                        
+            return url;               
         }
 
         public async Task<GetObjectResponse?> GetObjectAsync(string objKey)

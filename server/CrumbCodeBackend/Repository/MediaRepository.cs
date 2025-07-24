@@ -9,6 +9,8 @@ using CrumbCodeBackend.Data;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Requests;
 using CrumbCodeBackend.Models.Response;
+using CrumbCodeBackend.DTO;
+using CrumbCodeBackend.Mappers;
 
 namespace CrumbCodeBackend.Repository
 {
@@ -30,41 +32,57 @@ namespace CrumbCodeBackend.Repository
             return await _context.Medias.SumAsync(m => m.SizeInBytes);
         }
 
-        public async Task<Media?> CreateAsync(NewMediaRequest newMediaObject)
+        public async Task<ApiResponse<MediaDto>> CreateAsync(Media media, IFormFile? file)
         {
-            if (newMediaObject.File == null || newMediaObject == null)
+            if (file == null || media == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file was null"
+                };
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             var guid = Guid.NewGuid().ToString();
             try
             {
-                var fileUrl = await _amazonS3Service.UploadFileAsync(newMediaObject.File, guid);
+                var fileUrl = await _amazonS3Service.UploadFileAsync(file, guid);
                 if (fileUrl == null)
                 {
-                    return null;
+                    return new ApiResponse<MediaDto>
+                    {
+                        Success = false,
+                        StatusCode = 400,
+                        Message = "somehow file url is null"
+                    };
                 }
 
-                // Create Media
-                var media = new Media
+                var newMedia = new Media
                 {
-                    AltText = newMediaObject.AltText,
+                    AltText = media.AltText,
                     Url = fileUrl,
                     ObjectKey = "crumbcode/" + guid + "." + fileUrl.Split(".").Last(),
                     UUID = guid,
-                    ContentType = newMediaObject.ContentType,
-                    FileName = newMediaObject.FileName,
-                    SizeInBytes = newMediaObject.SizeInBytes
+                    ContentType = media.ContentType,
+                    FileName = media.FileName,
+                    SizeInBytes = media.SizeInBytes,
+                    ShowInGallery = media.ShowInGallery,
                 };
 
-                await _context.Medias.AddAsync(media);
+                await _context.Medias.AddAsync(newMedia);
                 await _context.SaveChangesAsync();
 
                 await transaction.CommitAsync();
 
-                return media;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = true,
+                    StatusCode = 200,
+                    Message = "ok",
+                    Data = newMedia.FromModelToDTO()
+                };
             }
             catch (Exception)
             {
@@ -110,63 +128,75 @@ namespace CrumbCodeBackend.Repository
 
         }
 
-        public async Task<Media?> MoveMedia(string uuid, string moveId, string? token)
+        public async Task<ApiResponse<MediaDto>> UpdateAsync(string uuid, Media media, IFormFile? file)
         {
-            var folder = await _context.Medias.FirstOrDefaultAsync((i) => i.UUID == uuid);
-            if(folder == null)
+            var existingMedia = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
+            if (existingMedia == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file was null"
+                };
             }
 
-            await _context.SaveChangesAsync();
-            return folder;
-        }
-
-        public async Task<Media?> Edit(string uuid, EditMediaRequest request)
-        {
-            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
-            if(media == null)
+            var fileUrl = file != null ? await _amazonS3Service.UploadFileAsync(file, uuid) : existingMedia.Url;
+            if (fileUrl == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file url not provided"
+                };
             }
 
-            media.AltText = request.AltText;
-            media.FileName = request.FileName;
+            existingMedia.AltText = media.AltText;
+            existingMedia.FileName = media.FileName;
+            existingMedia.ShowInGallery = media.ShowInGallery;
+            existingMedia.Url = fileUrl;
+            existingMedia.ObjectKey = "crumbcode/" + uuid + "." + fileUrl.Split(".").Last();
 
             await _context.SaveChangesAsync();
-            return media;
-        }
-        public async Task<Media?> Star(string uuid, bool star, string? token)
-        {
-            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
-            if(media == null)
+
+            return new ApiResponse<MediaDto>
             {
-                return null;
-            }
-
-            await _context.SaveChangesAsync();
-            return media;
+                Success = true,
+                StatusCode = 200,
+                Message = "ok",
+                Data = existingMedia.FromModelToDTO()
+            };
         }
-
-        public async Task<Media?> GetOne(string uuid)
+        public async Task<ApiResponse<MediaDto>> GetOne(string uuid)
         {
             var mediaQ = _context.Medias.AsQueryable();
             var media = await mediaQ.FirstOrDefaultAsync(m => m.UUID == uuid);
             
             if(media == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file was null"
+                };
             }
 
             var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
             media.Url = signedUrl;
 
-            return media;
+            return new ApiResponse<MediaDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Message = "ok",
+                Data = media.FromModelToDTO()
+            };
         }
-
         public async Task<Media?> Recycle(string uuid, string? token)
         {
-            var media = await GetOne(uuid);
+            var media = await Exists(uuid);
             if(media == null)
             {
                 return null;
@@ -175,10 +205,9 @@ namespace CrumbCodeBackend.Repository
             await _context.SaveChangesAsync();
             return media;
         }
-
         public async Task<Media?> Delete(string uuid)
         {
-            var media = await GetOne(uuid);
+            var media = await Exists(uuid);
             if(media == null)
             {
                 return null;
@@ -187,6 +216,11 @@ namespace CrumbCodeBackend.Repository
             _context.Medias.Remove(media);
             await _context.SaveChangesAsync();
 
+            return media;
+        }
+        public Task<Media?> Exists(string uuid)
+        {
+            var media = _context.Medias.FirstOrDefaultAsync(c => c.UUID == uuid);
             return media;
         }
     }

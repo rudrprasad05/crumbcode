@@ -39,7 +39,7 @@ namespace CrumbCodeBackend.Mappers
                 SizeInBytes = request.SizeInBytes,
                 UUID = request.UUID,
                 Url = url ?? request.Url,
-                ShowInGallery = request.ShowInGallery || true
+                ShowInGallery = request.ShowInGallery
             };
 
         }

@@ -1,7 +1,7 @@
 "use client";
 
 import { PostSidebarLogo } from "@/components/admin/sidebar/sidebar-logo";
-import { Button } from "@/components/ui/button";
+import { EditorSaveButton } from "@/components/global/EditorSaveButton";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -13,13 +13,12 @@ import { CakeProvider, useCake } from "@/context/CakeContext";
 import { cn } from "@/lib/utils";
 import { Cake } from "@/types";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { ArrowLeft, CloudOff, CloudUpload } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import CakeCardCreation from "./CakeCardCreation";
 import SideBarConfigTab from "./SideBarConfigTab";
 import SidebarDetailsTab from "./SidebarDetailsTab";
-import { EditorSaveButton } from "@/components/global/EditorSaveButton";
 
 export default function CakeEditor({ cake }: { cake?: Cake }) {
   return (
@@ -54,8 +53,6 @@ export default function CakeEditor({ cake }: { cake?: Cake }) {
 function Header() {
   const router = useRouter();
   const { saveCakeContext, hasChanged, isSaving } = useCake();
-
-  useEffect(() => {}, [hasChanged]);
 
   return (
     <div className="w-full flex items-center border border-gray-200 p-4">
