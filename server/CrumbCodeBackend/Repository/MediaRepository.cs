@@ -25,11 +25,18 @@ namespace CrumbCodeBackend.Repository
             _context = context;
             _amazonS3Service = amazonS3Service;
         }
-        public async Task<double> SumStorage()
+        public async Task<ApiResponse<double>> SumStorage()
         {
             var sizes = await _context.Medias.Select(m => m.SizeInBytes).ToListAsync();
-            Console.WriteLine("Sizes: " + string.Join(", ", sizes));
-            return await _context.Medias.SumAsync(m => m.SizeInBytes);
+            var data = await _context.Medias.SumAsync(m => m.SizeInBytes);
+            
+            return new ApiResponse<double>
+            {
+                Success = true,
+                StatusCode = 200,
+                Message = "ok",
+                Data = data
+            };
         }
 
         public async Task<ApiResponse<MediaDto>> CreateAsync(Media media, IFormFile? file)
@@ -141,7 +148,8 @@ namespace CrumbCodeBackend.Repository
                 };
             }
 
-            var fileUrl = file != null ? await _amazonS3Service.UploadFileAsync(file, uuid) : existingMedia.Url;
+            var newMediaObjectKey = Guid.NewGuid().ToString();
+            var fileUrl = file != null ? await _amazonS3Service.UploadFileAsync(file, newMediaObjectKey) : existingMedia.Url;
             if (fileUrl == null)
             {
                 return new ApiResponse<MediaDto>
@@ -156,7 +164,7 @@ namespace CrumbCodeBackend.Repository
             existingMedia.FileName = media.FileName;
             existingMedia.ShowInGallery = media.ShowInGallery;
             existingMedia.Url = fileUrl;
-            existingMedia.ObjectKey = "crumbcode/" + uuid + "." + fileUrl.Split(".").Last();
+            existingMedia.ObjectKey = "crumbcode/" + newMediaObjectKey + "." + fileUrl.Split(".").Last();
 
             await _context.SaveChangesAsync();
 

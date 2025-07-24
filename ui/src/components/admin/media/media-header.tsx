@@ -5,12 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 
-interface MediaHeaderProps {
-  onUpload: () => void;
-  totalItems: number;
-}
-
-export function MediaHeader({ onUpload, totalItems }: MediaHeaderProps) {
+export function MediaHeader() {
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="flex items-center gap-4 flex-1">

@@ -18,6 +18,6 @@ namespace CrumbCodeBackend.Interfaces
         public Task<Media?> Exists(string uuid);
         public Task<Media?> Recycle(string uuid, string? token);   
         public Task<Media?> Delete(string uuid);   
-        public Task<double> SumStorage();
+        public Task<ApiResponse<double>> SumStorage();
     }
 }

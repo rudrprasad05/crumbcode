@@ -16,15 +16,18 @@ namespace CrumbCodeBackend.Controllers
     {
         private readonly ICakeRepository _cakeRepository;
         private readonly ISocialMediaRepository _socialMediaRepository;
+        private readonly IMediaRepository _mediaRepository;
 
         public SiteController(
             ICakeRepository cakeRepository,
+            IMediaRepository mediaRepository,
             ISocialMediaRepository socialMediaRepository,
             IConfiguration configuration,
             ITokenService tokenService
         ) : base(configuration, tokenService)
         {
             _cakeRepository = cakeRepository;
+            _mediaRepository = mediaRepository;
             _socialMediaRepository = socialMediaRepository;
 
         }
@@ -56,6 +59,24 @@ namespace CrumbCodeBackend.Controllers
             if (model == null)
             {
                 return BadRequest(new ApiResponse<List<SocialMediaDto>>
+                {
+                    Success = false,
+                    StatusCode = 400,
+
+                }
+                );
+            }
+            return Ok(model);
+        }
+
+        [HttpGet("get-storage-used")]
+        public async Task<IActionResult> GetStorageSum([FromQuery] CakeQueryObject queryObject)
+        {
+            var model = await _mediaRepository.SumStorage();
+
+            if (model == null)
+            {
+                return BadRequest(new ApiResponse<double>
                 {
                     Success = false,
                     StatusCode = 400,

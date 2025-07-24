@@ -136,8 +136,12 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
         formData.append("file", file);
       }
 
+      console.log(formData, m);
+
       toast.success("Uploaded successfully");
       const res = await UploadOneFile(formData, m.uuid);
+
+      console.log(res);
 
       if (!res) throw new Error("Upload failed");
     } catch (error) {

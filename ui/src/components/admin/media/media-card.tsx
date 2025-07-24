@@ -108,7 +108,12 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
             </div>
           )}
 
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-2 right-2 flex items-center gap-2">
+            {item.showInGallery && (
+              <Badge variant="secondary" className={`text-xs text-pink-950`}>
+                Gallery
+              </Badge>
+            )}
             <Badge variant="secondary" className={`text-xs ${getTypeColor()}`}>
               {item.contentType.split("/")[0]}
             </Badge>
@@ -135,8 +140,9 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
             )}
           </div>
 
-          <div className="text-xs text-gray-400">
-            {new Date(item.createdOn).toLocaleDateString()}
+          <div className="text-xs text-gray-400 flex justify-between items-center">
+            <div>{new Date(item.createdOn).toLocaleDateString()}</div>
+            <div>{formatFileSize(item.sizeInBytes)}</div>
           </div>
         </div>
       </CardContent>

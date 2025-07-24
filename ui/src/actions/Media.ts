@@ -39,10 +39,12 @@ export async function GetOneMedia(
 export async function UploadOneFile(form: FormData, uuid?: string) {
   let apistr = "";
   if (uuid && uuid.trim().length > 0) {
-    apistr = "media/upsert?uuid" + uuid;
+    apistr = "media/upsert?uuid=" + uuid;
   } else {
     apistr = "media/upsert";
   }
+
+  console.log(apistr);
 
   try {
     const res = await axiosGlobal.post(apistr, form);

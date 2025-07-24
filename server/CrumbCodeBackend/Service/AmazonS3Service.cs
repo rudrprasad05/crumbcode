@@ -32,7 +32,6 @@ namespace CrumbCodeBackend.Service
                 ForcePathStyle = true // Important for MinIO
             };
 
-
             _s3Client = new AmazonS3Client(accessKey, secretKey, config);
             _bucketName = awsOptions["BucketName"] ?? throw new InvalidOperationException("bucket name");
         }

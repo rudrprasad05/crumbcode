@@ -40,3 +40,26 @@ export async function GetAllSocialMediaSite(
     return tmp;
   }
 }
+
+export async function GetStorageUsed(
+  query?: MediaQueryObject
+): Promise<ApiResponse<number>> {
+  const params = buildMediaQueryParams(query);
+
+  try {
+    const res = await axiosGlobal.get<ApiResponse<number>>(
+      `site/get-storage-used?${params}`
+    );
+
+    return res.data;
+  } catch (error) {
+    console.log(error);
+    const tmp: ApiResponse<number> = {
+      success: false,
+      statusCode: 400,
+      timestamp: Date.now().toLocaleString(),
+      data: 0,
+    };
+    return tmp;
+  }
+}

@@ -22,6 +22,7 @@ import {
   CloudUpload,
   FileText,
   ImageIcon,
+  Loader2,
   Video,
 } from "lucide-react";
 import Image from "next/image";
@@ -62,38 +63,9 @@ export default function MediaEditor({ media }: { media?: Media }) {
   );
 }
 
-function MediaEditorContent({ media }: { media?: Media }) {
-  const { setInitialState } = useMedia();
-  return (
-    <div className="min-h-screen w-full overflow-hidden bg-gray-50 relative">
-      <Header />
-      <div className="flex-1 min-h-screen flex flex-row">
-        <ResizablePanelGroup
-          direction="horizontal"
-          className="flex-1 overflow-hidden"
-        >
-          <ResizablePanel defaultSize={60} minSize={30}>
-            <main className="w-full h-full p-6">
-              <div className="w-full h-full grid place-items-center">
-                <MediaCard data={media} />
-              </div>
-            </main>
-          </ResizablePanel>
-
-          <ResizableHandle />
-
-          <ResizablePanel defaultSize={40} minSize={20}>
-            <SideBar />
-          </ResizablePanel>
-        </ResizablePanelGroup>
-      </div>
-    </div>
-  );
-}
-
 function Header() {
   const router = useRouter();
-  const { saveContext, hasChanged } = useMedia();
+  const { saveContext, hasChanged, isSaving } = useMedia();
 
   return (
     <div className="w-full flex items-center border border-gray-200 p-4">
@@ -119,11 +91,13 @@ function Header() {
           )}
         </div>
         <Button
-          disabled={!hasChanged}
+          disabled={!hasChanged || isSaving}
           onClick={saveContext}
           variant={"outline"}
         >
-          Save
+          {!hasChanged && "Saved"}
+          {hasChanged && "Save"}
+          {isSaving && <Loader2 className="animate-spin w-4 h-4" />}
         </Button>
       </div>
       <SidebarHeader className="ml-5">

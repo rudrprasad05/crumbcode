@@ -19,8 +19,11 @@ import {
   Cake,
   Bell,
   Globe,
+  Cloud,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { GetStorageUsed } from "@/actions/Site";
 
 const navigationItems = [
   {
@@ -69,9 +72,9 @@ export function SidebarNavigation() {
   const pathname = usePathname();
 
   return (
-    <SidebarGroup>
-      <SidebarGroupContent>
-        <SidebarMenu>
+    <SidebarGroup className="h-full">
+      <SidebarGroupContent className="h-full">
+        <SidebarMenu className="h-full">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
             return (
