@@ -19,7 +19,7 @@ export default function EditCategoryPage({ params }: PageProps) {
   useEffect(() => {
     const getData = async () => {
       const cake = await GetOneCake(id);
-      setCake(cake);
+      setCake(cake.data);
 
       setLoading(false);
     };

@@ -92,7 +92,7 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
       setFile(undefined);
       setPreviewUrl(undefined);
       setMedia((prev) => {
-        let tmp = {
+        const tmp = {
           ...prev,
           url: undefined,
         };
@@ -110,7 +110,7 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   function updateValues<K extends keyof Media>(key: K, value: Media[K]) {
     console.log(key, value);
     setMedia((prev) => {
-      let tmp = {
+      const tmp = {
         ...prev,
         [key]: value,
       };
@@ -120,7 +120,7 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   }
 
   async function handleMediaSave() {
-    let m = media as Media;
+    const m = media as Media;
     if (!previewUrl) {
       toast.error("No file selected");
       throw new Error();

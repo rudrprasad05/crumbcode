@@ -23,8 +23,15 @@ export async function GetAllCakes(
   return res.data;
 }
 
-export async function GetOneCake(uuid?: string): Promise<Cake> {
-  const res = await axiosGlobal.get<Cake>("cake/get-one?uuid=" + uuid);
+export async function GetOneCake(uuid?: string): Promise<ApiResponse<Cake>> {
+  const token = await GetToken();
+
+  const res = await axiosGlobal.get<ApiResponse<Cake>>(
+    "cake/get-one?uuid=" + uuid,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return res.data;
 }
 

@@ -135,7 +135,7 @@ namespace CrumbCodeBackend.Repository
             };
         }
 
-        public async Task<CakeDto?> GetOneAsync(string uuid)
+        public async Task<ApiResponse<CakeDto>> GetOneAsync(string uuid)
         {
             var cake = await _context.Cakes
             .Include(c => c.Media)
@@ -143,18 +143,29 @@ namespace CrumbCodeBackend.Repository
             .FirstOrDefaultAsync(c => c.UUID == uuid);
 
             if (cake == null) {
-                return null;
+                return new ApiResponse<CakeDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                };
             }
             
             MediaDto? mediaDto = null;
             if (cake.Media != null)
             {
                 var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media?.ObjectKey ?? "");
-                mediaDto = cake.Media?.FromModelToDTO(signedUrl);
+                mediaDto = cake.Media?.FromModelToDTO(url: signedUrl);
             }
 
             var dto = cake.FromModelToDto();
-            return dto;
+            dto.Media = mediaDto;
+            
+            return new ApiResponse<CakeDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = dto,
+            };
         }
 
         public async Task<ApiResponse<CakeDto>> SafeDelete(string uuid)

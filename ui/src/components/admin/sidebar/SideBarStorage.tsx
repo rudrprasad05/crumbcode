@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 export default function SideBarStorage() {
   const [storageUsed, setStorageUsed] = useState(0);
+  const [maxStorage, setMaxStorage] = useState(20 * 2 ** 30);
 
   useEffect(() => {
     const getData = async () => {
@@ -15,12 +16,12 @@ export default function SideBarStorage() {
 
       setStorageUsed(data.data as number);
     };
+    setMaxStorage(20 * 2 ** 30);
     getData();
   }, []);
 
   function showPercent(i: number) {
-    let max = 20 * 2 ** 30;
-    return ((i / max) * 100).toFixed(2);
+    return ((i / maxStorage) * 100).toFixed(2);
   }
 
   return (
