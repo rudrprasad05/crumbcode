@@ -18,12 +18,14 @@ namespace CrumbCodeBackend.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly IAmazonS3Service _amazonS3Service;
+        private readonly INotificationService _notificationService;
 
-
-        public MediaRepository(ApplicationDbContext context, IAmazonS3Service amazonS3Service)
+        public MediaRepository(INotificationService notificationService, ApplicationDbContext context, IAmazonS3Service amazonS3Service)
         {
             _context = context;
             _amazonS3Service = amazonS3Service;
+            _notificationService = notificationService;
+
         }
         public async Task<ApiResponse<double>> SumStorage()
         {
@@ -80,8 +82,14 @@ namespace CrumbCodeBackend.Repository
 
                 await _context.Medias.AddAsync(newMedia);
                 await _context.SaveChangesAsync();
-
                 await transaction.CommitAsync();
+
+                await _notificationService.CreateNotificationAsync(
+                    title: "Media created",
+                    message: "The media " + newMedia.FileName + " was created",
+                    type: NotificationType.SUCCESS,
+                    actionUrl: "/admin/media/edit/" + newMedia.UUID
+                );
 
                 return new ApiResponse<MediaDto>
                 {
@@ -112,6 +120,7 @@ namespace CrumbCodeBackend.Repository
                 media = media.Where(m => m.ShowInGallery == queryObject.ShowInGallery.Value);
             }
 
+            var totalCount = await media.CountAsync();
             var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
             var res = await media
                 .Skip(skip)
@@ -126,8 +135,6 @@ namespace CrumbCodeBackend.Repository
                 item.Url = signedUrl;
                 signedMedia.Add(item);
             }
-
-            var totalCount = signedMedia.Count;
 
             return new ApiResponse<List<Media>>
             {
@@ -180,6 +187,12 @@ namespace CrumbCodeBackend.Repository
             existingMedia.ShowInGallery = media.ShowInGallery;
 
             await _context.SaveChangesAsync();
+            await _notificationService.CreateNotificationAsync(
+                title: "Media Updated",
+                message: "The media " + existingMedia.FileName + " was updated",
+                type: NotificationType.SUCCESS,
+                actionUrl: "/admin/bin?type=media&uuid=" + existingMedia.UUID
+            );
 
             return new ApiResponse<MediaDto>
             {
@@ -215,30 +228,36 @@ namespace CrumbCodeBackend.Repository
                 Data = media.FromModelToDTO()
             };
         }
-        public async Task<Media?> Recycle(string uuid, string? token)
+        public async Task<ApiResponse<MediaDto>> SafeDelete(string uuid)
         {
             var media = await Exists(uuid);
             if(media == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "media was null"
+                };
             }
+            media.IsDeleted = true;
             
             await _context.SaveChangesAsync();
-            return media;
-        }
-        public async Task<Media?> Delete(string uuid)
-        {
-            var media = await Exists(uuid);
-            if(media == null)
+            await _notificationService.CreateNotificationAsync(
+                title: "Media Deleted",
+                message: "The media " + media.FileName + " was deleted",
+                type: NotificationType.WARNING,
+                actionUrl: "/admin/bin?type=media&uuid=" + media.UUID
+            );
+
+            return new ApiResponse<MediaDto>
             {
-                return null;
-            }
-
-            _context.Medias.Remove(media);
-            await _context.SaveChangesAsync();
-
-            return media;
+                Success = true,
+                StatusCode = 200,
+                Data = media.FromModelToDTO()
+            };
         }
+
         public Task<Media?> Exists(string uuid)
         {
             var media = _context.Medias.FirstOrDefaultAsync(c => c.UUID == uuid);

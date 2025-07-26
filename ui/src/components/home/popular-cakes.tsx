@@ -1,7 +1,7 @@
 "use client";
 
 import { GetAllCakes } from "@/actions/Cake";
-import { Cake, MetaData } from "@/types";
+import { Cake, ESortBy, MetaData } from "@/types";
 import { useEffect, useState } from "react";
 import ErrorContainer from "../global/ErrorContainer";
 import { LoadingContainer } from "../global/LoadingContainer";
@@ -26,6 +26,7 @@ export default function PopularCakes() {
         const data = await GetAllCakesSite({
           pageNumber: pagination.pageNumber,
           pageSize: pagination.pageSize,
+          sortBy: ESortBy.ASC,
         });
 
         setcakes(data.data as Cake[]);

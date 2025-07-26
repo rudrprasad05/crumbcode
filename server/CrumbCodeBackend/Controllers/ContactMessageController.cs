@@ -20,7 +20,7 @@ namespace CrumbCodeBackend.Controllers
 {
     [Route("api/contact")]
     [ApiController]
-    public class ContactMessageController : BaseController
+    public class ContactMessageController : ProtectedController
     {
         private readonly IContactMessageRepository _contactMessage;
 

@@ -4,7 +4,7 @@ import { GetAllSocialMedia } from "@/actions/SocialMedia";
 import { Default, SocialIcons } from "@/components/svg/icons";
 import { Card, CardContent } from "@/components/ui/card";
 import { parseSocialLink } from "@/lib/link-parse";
-import { MetaData, SocialMedia } from "@/types";
+import { ESortBy, MetaData, SocialMedia } from "@/types";
 import Link from "next/link";
 import { FC, SVGProps, useEffect, useState } from "react";
 import ContactForm from "./contact-form";
@@ -29,6 +29,7 @@ export default function ContactSection() {
       const data = await GetAllSocialMediaSite({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
+        sortBy: ESortBy.ASC,
       });
 
       setSocialIcons(data.data as SocialMedia[]);

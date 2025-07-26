@@ -1,40 +1,32 @@
 "use client";
-import { useEffect, useState } from "react";
-import {
-  Bell,
-  Search,
-  Filter,
-  MoreHorizontal,
-  Clock,
-  AlertCircle,
-  CheckCircle,
-  Info,
-  AlertTriangle,
-} from "lucide-react";
+import { MarkAsRead, SafeDeleteNotification } from "@/actions/Notifications";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Notification, NotificationTypes } from "@/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import Link from "next/link";
-import { MarkAsRead, SafeDeleteNotification } from "@/actions/Notifications";
+import { Notification, NotificationTypes } from "@/types";
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle,
+  Clock,
+  Info,
+  MoreHorizontal,
+} from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { no } from "zod/v4/locales";
 
-function getNotificationIcon(type: NotificationTypes) {
+function getNotificationIcon(type: any) {
   switch (type) {
-    case NotificationTypes.ERROR:
+    case "ERROR":
       return <AlertCircle className="h-4 w-4 text-red-500" />;
-    case NotificationTypes.WARNING:
+    case "WARNING":
       return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-    case NotificationTypes.SUCCESS:
+    case "SUCCESS":
       return <CheckCircle className="h-4 w-4 text-green-500" />;
     default:
       return <Info className="h-4 w-4 text-blue-500" />;

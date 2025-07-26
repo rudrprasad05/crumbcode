@@ -33,6 +33,19 @@ export async function GetOneCake(uuid?: string): Promise<ApiResponse<Cake>> {
   return res.data;
 }
 
+export async function RestoreCake(uuid?: string): Promise<ApiResponse<Cake>> {
+  const token = await GetToken();
+
+  const res = await axiosGlobal.post<ApiResponse<Cake>>(
+    "cake/restore?uuid=" + uuid,
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
+  return res.data;
+}
+
 export async function SaveCake(
   cake: Partial<Cake>,
   uuid?: string
@@ -49,9 +62,7 @@ export async function SaveCake(
 
 export async function SafeDeleteCake(uuid: string): Promise<ApiResponse<Cake>> {
   const token = await GetToken();
-  //   if (!token) {
-  //     return redirect("/");
-  //   }
+
   const res = await axiosGlobal.delete<ApiResponse<Cake>>(
     "cake/safe-delete/" + uuid,
     {

@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteForever } from "@/actions/Media";
+import { DeleteForever, SafeDeleteMedia } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,18 +25,21 @@ export function DeleteMediaDialoge({ id }: { id: string }) {
   async function handleDelete() {
     setIsLoading(true);
     try {
-      const res = await DeleteForever(id);
+      const res = await SafeDeleteMedia(id);
       setIsLoading(false);
       toast.success("Media Deleted");
       setIsOpen(false);
-      router.refresh();
+
+      if (res.success) {
+        router.push("/admin/media");
+      }
     } catch (error) {
       setIsLoading(false);
       toast.error("Error Occured");
     }
   }
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="w-full" asChild>
         <Button
           variant="outline"

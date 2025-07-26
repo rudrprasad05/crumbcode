@@ -38,7 +38,7 @@ function getNotificationIcon(type: Notification["type"]) {
 
 function formatTimeAgo(str: string) {
   const date = new Date(str);
-  const now = new Date(date);
+  const now = new Date();
   const diffInMinutes = Math.floor(
     (now.getTime() - date.getTime()) / (1000 * 60)
   );

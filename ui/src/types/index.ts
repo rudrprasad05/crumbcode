@@ -147,6 +147,13 @@ export interface MediaQueryObject {
   pageSize?: number;
   showInGallery?: boolean;
   isDeleted?: boolean;
+  sortBy?: ESortBy;
+  isAvailable?: boolean;
+}
+
+export enum ESortBy {
+  ASC = "ASC",
+  DSC = "DSC",
 }
 
 export interface MetaData {

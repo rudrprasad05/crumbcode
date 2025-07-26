@@ -1,7 +1,6 @@
 "use client";
 
-import { SafeDeleteCake } from "@/actions/Cake";
-import { DeleteForever } from "@/actions/Media";
+import { SafeDeleteMedia } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,10 +25,15 @@ export function DeleteMedia({ uuid }: { uuid: string }) {
   async function handleDelete() {
     setIsLoading(true);
     try {
-      const res = await SafeDeleteCake(uuid);
+      const res = await SafeDeleteMedia(uuid);
+
       setIsLoading(false);
       toast.success("Media Deleted");
       setIsOpen(false);
+
+      if (res.success) {
+        router.refresh();
+      }
       router.refresh();
     } catch (error) {
       setIsLoading(false);
@@ -37,7 +41,7 @@ export function DeleteMedia({ uuid }: { uuid: string }) {
     }
   }
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="w-full" asChild>
         <Button
           variant="outline"

@@ -16,8 +16,7 @@ namespace CrumbCodeBackend.Interfaces
         public Task<ApiResponse<MediaDto>> GetOne(string uuid);
         public Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject);
         public Task<Media?> Exists(string uuid);
-        public Task<Media?> Recycle(string uuid, string? token);   
-        public Task<Media?> Delete(string uuid);   
+        public Task<ApiResponse<MediaDto>> SafeDelete(string uuid);
         public Task<ApiResponse<double>> SumStorage();
     }
 }

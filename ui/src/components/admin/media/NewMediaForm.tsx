@@ -41,7 +41,8 @@ export default function NewMediaForm() {
       //   formData.append("showInGallery", data)
 
       const res = await UploadOneFile(formData);
-      const getMedia = await GetOneMedia(res.uuid);
+      console.log(res);
+      const getMedia = await GetOneMedia(res?.data?.uuid as string);
 
       changeMedia(getMedia.data as Media);
 

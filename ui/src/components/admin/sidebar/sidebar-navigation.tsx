@@ -20,6 +20,7 @@ import {
   Bell,
   Globe,
   Cloud,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -65,6 +66,11 @@ const navigationItems = [
     title: "Notifications",
     href: "/admin/notifications",
     icon: Bell,
+  },
+  {
+    title: "Recycle Bin",
+    href: "/admin/bin",
+    icon: Trash2,
   },
 ];
 

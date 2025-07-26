@@ -1,16 +1,10 @@
 "use client";
 
-import { GetAllCakes } from "@/actions/Cake";
-import {
-  LoadingCard,
-  LoadingHorizontialCard,
-} from "@/components/global/LoadingContainer";
+import { GetAllNotifications } from "@/actions/Notifications";
+import { LoadingHorizontialCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
-import { Badge } from "@/components/ui/badge";
-import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import Image from "next/image";
 import {
   Select,
   SelectContent,
@@ -18,13 +12,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { Cake, CakeTypeColorClasses, MetaData } from "@/types";
-import { Plus, Search } from "lucide-react";
-import Link from "next/link";
+import { ESortBy, MetaData, Notification } from "@/types";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
-import { GetAllNotifications } from "@/actions/Notifications";
-import { Notification } from "@/types";
 import { NotificationCard } from "./NotificationCard";
 
 interface ICakeTypesSection {
@@ -49,6 +39,7 @@ export default function NotificationSection() {
       const data = await GetAllNotifications({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
+        sortBy: ESortBy.ASC,
       });
 
       setNotifications(data.data as Notification[]);
@@ -124,11 +115,10 @@ function Header() {
 }
 
 function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
-  const [isImageValid, setIsImageValid] = useState(true);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
   if (data.length === 0 && !isLoading) {
     return <NoDataContainer />;
   }
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 gap-4 py-4">
@@ -138,6 +128,7 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
       </div>
     );
   }
+
   return (
     <div className="grid grid-cols-1 gap-4 py-4">
       {data.map((i) => (

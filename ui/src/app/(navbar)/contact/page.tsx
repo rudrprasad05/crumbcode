@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 import ContactForm from "@/components/home/contact-form";
 import { GetAllSocialMediaSite } from "@/actions/Site";
-import { SocialMedia, MetaData } from "@/types";
+import { SocialMedia, MetaData, ESortBy } from "@/types";
 import SocialCard from "@/components/home/SocialCard";
 
 export default function ContactPage() {
@@ -29,6 +29,7 @@ export default function ContactPage() {
       const data = await GetAllSocialMediaSite({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
+        sortBy: ESortBy.ASC,
       });
 
       setSocialIcons(data.data as SocialMedia[]);

@@ -22,10 +22,8 @@ export async function GetMedia(
   return res.data;
 }
 
-export async function GetOneMedia(
-  uuid: string,
-  token?: string
-): Promise<ApiResponse<Media>> {
+export async function GetOneMedia(uuid: string): Promise<ApiResponse<Media>> {
+  const token = await GetToken();
   const res = await axiosGlobal.get<ApiResponse<Media>>(
     "media/get-one/" + uuid,
     {
@@ -35,7 +33,10 @@ export async function GetOneMedia(
   return res.data;
 }
 
-export async function UploadOneFile(form: FormData, uuid?: string) {
+export async function UploadOneFile(
+  form: FormData,
+  uuid?: string
+): Promise<ApiResponse<Media>> {
   let apistr = "";
   if (uuid && uuid.trim().length > 0) {
     apistr = "media/upsert?uuid=" + uuid;
@@ -43,12 +44,8 @@ export async function UploadOneFile(form: FormData, uuid?: string) {
     apistr = "media/upsert";
   }
 
-  try {
-    const res = await axiosGlobal.post(apistr, form);
-    return res.data;
-  } catch (error) {
-    console.dir(error, { depth: null });
-  }
+  const res = await axiosGlobal.post(apistr, form);
+  return res.data;
 }
 
 export async function GetStarMedia() {
@@ -93,12 +90,17 @@ export async function RenameMedia(name: string, id: string) {
   return res.data;
 }
 
-export async function DeleteMedia(id: string) {
+export async function SafeDeleteMedia(
+  uuid: string
+): Promise<ApiResponse<Media>> {
   const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/recycle/" + id);
+
+  const res = await axiosGlobal.delete<ApiResponse<Media>>(
+    "media/safe-delete/" + uuid,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
   return res.data;
 }

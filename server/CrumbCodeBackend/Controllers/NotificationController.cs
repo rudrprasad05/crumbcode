@@ -16,7 +16,7 @@ namespace CrumbCodeBackend.Controllers
     [Route("api/notification")]
     [ApiController]
 
-    public class NotificationController : BaseController
+    public class NotificationController : ProtectedController
     {
         private readonly INotificationRepository _notificationRepository;
 

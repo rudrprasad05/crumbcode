@@ -17,7 +17,7 @@ namespace CrumbCodeBackend.Controllers
 {
     [ApiController]
     [Route("api/media")]
-    public class MediaController : BaseController
+    public class MediaController : ProtectedController
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IAmazonS3Service _amazonS3Service;
@@ -108,38 +108,19 @@ namespace CrumbCodeBackend.Controllers
             return Ok(media);
         }
 
-        [HttpDelete("recycle/{id}")]
-        public async Task<IActionResult> Recycle([FromRoute] string id)
+        [HttpDelete("safe-delete/{uuid}")]
+        public override async Task<IActionResult> SafeDelete([FromRoute] string uuid)
         {
-            var media = await _mediaRepository.Recycle(id, "");
-            if(media == null)
+            var model = await _mediaRepository.SafeDelete(uuid);
+
+            if (model == null)
             {
-                return Unauthorized();
+                return BadRequest("model not gotten");
             }
 
-            var dto = media.FromMediaToDTO();
-            return Ok(dto);
+            return Ok(model);
         }
 
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] string id)
-        {
-            var media = await _mediaRepository.Delete(id);
-            if(media == null)
-            {
-                return Unauthorized();
-            }
-
-            var deleteFromS3 = await _amazonS3Service.DeleteFileAsync(media.ObjectKey ?? throw new InvalidOperationException());
-            
-            if(deleteFromS3 == true)
-            {
-                return Ok("deleted");
-            }
-
-            return BadRequest("not deleted");
-        }
-        
         [HttpGet("download")]
         public async Task<IActionResult> DownloadFile([FromQuery] string objKey)
         {

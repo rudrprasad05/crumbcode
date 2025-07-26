@@ -66,6 +66,20 @@ namespace CrumbCodeBackend.Controllers
 
         }
 
+        [HttpPost("restore")]
+        public async Task<IActionResult> Restore([FromQuery] string uuid)
+        {
+            var model = await _cakeRepository.Restore(uuid);
+
+            if (model == null)
+            {
+                return BadRequest("model not gotten");
+            }
+
+            return Ok(model);
+
+        }
+
         [HttpPost("upsert")]
         [ProducesResponseType(typeof(CreateNewCakeResponse), 200)]
 

@@ -17,7 +17,7 @@ namespace CrumbCodeBackend.Controllers
     [Route("api/social-media")]
     [ApiController]
     [Authorize]
-    public class SocialMediaController : BaseController
+    public class SocialMediaController : ProtectedController
     {
         private readonly ISocialMediaRepository _socialMediaRepository;
 

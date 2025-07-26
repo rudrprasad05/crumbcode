@@ -75,7 +75,9 @@ function Header() {
     <>
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Cakes</h1>
-        <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
+        <p className="text-gray-600 mt-2">
+          Create and manage your messages here
+        </p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div className="flex items-center gap-4 flex-1">

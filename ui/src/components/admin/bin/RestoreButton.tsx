@@ -1,7 +1,5 @@
 "use client";
 
-import { SafeDeleteCake } from "@/actions/Cake";
-import { DeleteForever } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -13,12 +11,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2, Trash } from "lucide-react";
+import { ApiResponse, Cake } from "@/types";
+import { Loader2, RefreshCcw, Trash } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export function DeleteCake({ uuid }: { uuid: string }) {
+export function RestoreButton({
+  uuid,
+  onDelete,
+}: {
+  uuid: string;
+  onDelete: (uuid?: string) => Promise<ApiResponse<Cake>>;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -26,32 +31,36 @@ export function DeleteCake({ uuid }: { uuid: string }) {
   async function handleDelete() {
     setIsLoading(true);
     try {
-      const res = await SafeDeleteCake(uuid);
+      const res = await onDelete(uuid);
+
       setIsLoading(false);
-      toast.success("Media Deleted");
+      toast.success("Object Restored");
       setIsOpen(false);
-      router.push("/admin/cakes");
+
+      if (res.success) {
+        window.location.reload();
+      }
     } catch (error) {
       setIsLoading(false);
       toast.error("Error Occured");
     }
   }
   return (
-    <Dialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger className="w-full" asChild>
         <Button
           variant="outline"
           onClick={() => setIsOpen(true)}
           className="w-24 flex items-center justify-between"
         >
-          Delete <Trash className="" />
+          Restore <RefreshCcw className="" />
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-white">
         <DialogHeader>
-          <DialogTitle>Delete Media</DialogTitle>
+          <DialogTitle>Restore Cake</DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete the cake?
+            Restore your cake so your users can see it
           </DialogDescription>
         </DialogHeader>
 
@@ -66,7 +75,7 @@ export function DeleteCake({ uuid }: { uuid: string }) {
             className="bg-rose-500 hover:bg-red-600"
             variant={"destructive"}
           >
-            Delete
+            Restore
             {isLoading && <Loader2 className="animate-spin" />}
           </Button>
         </DialogFooter>

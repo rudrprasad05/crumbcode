@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Cake, CakeTypeColorClasses, Media, MetaData } from "@/types";
+import { Cake, CakeTypeColorClasses, ESortBy, Media, MetaData } from "@/types";
 import { FileText, ImageIcon, Plus, Search, Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -24,6 +24,12 @@ import { useEffect, useState } from "react";
 interface ICakeTypesSection {
   data: Cake[];
   isLoading: boolean;
+}
+
+interface Filters {
+  search: string;
+  isAvailable?: boolean;
+  sortBy?: ESortBy;
 }
 
 export default function CakeSection() {
@@ -37,12 +43,21 @@ export default function CakeSection() {
     totalPages: 0,
   });
 
+  const [filters, setFilters] = useState<Filters>({
+    sortBy: ESortBy.DSC,
+    search: "",
+    isAvailable: undefined,
+  });
+
   useEffect(() => {
     setCakeItems([]);
+    console.log(filters);
+    // return;
     const getData = async () => {
       const data = await GetAllCakes({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
+        sortBy: filters.sortBy,
       });
 
       setCakeItems(data.data as Cake[]);
@@ -57,11 +72,11 @@ export default function CakeSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber, pagination.pageSize]);
+  }, [pagination.pageNumber, pagination.pageSize, filters]);
 
   return (
     <div>
-      <Header />
+      <Header filters={filters} onChange={setFilters} />
       <HandleDataSection isLoading={loading} data={cakeItems} />
       <div className="py-8">
         <PaginationSection
@@ -73,7 +88,13 @@ export default function CakeSection() {
   );
 }
 
-function Header() {
+function Header({
+  filters,
+  onChange,
+}: {
+  filters: Filters;
+  onChange: (newFilters: Filters) => void;
+}) {
   return (
     <>
       <div>
@@ -81,29 +102,40 @@ function Header() {
         <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
       </div>
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        {/* <div className="flex items-center gap-4 flex-1">
+        <div className="flex items-center gap-4 flex-1">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search posts..."
+              placeholder="Search cakes..."
               className="pl-10 bg-white border-gray-200"
+              value={filters.search || ""}
+              onChange={(e) => onChange({ ...filters, search: e.target.value })}
             />
           </div>
 
-          <Select>
+          <Select
+            value={String(filters.sortBy) || "DSC"}
+            onValueChange={(val) =>
+              onChange({ ...filters, sortBy: val as unknown as ESortBy })
+            }
+          >
             <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue />
+              <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="cake">Cakes</SelectItem>
-              <SelectItem value="feature">Features</SelectItem>
+              <SelectItem value="DSC">Newest</SelectItem>
+              <SelectItem value="ASC">Oldest</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select
+            value={String(filters.isAvailable || "all")}
+            onValueChange={(val) =>
+              onChange({ ...filters, isAvailable: val as unknown as boolean })
+            }
+          >
             <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue />
+              <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
@@ -111,7 +143,7 @@ function Header() {
               <SelectItem value="inactive">Inactive</SelectItem>
             </SelectContent>
           </Select>
-        </div> */}
+        </div>
 
         <Link href={"/admin/cakes/create"}>
           <div

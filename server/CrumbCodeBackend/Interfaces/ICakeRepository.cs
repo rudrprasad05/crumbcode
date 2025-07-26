@@ -15,6 +15,7 @@ namespace CrumbCodeBackend.Interfaces
         public Task<ApiResponse<CakeDto>> CreateAsync(Cake cake);
         public Task<ApiResponse<List<CakeDto>>> GetAllAsync(CakeQueryObject queryObject);
         public Task<ApiResponse<CakeDto>> GetOneAsync(string uuid);
+        public Task<ApiResponse<CakeDto>> Restore(string uuid);
         public Task<Cake?> Exists(string uuid);
         public Task<ApiResponse<CakeDto>> SafeDelete(string uuid);
 

@@ -65,7 +65,7 @@ namespace CrumbCodeBackend.Repository
 
             var res = await query
                 .Where(i => i.IsDeleted == false)
-                .OrderBy(i => i.CreatedOn)
+                .OrderByDescending(i => i.CreatedOn)
                 .Skip(skip)
                 .Take(queryObject.PageSize)
                 .ToListAsync();
