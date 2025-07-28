@@ -1,29 +1,47 @@
 services:
-  db-migrate:
-    build:
-      context: ./server/CrumbCodeBackend
-      dockerfile: Dockerfile
-    depends_on:
-      - db
-    environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      ConnectionStrings__Default: "server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD}"
-    command: ["dotnet", "ef", "database", "update"]
-    networks:
-      - crumbcode_network
-    restart: "no" # Run once and exit
+  # db-migrate:
+  #   build:
+  #     context: ./server/CrumbCodeBackend
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   environment:
+  #     ASPNETCORE_ENVIRONMENT: Production
+  #     ConnectionStrings__DefaultConnection: "server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD};AllowPublicKeyRetrieval=True;SslMode=None;Connection Timeout=60;Default Command Timeout=300;"
+  #   command: >
+  #     sh -c "
+  #       echo 'Waiting additional 10 seconds for MySQL to be fully ready...' &&
+  #       sleep 10 &&
+  #       dotnet ef database update
+  #     "
+  #   networks:
+  #     - crumbcode_network
+  #   restart: "no" # Run once and exit
 
   backend:
     build:
       context: ./server/CrumbCodeBackend
       dockerfile: Dockerfile
     depends_on:
-      - db-migrate # Wait for migrations to complete
+      db:
+        condition: service_healthy
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__Default=server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ConnectionStrings__DefaultConnection=server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD};AllowPublicKeyRetrieval=True;SslMode=None;Connection Timeout=60;Default Command Timeout=300;
+      - Backend__Url=http://0.0.0.0:5080
+      - Frontend__Url=http://frontend:${FRONTEND_PORT}/
+      - JWT__Issuer=http://backend:5080
+      - JWT__Audience=http://frontend:${FRONTEND_PORT}
+      - JWT__SigningKey=${JWT_SIGNING_KEY}
+      # MinIO configuration
+      - MINIO__AccessKey=${MINIO_ACCESS_KEY}
+      - MINIO__SecretKey=${MINIO_SECRET_KEY}
+      - MINIO__BucketName=${MINIO_BUCKET_NAME}
+      - MINIO__Region=${MINIO_REGION}
+      - MINIO__ServiceURL=${MINIO_SERVICE_URL}
     ports:
-      - "${BACKEND_PORT}:8080"
+      - "${BACKEND_PORT}:5080"
     restart: unless-stopped
     networks:
       - crumbcode_network
@@ -35,9 +53,9 @@ services:
     ports:
       - "${FRONTEND_PORT}:3000"
     depends_on:
-      - backend # Wait for migrations to complete
+      - backend
     environment:
-      - NEXT_PUBLIC_API_BASE_URL=http://localhost:${BACKEND_PORT}/api/
+      - NEXT_PUBLIC_API_BASE_URL=http://backend:${BACKEND_PORT}/api/
     restart: unless-stopped
     networks:
       - crumbcode_network
@@ -48,8 +66,27 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER} # Add this
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD} # Add this for the user
     volumes:
       - crumbcode_data:/var/lib/mysql
+    # Database is only accessible from within the Docker network (no external ports)
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "${MYSQL_USER}",
+          "-p${MYSQL_PASSWORD}",
+        ]
+      timeout: 20s
+      retries: 15
+      interval: 5s
+      start_period: 60s
     restart: unless-stopped
     networks:
       - crumbcode_network
