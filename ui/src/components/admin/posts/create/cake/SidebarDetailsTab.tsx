@@ -10,7 +10,10 @@ import {
 
 import { GetMedia } from "@/actions/Media";
 import NewMediaForm from "@/components/admin/media/NewMediaForm";
-import { LoadingCard } from "@/components/global/LoadingContainer";
+import {
+  LoadingCard,
+  SmallMediaLoadingCard,
+} from "@/components/global/LoadingContainer";
 import PaginationSection from "@/components/global/PaginationSection";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,10 +35,18 @@ import { CakeType, Media, MetaData } from "@/types";
 import { Check, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { getTypeIcon } from "@/lib/icon-parse";
 
 export default function SidebarDetailsTab() {
   const { cake, cakeTypes, updateCakeValues } = useCake();
-  const [isMediaImageLoaded, setIsMediaImageLoaded] = useState(true);
+  const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  useEffect(() => {
+    console.log("uf hit");
+    setIsImageValid(true);
+    setIsImageLoaded(false);
+  }, [cake?.media]);
   return (
     <div className="grow">
       <div className="space-y-6 w-full py-4">
@@ -115,19 +126,36 @@ export default function SidebarDetailsTab() {
           <MediaSelectDialog />
 
           <div className="relative w-64 h-64">
-            {isMediaImageLoaded && (
-              <div className="absolute inset-0 bg-gray-300 animate-pulse rounded" />
+            {isImageValid ? (
+              <>
+                <Image
+                  width={100}
+                  height={100}
+                  src={cake.media?.url || "/image.svg"}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null; // prevent infinite loop
+                    setIsImageValid(false);
+                  }}
+                  onLoad={() => setIsImageLoaded(true)}
+                  alt={(cake.media?.altText || cake.media?.fileName) as string}
+                  className={cn(
+                    "w-full h-full object-cover",
+                    isImageLoaded ? "opacity-100" : "opacity-0"
+                  )}
+                />
+                {!isImageLoaded && (
+                  <div
+                    className={cn(
+                      "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                    )}
+                  ></div>
+                )}
+              </>
+            ) : (
+              <div className="border border-solid w-full h-full flex items-center justify-center bg-gray-50">
+                {getTypeIcon(cake.media as Media)}
+              </div>
             )}
-
-            <Image
-              src={cake?.media?.url as string}
-              alt={cake?.media?.altText as string}
-              fill
-              className={`object-cover rounded-lg transition-opacity duration-500 ${
-                isMediaImageLoaded ? "opacity-0" : "opacity-100"
-              }`}
-              onLoad={() => setIsMediaImageLoaded(false)}
-            />
           </div>
         </div>
       </div>
@@ -208,7 +236,7 @@ function MediaListTab({
     return (
       <div className="grid grid-cols-3 gap-4 max-h-[60vh] overflow-visible w-full">
         {Array.from({ length: 6 }, (_, i) => (
-          <LoadingCard key={i} />
+          <SmallMediaLoadingCard key={i} />
         ))}
       </div>
     );
@@ -225,7 +253,7 @@ function MediaListTab({
           }}
           key={media.uuid}
           className={cn(
-            "relative overflow-visible border rounded hover:ring-2 ring-primary transition cursor-pointer"
+            "relative rounded-lg overflow-visible border hover:ring-2 ring-primary transition cursor-pointer"
           )}
         >
           {cake.media?.objectKey == media.objectKey && (
@@ -243,7 +271,7 @@ function MediaListTab({
               height={50}
               src={media.url || "/placeholder.svg"}
               alt={media.fileName}
-              className={`object-cover h-full w-full transition-opacity duration-500 ${
+              className={`object-cover rounded-t-lg h-full w-full transition-opacity duration-500 ${
                 isImageLoading[index] ? "opacity-0" : "opacity-100"
               }`}
               onLoad={() =>

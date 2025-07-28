@@ -99,7 +99,7 @@ export default function NewMediaForm() {
           <input
             id="file"
             type="file"
-            accept="image/*"
+            accept="image/*, image/avif"
             hidden
             onChange={(e) => {
               const f = e.target.files?.[0];

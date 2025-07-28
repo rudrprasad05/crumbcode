@@ -33,6 +33,17 @@ export function LoadingCard() {
   );
 }
 
+export function SmallMediaLoadingCard() {
+  return (
+    <div className="flex flex-col space-y-3  bg-white rounded-lg">
+      <Skeleton className="h-full aspect-square w-full rounded-t-xl rounded-b-none bg-gray-300" />
+      <div className="space-y-2 p-4">
+        <Skeleton className="h-2 w-full  bg-gray-300" />
+      </div>
+    </div>
+  );
+}
+
 export function LoadingHorizontialCard() {
   return (
     <div className="flex gap-4 my-4">

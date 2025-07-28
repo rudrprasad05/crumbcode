@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { useCake } from "@/context/CakeContext";
 import React from "react";
 import { DeleteCake } from "./DeleteCake";
+import { DateTime } from "luxon";
 import {
   Card,
   CardContent,
@@ -15,27 +16,35 @@ import {
 
 export default function SideBarConfigTab() {
   const { cake, updateCakeValues } = useCake();
+
   const dateFormatOptions: Intl.DateTimeFormatOptions = {
     day: "2-digit",
     month: "2-digit",
     year: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
-    hour12: true, // set to false for 24h format
+    hour12: false, // set to false for 24h format
   };
 
   const parseDate = (
     options: Intl.DateTimeFormatOptions,
     date?: string
   ): string => {
-    date = date?.trim();
-    if (!date || date.length == 0) {
-      return new Date(Date.now()).toLocaleDateString(
-        undefined,
-        dateFormatOptions
+    const dateFormatOptions: Intl.DateTimeFormatOptions = {
+      ...options,
+      timeZone: "Pacific/Auckland", // GMT+12 (handles daylight saving too)
+    };
+
+    if (!date || date.trim().length === 0) {
+      return new Intl.DateTimeFormat(undefined, dateFormatOptions).format(
+        new Date()
       );
     }
-    return new Date(date).toLocaleDateString(undefined, dateFormatOptions);
+
+    const parsedDate = new Date(date);
+    return new Intl.DateTimeFormat(undefined, dateFormatOptions).format(
+      parsedDate
+    );
   };
 
   return (

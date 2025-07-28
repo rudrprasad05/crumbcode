@@ -1,7 +1,6 @@
 "use client";
 
 import { SafeDeleteCake } from "@/actions/Cake";
-import { DeleteForever } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

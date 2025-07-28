@@ -177,7 +177,7 @@ namespace CrumbCodeBackend.Repository
             foreach (var cake in cakes)
             {
                 var dto = cake.FromModelToDto();
-                if (cake.Media != null)
+                if (cake.Media != null && !cake.Media.IsDeleted)
                 {
                     var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media.ObjectKey);
                     dto.Media = cake.Media.FromModelToDTO(signedUrl);
@@ -214,16 +214,13 @@ namespace CrumbCodeBackend.Repository
                     StatusCode = 400,
                 };
             }
-            
-            MediaDto? mediaDto = null;
-            if (cake.Media != null)
-            {
-                var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media?.ObjectKey ?? "");
-                mediaDto = cake.Media?.FromModelToDTO(url: signedUrl);
-            }
 
             var dto = cake.FromModelToDto();
-            dto.Media = mediaDto;
+            if (cake.Media != null && !cake.Media.IsDeleted)
+            {
+                var signedUrl = await _amazonS3Service.GetImageSignedUrl(cake.Media.ObjectKey);
+                dto.Media = cake.Media.FromModelToDTO(signedUrl);
+            }
 
             return new ApiResponse<CakeDto>
             {

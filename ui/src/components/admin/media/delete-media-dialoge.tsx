@@ -1,6 +1,6 @@
 "use client";
 
-import { DeleteForever, SafeDeleteMedia } from "@/actions/Media";
+import { SafeDeleteMedia } from "@/actions/Media";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

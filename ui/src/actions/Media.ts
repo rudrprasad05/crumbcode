@@ -38,25 +38,17 @@ export async function UploadOneFile(
   uuid?: string
 ): Promise<ApiResponse<Media>> {
   let apistr = "";
+  const token = await GetToken();
+
   if (uuid && uuid.trim().length > 0) {
     apistr = "media/upsert?uuid=" + uuid;
   } else {
     apistr = "media/upsert";
   }
 
-  const res = await axiosGlobal.post(apistr, form);
-  return res.data;
-}
-
-export async function GetStarMedia() {
-  const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
-  const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsStarred=true"
-  );
-
+  const res = await axiosGlobal.post(apistr, form, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 }
 
@@ -65,26 +57,8 @@ export async function SumMedia() {
   if (!token) {
     return redirect("/");
   }
-  const res = await axiosGlobal.get<number>("media/sum");
-
-  return res.data;
-}
-
-export async function GetDeleted() {
-  const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
-  const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsDeleted=true"
-  );
-
-  return res.data;
-}
-
-export async function RenameMedia(name: string, id: string) {
-  const res = await axiosGlobal.patch<Partial<Media>[]>("media/rename/" + id, {
-    name,
+  const res = await axiosGlobal.get<number>("media/sum", {
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   return res.data;
@@ -105,18 +79,6 @@ export async function SafeDeleteMedia(
   return res.data;
 }
 
-export async function DeleteForever(id: string) {
-  const token = await GetToken();
-  //   if (!token) {
-  //     return redirect("/");
-  //   }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-
-  return res.data;
-}
-
 export async function GetOne(id: string): Promise<Partial<Media>> {
   try {
     const token = await GetToken();
@@ -124,7 +86,9 @@ export async function GetOne(id: string): Promise<Partial<Media>> {
     if (!token || token == "" || token == undefined) {
       return redirect("/errors/403");
     }
-    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id);
+    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     return res.data;
   } catch (error) {

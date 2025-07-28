@@ -3,13 +3,16 @@
 import { Badge } from "@/components/ui/badge";
 import { useCake } from "@/context/CakeContext";
 import { cn } from "@/lib/utils";
-import { Cake, CakeTypeColorClasses } from "@/types";
+import { Cake, CakeTypeColorClasses, Media } from "@/types";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { getTypeIcon } from "@/lib/icon-parse";
 
 export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
   const { cake, setInitialCakeState } = useCake();
+  const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
 
   useEffect(() => {
     if (cake.uuid == cakeData?.uuid) return;
@@ -18,16 +21,45 @@ export default function CakeCardCreation({ cakeData }: { cakeData?: Cake }) {
     }
   }, [cakeData, setInitialCakeState]);
 
+  useEffect(() => {
+    console.log("uf hit");
+    setIsImageValid(true);
+    setIsImageLoaded(false);
+  }, [cake?.media]);
+
   return (
     <div className="bg-white rounded-xl w-[340px] shadow-md overflow-hidden">
-      <div className="h-48 overflow-hidden">
-        <Image
-          src={cake.media?.url as string}
-          alt={""}
-          width={100}
-          height={100}
-          className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-        />
+      <div className="relative w-full h-48 bg-gray-100 rounded-t-lg overflow-hidden">
+        {isImageValid ? (
+          <>
+            <Image
+              width={100}
+              height={100}
+              src={cake.media?.url || "/image.svg"}
+              onError={(e) => {
+                e.currentTarget.onerror = null; // prevent infinite loop
+                setIsImageValid(false);
+              }}
+              onLoad={() => setIsImageLoaded(true)}
+              alt={(cake.media?.altText || cake.media?.fileName) as string}
+              className={cn(
+                "w-full h-full object-cover",
+                isImageLoaded ? "opacity-100" : "opacity-0"
+              )}
+            />
+            {!isImageLoaded && (
+              <div
+                className={cn(
+                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                )}
+              ></div>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-50">
+            {getTypeIcon(cake.media as Media)}
+          </div>
+        )}
       </div>
       <div className="p-6">
         <div className="flex">

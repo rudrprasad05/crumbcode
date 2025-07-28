@@ -43,7 +43,7 @@ export function DashboardStats() {
             </CardTitle>
             <Cake className="h-4 w-4 text-gray-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             {loading && (
               <Loader2 className="text-2xl text-gray-900 animate-spin" />
             )}
@@ -59,7 +59,7 @@ export function DashboardStats() {
             </CardTitle>
             <MessageCircle className="h-4 w-4 text-gray-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             {loading && (
               <Loader2 className="text-2xl text-gray-900 animate-spin" />
             )}
@@ -75,7 +75,7 @@ export function DashboardStats() {
             </CardTitle>
             <Database className="h-4 w-4 text-gray-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             {loading && (
               <Loader2 className="text-2xl text-gray-900 animate-spin" />
             )}
@@ -91,7 +91,7 @@ export function DashboardStats() {
             </CardTitle>
             <Users className="h-4 w-4 text-gray-400" />
           </CardHeader>
-          <CardContent>
+          <CardContent className="mt-auto">
             {loading && (
               <Loader2 className="text-2xl text-gray-900 animate-spin" />
             )}

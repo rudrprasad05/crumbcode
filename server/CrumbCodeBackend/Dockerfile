@@ -1,22 +1,19 @@
-# Use the official .NET 8 SDK to build
+# First stage: build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-WORKDIR /app
+WORKDIR /src
 
-# Copy csproj and restore
-COPY *.csproj ./
+# Copy csproj and restore as distinct layers
+COPY CrumbCodeBackend.csproj ./
 RUN dotnet restore
 
-# Copy the rest of the source
+# Copy everything else and build
 COPY . ./
-RUN dotnet publish -c Release -o /out
+RUN dotnet publish -c Release -o /app/publish
 
-# Use the ASP.NET Core runtime for running the app
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+# Final stage: runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
-COPY --from=build /out ./
+COPY --from=build /app/publish .
 
-# Set the port the container will listen on
-ENV ASPNETCORE_URLS=http://0.0.0.0:5080
 EXPOSE 5080
-
 ENTRYPOINT ["dotnet", "CrumbCodeBackend.dll"]

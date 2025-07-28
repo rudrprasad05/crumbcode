@@ -106,7 +106,7 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   // TODO when media is uploaded, it calls this function to change the context. but the url being sent is incorrect?? idk. this occurs in NewMediaForm in the edit cake page. should also occur in the new cake page
 
   function changeMedia(media: Media) {
-    console.log(media);
+    console.log("changemedia", media);
     setCake((prev) => ({ ...prev, media: media }));
   }
 

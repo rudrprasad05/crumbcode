@@ -7,7 +7,7 @@ const agent = new http.Agent({
 });
 
 export const axiosGlobal = axios.create({
-  baseURL: "http://localhost:5080/api/", //process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: "https://192.168.1.10:5080/api/", //process.env.NEXT_PUBLIC_API_BASE_URL,
   timeout: 100000, // 10 seconds timeout
   headers: {
     "Access-Control-Allow-Origin": "*",

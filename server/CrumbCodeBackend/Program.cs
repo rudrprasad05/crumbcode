@@ -38,6 +38,7 @@ builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();
 builder.Services.AddScoped<ISocialMediaRepository, SocialMediaRepository>();
 builder.Services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.WebHost.UseUrls(builder.Configuration["Backend:Url"] ?? throw new InvalidOperationException());
 
 var app = builder.Build();
 

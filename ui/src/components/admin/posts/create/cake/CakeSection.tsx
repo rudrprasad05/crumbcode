@@ -20,6 +20,7 @@ import { Cake, CakeTypeColorClasses, ESortBy, Media, MetaData } from "@/types";
 import { FileText, ImageIcon, Plus, Search, Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getTypeIcon } from "@/lib/icon-parse";
 
 interface ICakeTypesSection {
   data: Cake[];
@@ -163,19 +164,9 @@ function Header({
 function CakeCard({ data }: { data: Cake }) {
   const [isImageValid, setIsImageValid] = useState(true);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
-  const getTypeIcon = (item: Media) => {
-    const type = item.contentType;
 
-    if (type.startsWith("image/")) {
-      return <ImageIcon className="h-4 w-4" />;
-    } else if (type.startsWith("video/")) {
-      return <Video className="h-4 w-4" />;
-    } else if (type.startsWith("application/") || type.startsWith("text/")) {
-      return <FileText className="h-4 w-4" />;
-    } else {
-      return <FileText className="h-4 w-4" />;
-    }
-  };
+  console.log(data.media);
+
   return (
     <div
       key={data.uuid}
