@@ -12,15 +12,10 @@ import PaginationSection from "@/components/global/PaginationSection";
 
 export function MediaLibrary() {
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  const router = useRouter();
-
   const [pagination, setPagination] = useState<MetaData>({
     pageNumber: 1,
     totalCount: 1,
-    pageSize: 5,
+    pageSize: 10,
     totalPages: 0,
   });
 
@@ -40,10 +35,10 @@ export function MediaLibrary() {
         ),
       }));
 
-      setLoading(false);
+      //   setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize]);
 
   const handleDelete = (id: number) => {
     const updatedItems = mediaItems.filter((item) => item.id !== id);
@@ -52,13 +47,8 @@ export function MediaLibrary() {
 
   return (
     <div className="space-y-6">
-      <MediaHeader
-        onUpload={() => setIsUploadModalOpen(true)}
-        totalItems={mediaItems?.length || 0}
-      />
-
+      <MediaHeader />
       <MediaGrid items={mediaItems} onDelete={handleDelete} />
-
       <PaginationSection
         pagination={pagination}
         setPagination={setPagination}

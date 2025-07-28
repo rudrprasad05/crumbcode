@@ -9,6 +9,8 @@ using CrumbCodeBackend.Data;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Requests;
 using CrumbCodeBackend.Models.Response;
+using CrumbCodeBackend.DTO;
+using CrumbCodeBackend.Mappers;
 
 namespace CrumbCodeBackend.Repository
 {
@@ -16,55 +18,86 @@ namespace CrumbCodeBackend.Repository
     {
         private readonly ApplicationDbContext _context;
         private readonly IAmazonS3Service _amazonS3Service;
+        private readonly INotificationService _notificationService;
 
-
-        public MediaRepository(ApplicationDbContext context, IAmazonS3Service amazonS3Service)
+        public MediaRepository(INotificationService notificationService, ApplicationDbContext context, IAmazonS3Service amazonS3Service)
         {
             _context = context;
             _amazonS3Service = amazonS3Service;
+            _notificationService = notificationService;
+
         }
-        public async Task<double> SumStorage()
+        public async Task<ApiResponse<double>> SumStorage()
         {
             var sizes = await _context.Medias.Select(m => m.SizeInBytes).ToListAsync();
-            Console.WriteLine("Sizes: " + string.Join(", ", sizes));
-            return await _context.Medias.SumAsync(m => m.SizeInBytes);
+            var data = await _context.Medias.SumAsync(m => m.SizeInBytes);
+            
+            return new ApiResponse<double>
+            {
+                Success = true,
+                StatusCode = 200,
+                Message = "ok",
+                Data = data
+            };
         }
 
-        public async Task<Media?> CreateAsync(NewMediaRequest newMediaObject)
+        public async Task<ApiResponse<MediaDto>> CreateAsync(Media media, IFormFile? file)
         {
-            if (newMediaObject.File == null || newMediaObject == null)
+            if (file == null || media == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file was null"
+                };
             }
 
             using var transaction = await _context.Database.BeginTransactionAsync();
             var guid = Guid.NewGuid().ToString();
             try
             {
-                var fileUrl = await _amazonS3Service.UploadFileAsync(newMediaObject.File, guid);
+                var fileUrl = await _amazonS3Service.UploadFileAsync(file, guid);
                 if (fileUrl == null)
                 {
-                    return null;
+                    return new ApiResponse<MediaDto>
+                    {
+                        Success = false,
+                        StatusCode = 400,
+                        Message = "somehow file url is null"
+                    };
                 }
 
-                // Create Media
-                var media = new Media
+                var newMedia = new Media
                 {
-                    AltText = newMediaObject.AltText,
+                    AltText = media.AltText,
                     Url = fileUrl,
                     ObjectKey = "crumbcode/" + guid + "." + fileUrl.Split(".").Last(),
                     UUID = guid,
-                    ContentType = newMediaObject.ContentType,
-                    FileName = newMediaObject.FileName,
-                    SizeInBytes = newMediaObject.SizeInBytes
+                    ContentType = media.ContentType,
+                    FileName = media.FileName,
+                    SizeInBytes = media.SizeInBytes,
+                    ShowInGallery = media.ShowInGallery,
                 };
 
-                await _context.Medias.AddAsync(media);
+                await _context.Medias.AddAsync(newMedia);
                 await _context.SaveChangesAsync();
-
                 await transaction.CommitAsync();
 
-                return media;
+                await _notificationService.CreateNotificationAsync(
+                    title: "Media created",
+                    message: "The media " + newMedia.FileName + " was created",
+                    type: NotificationType.SUCCESS,
+                    actionUrl: "/admin/media/edit/" + newMedia.UUID
+                );
+
+                return new ApiResponse<MediaDto>
+                {
+                    Success = true,
+                    StatusCode = 200,
+                    Message = "ok",
+                    Data = newMedia.FromModelToDTO()
+                };
             }
             catch (Exception)
             {
@@ -77,8 +110,18 @@ namespace CrumbCodeBackend.Repository
         public async Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject)
         {
             var media = _context.Medias.AsQueryable();
-            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
+            if (queryObject.IsDeleted.HasValue)
+            {
+                media = media.Where(m => m.IsDeleted == queryObject.IsDeleted.Value);
+            }
 
+            if (queryObject.ShowInGallery.HasValue)
+            {
+                media = media.Where(m => m.ShowInGallery == queryObject.ShowInGallery.Value);
+            }
+
+            var totalCount = await media.CountAsync();
+            var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;
             var res = await media
                 .Skip(skip)
                 .Take(queryObject.PageSize)
@@ -92,8 +135,6 @@ namespace CrumbCodeBackend.Repository
                 item.Url = signedUrl;
                 signedMedia.Add(item);
             }
-
-            var totalCount = await _context.Medias.CountAsync();
 
             return new ApiResponse<List<Media>>
             {
@@ -110,83 +151,116 @@ namespace CrumbCodeBackend.Repository
 
         }
 
-        public async Task<Media?> MoveMedia(string uuid, string moveId, string? token)
+        public async Task<ApiResponse<MediaDto>> UpdateAsync(string uuid, Media media, IFormFile? file)
         {
-            var folder = await _context.Medias.FirstOrDefaultAsync((i) => i.UUID == uuid);
-            if(folder == null)
+            var existingMedia = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
+            if (existingMedia == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file was null"
+                };
+            };
+
+            if (file != null)
+            {
+                var newMediaObjectKey = Guid.NewGuid().ToString();
+                var fileUrl = await _amazonS3Service.UploadFileAsync(file, newMediaObjectKey);
+                if (fileUrl == null)
+                {
+                    return new ApiResponse<MediaDto>
+                    {
+                        Success = false,
+                        StatusCode = 400,
+                        Message = "file url not provided"
+                    };
+                }
+
+                existingMedia.Url = fileUrl;
+                existingMedia.ObjectKey = "crumbcode/" + newMediaObjectKey + "." + fileUrl.Split(".").Last();
             }
 
-            await _context.SaveChangesAsync();
-            return folder;
-        }
+            existingMedia.AltText = media.AltText;
+            existingMedia.FileName = media.FileName;
+            existingMedia.ShowInGallery = media.ShowInGallery;
 
-        public async Task<Media?> Edit(string uuid, EditMediaRequest request)
-        {
-            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
-            if(media == null)
+            await _context.SaveChangesAsync();
+            await _notificationService.CreateNotificationAsync(
+                title: "Media Updated",
+                message: "The media " + existingMedia.FileName + " was updated",
+                type: NotificationType.SUCCESS,
+                actionUrl: "/admin/bin?type=media&uuid=" + existingMedia.UUID
+            );
+
+            return new ApiResponse<MediaDto>
             {
-                return null;
-            }
-
-            media.AltText = request.AltText;
-            media.FileName = request.FileName;
-
-            await _context.SaveChangesAsync();
-            return media;
+                Success = true,
+                StatusCode = 200,
+                Message = "ok",
+                Data = existingMedia.FromModelToDTO()
+            };
         }
-        public async Task<Media?> Star(string uuid, bool star, string? token)
-        {
-            var media = await _context.Medias.FirstOrDefaultAsync((m) => m.UUID == uuid);
-            if(media == null)
-            {
-                return null;
-            }
-
-            await _context.SaveChangesAsync();
-            return media;
-        }
-
-        public async Task<Media?> GetOne(string uuid)
+        public async Task<ApiResponse<MediaDto>> GetOne(string uuid)
         {
             var mediaQ = _context.Medias.AsQueryable();
             var media = await mediaQ.FirstOrDefaultAsync(m => m.UUID == uuid);
             
             if(media == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "file was null"
+                };
             }
 
             var signedUrl = await _amazonS3Service.GetImageSignedUrl(media.ObjectKey);
             media.Url = signedUrl;
 
-            return media;
+            return new ApiResponse<MediaDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Message = "ok",
+                Data = media.FromModelToDTO()
+            };
         }
-
-        public async Task<Media?> Recycle(string uuid, string? token)
+        public async Task<ApiResponse<MediaDto>> SafeDelete(string uuid)
         {
-            var media = await GetOne(uuid);
+            var media = await Exists(uuid);
             if(media == null)
             {
-                return null;
+                return new ApiResponse<MediaDto>
+                {
+                    Success = false,
+                    StatusCode = 400,
+                    Message = "media was null"
+                };
             }
+            media.IsDeleted = true;
             
             await _context.SaveChangesAsync();
-            return media;
+            await _notificationService.CreateNotificationAsync(
+                title: "Media Deleted",
+                message: "The media " + media.FileName + " was deleted",
+                type: NotificationType.WARNING,
+                actionUrl: "/admin/bin?type=media&uuid=" + media.UUID
+            );
+
+            return new ApiResponse<MediaDto>
+            {
+                Success = true,
+                StatusCode = 200,
+                Data = media.FromModelToDTO()
+            };
         }
 
-        public async Task<Media?> Delete(string uuid)
+        public Task<Media?> Exists(string uuid)
         {
-            var media = await GetOne(uuid);
-            if(media == null)
-            {
-                return null;
-            }
-
-            _context.Medias.Remove(media);
-            await _context.SaveChangesAsync();
-
+            var media = _context.Medias.FirstOrDefaultAsync(c => c.UUID == uuid);
             return media;
         }
     }

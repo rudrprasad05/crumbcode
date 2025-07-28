@@ -1,7 +1,51 @@
+"use client";
+
+import { GetAllSocialMedia } from "@/actions/SocialMedia";
+import { Default, SocialIcons } from "@/components/svg/icons";
+import { Card, CardContent } from "@/components/ui/card";
+import { parseSocialLink } from "@/lib/link-parse";
+import { ESortBy, MetaData, SocialMedia } from "@/types";
+import Link from "next/link";
+import { FC, SVGProps, useEffect, useState } from "react";
 import ContactForm from "./contact-form";
-import { Instagram, Facebook, Mail, Phone, MapPin } from "lucide-react";
+import { GetAllSocialMediaSite } from "@/actions/Site";
+import SocialCard from "./SocialCard";
+type IconType = FC<SVGProps<SVGSVGElement>>;
 
 export default function ContactSection() {
+  const [socialIcons, setSocialIcons] = useState<SocialMedia[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const [pagination, setPagination] = useState<MetaData>({
+    pageNumber: 1,
+    totalCount: 0,
+    pageSize: 5,
+    totalPages: 0,
+  });
+
+  useEffect(() => {
+    setSocialIcons([]);
+    const getData = async () => {
+      const data = await GetAllSocialMediaSite({
+        pageNumber: pagination.pageNumber,
+        pageSize: pagination.pageSize,
+        sortBy: ESortBy.ASC,
+      });
+
+      setSocialIcons(data.data as SocialMedia[]);
+      setPagination((prev) => ({
+        ...prev,
+        totalCount: data.meta?.totalCount as number,
+        totalPages: Math.ceil(
+          (data.meta?.totalCount as number) / pagination.pageSize
+        ),
+      }));
+
+      setLoading(false);
+    };
+    getData();
+  }, [pagination.pageNumber, pagination.pageSize]);
+
   return (
     <section className="py-16 bg-white" id="contact">
       <div className="container mx-auto px-4">
@@ -10,62 +54,16 @@ export default function ContactSection() {
           <p className="text-gray-700 mt-2">Reach Out for a Custom Cake</p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div className="">
             <ContactForm />
           </div>
 
           <div className="flex flex-col justify-center">
-            <div className="space-y-6">
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Facebook className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Facebook</h3>
-                  <p className="text-gray-600">@crumbcode</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Instagram className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Instagram</h3>
-                  <p className="text-gray-600">@crumbcode</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Mail className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Email</h3>
-                  <p className="text-gray-600">cakes@crumbcodefiji.com</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <Phone className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Phone</h3>
-                  <p className="text-gray-600">679 999 9999</p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="bg-rose-100 p-3 rounded-full text-rose-600">
-                  <MapPin className="h-6 w-6" />
-                </div>
-                <div>
-                  <h3 className="font-medium text-gray-900">Address</h3>
-                  <p className="text-gray-600">123 Street Road, Nakasi</p>
-                </div>
-              </div>
+            <div className="space-y-4 flex flex-col">
+              {socialIcons.map((i, index) => (
+                <SocialCard key={index} data={i} />
+              ))}
             </div>
           </div>
         </div>

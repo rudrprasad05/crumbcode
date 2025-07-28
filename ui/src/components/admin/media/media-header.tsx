@@ -2,22 +2,10 @@
 
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Box, CloudUpload, Search } from "lucide-react";
-import NewMediaModal from "./NewMediaModal";
+import { Plus, Search } from "lucide-react";
+import Link from "next/link";
 
-interface MediaHeaderProps {
-  onUpload: () => void;
-  totalItems: number;
-}
-
-export function MediaHeader({ onUpload, totalItems }: MediaHeaderProps) {
+export function MediaHeader() {
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div className="flex items-center gap-4 flex-1">
@@ -30,16 +18,16 @@ export function MediaHeader({ onUpload, totalItems }: MediaHeaderProps) {
         </div>
       </div>
 
-      <NewMediaModal>
+      <Link href={"/admin/media/create"}>
         <div
           className={`${buttonVariants({
             variant: "default",
           })} w-full text-start justify-start px-2 my-2`}
         >
-          <CloudUpload />
-          Upload
+          <Plus />
+          New Media
         </div>
-      </NewMediaModal>
+      </Link>
     </div>
   );
 }

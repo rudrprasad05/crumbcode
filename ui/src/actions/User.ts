@@ -5,7 +5,6 @@ import { LoginResponse } from "@/types/schema";
 import { SignInFormType } from "@/types/zod";
 import https from "https";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 
 const agent = new https.Agent({
   rejectUnauthorized: false, // Allow self-signed cert
@@ -27,7 +26,7 @@ export async function LoginUser(data: SignInFormType): Promise<LoginResponse> {
 
 export async function ConfirmEmail(token: string): Promise<boolean> {
   try {
-    const res = await axiosGlobal.post("auth/confirm-email/" + token);
+    await axiosGlobal.post("auth/confirm-email/" + token);
     return true;
   } catch (error) {
     return false;

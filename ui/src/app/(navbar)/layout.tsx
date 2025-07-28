@@ -1,4 +1,5 @@
 import Header from "@/components/global/header";
+import { Suspense } from "react";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,7 @@ export default function RootLayout({
   return (
     <main>
       <Header />
-      {children}
+      <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
     </main>
   );
 }

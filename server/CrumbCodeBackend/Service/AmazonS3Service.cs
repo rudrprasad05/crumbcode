@@ -32,7 +32,6 @@ namespace CrumbCodeBackend.Service
                 ForcePathStyle = true // Important for MinIO
             };
 
-
             _s3Client = new AmazonS3Client(accessKey, secretKey, config);
             _bucketName = awsOptions["BucketName"] ?? throw new InvalidOperationException("bucket name");
         }
@@ -47,8 +46,7 @@ namespace CrumbCodeBackend.Service
                 Expires = DateTime.UtcNow.AddMinutes(15)
             });
 
-            return url;
-                        
+            return url;               
         }
 
         public async Task<GetObjectResponse?> GetObjectAsync(string objKey)

@@ -32,6 +32,14 @@ export const NewMediaFormSchema = z.object({
     .refine((file) => file.size > 0, "File cannot be empty"),
 });
 
+export const NewSocialLinkForm = z.object({
+  name: z.string().min(1, "Name is required"),
+  icon: z.string().optional(),
+  url: z.string().url("Url needs to be correct"),
+  isActive: z.boolean().default(true).optional(),
+});
+
 export type NewMediaFormType = z.infer<typeof NewMediaFormSchema>;
 export type SignInFormType = z.infer<typeof SignInForm>;
 export type RegisterFormType = z.infer<typeof RegisterForm>;
+export type NewSocialLinkType = z.infer<typeof NewSocialLinkForm>;

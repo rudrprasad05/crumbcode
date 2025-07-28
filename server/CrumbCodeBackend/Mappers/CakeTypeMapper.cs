@@ -28,7 +28,9 @@ namespace CrumbCodeBackend.Mappers
             {
                 Name = request.Name,
                 Description = request.Description,
-                Color = request.Color
+                Color = request.Color,
+                Id = request.Id,
+                UUID = request.UUID
             };
         }
     }

@@ -5,6 +5,7 @@ export interface BaseModel {
   uuid: string;
   createdOn: string;
   updatedOn: string;
+  isDeleted: boolean;
 }
 
 export interface Cake extends BaseModel {
@@ -23,6 +24,25 @@ export interface Cake extends BaseModel {
   //   allergens: Allergen[];
 }
 
+export interface ContactMessage extends BaseModel {
+  user: Partial<User>;
+  name: string;
+  email: string;
+  message: string;
+  type: ContactMessageTypes;
+}
+
+export enum ContactMessageTypes {
+  INFO = "INFO",
+  ORDER = "ORDER",
+  UPDATE = "UPDATE",
+}
+
+export interface IconType {
+  name: string;
+  Icon: any;
+}
+
 export interface CakeType extends BaseModel {
   name: string;
   color: string;
@@ -36,14 +56,31 @@ export interface Media extends BaseModel {
   fileName: string;
   contentType: string;
   sizeInBytes: number;
+  showInGallery: boolean;
+}
+
+export enum NotificationTypes {
+  "INFO",
+  "WARNING",
+  "ERROR",
+  "SUCCESS",
 }
 
 export interface Notification extends BaseModel {
   title: string;
   message: string;
   isRead: boolean;
-  type: "info" | "warning" | "error";
+  type: NotificationTypes;
   userId?: number;
+  user?: User;
+  actionUrl: string;
+}
+
+export interface SocialMedia extends BaseModel {
+  name: string;
+  icon: string;
+  url: string;
+  isActive: boolean;
 }
 
 export interface User {
@@ -71,6 +108,14 @@ export const CakeTypeColorClasses: Record<string, string> = {
   "purple-600": "bg-purple-600 border-purple-600/50",
   "yellow-600": "bg-yellow-600 border-yellow-600/50",
 };
+
+export interface DashboardData {
+  totalCakes: number;
+  totalMessages: number;
+  totalUsers: number;
+  totalMedia: number;
+  notifications: Notification[];
+}
 
 export interface NewCakeTypeRequest {
   name: string;
@@ -100,6 +145,15 @@ export interface NewMediaRequest {
 export interface MediaQueryObject {
   pageNumber?: number;
   pageSize?: number;
+  showInGallery?: boolean;
+  isDeleted?: boolean;
+  sortBy?: ESortBy;
+  isAvailable?: boolean;
+}
+
+export enum ESortBy {
+  ASC = "ASC",
+  DSC = "DSC",
 }
 
 export interface MetaData {

@@ -21,8 +21,8 @@ export default function NotFound() {
             404 - Page Not Found
           </CardTitle>
           <CardDescription className="text-gray-600">
-            The page you're looking for doesn't exist. It might have been moved,
-            deleted, or you entered the wrong URL.
+            The page you&apos;re looking for doesn&apos;t exist. It might have
+            been moved, deleted, or you entered the wrong URL.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -47,7 +47,7 @@ export default function NotFound() {
             </Button>
           </div>
           <div className="text-center text-sm text-gray-500">
-            Still can't find what you're looking for?{" "}
+            Still can&apos;t find what you&apos;re looking for?{" "}
             <Link href="/contact" className="text-blue-600 hover:underline">
               Contact Support
             </Link>

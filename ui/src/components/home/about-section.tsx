@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 export default function AboutSection() {
@@ -6,8 +7,10 @@ export default function AboutSection() {
       <div className="container mx-auto px-4">
         <div className="flex flex-col lg:flex-row items-center gap-12">
           <div className="lg:w-1/2">
-            <img
-              src="https://bucket.procyonfiji.com/procyon/cc-pop-5.png"
+            <Image
+              width={200}
+              height={200}
+              src="/cc-pop-5.png"
               alt="Freshly baked cakes"
               className="rounded-xl w-full"
             />

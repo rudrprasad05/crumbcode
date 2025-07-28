@@ -22,7 +22,6 @@ export default function PaginationSection({
   pagination,
   setPagination,
 }: IPagination) {
-  console.log(pagination);
   const handleChangePage = (i: number) => {
     setPagination((prev) => ({ ...prev, pageNumber: i }));
   };
@@ -37,7 +36,6 @@ export default function PaginationSection({
   const handlePrev = () => {
     let cPage = pagination.pageNumber;
     if (--cPage < 1) {
-      console.log("block");
       return;
     }
     setPagination((prev) => ({ ...prev, pageNumber: cPage }));

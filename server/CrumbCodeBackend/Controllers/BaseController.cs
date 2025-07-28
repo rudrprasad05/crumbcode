@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrumbCodeBackend.Controllers
 {
-    public class BaseController : ControllerBase
+    public abstract class BaseController : ControllerBase
     {
         protected readonly IConfiguration _configuration;
         protected readonly ITokenService _tokenService;
@@ -19,5 +19,11 @@ namespace CrumbCodeBackend.Controllers
             _tokenService = tokenService;
         }
         protected string? UserId => HttpContext.Items["UserId"]?.ToString();
+
+        [HttpDelete("{uuid}")]
+        public virtual Task<IActionResult> SafeDelete([FromRoute] string uuid)
+        {
+            return Task.FromResult<IActionResult>(NotFound());
+        }
     }
 }

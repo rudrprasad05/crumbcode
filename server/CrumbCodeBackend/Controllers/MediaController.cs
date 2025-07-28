@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Amazon.S3;
+using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Mappers;
 using CrumbCodeBackend.Models;
@@ -16,7 +17,7 @@ namespace CrumbCodeBackend.Controllers
 {
     [ApiController]
     [Route("api/media")]
-    public class MediaController : BaseController
+    public class MediaController : ProtectedController
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IAmazonS3Service _amazonS3Service;
@@ -31,50 +32,41 @@ namespace CrumbCodeBackend.Controllers
             _amazonS3Service = amazonS3Service;
         }
 
-        [HttpPost("create")]
-        [ProducesResponseType(typeof(GetOnlyMediaRes), 200)]
-
-        public async Task<IActionResult> CreateMedia(
-            [FromForm] string Url,
+        [HttpPost("upsert")]
+        public async Task<IActionResult> UpsertAsync(
+            [FromQuery] string? uuid,
             [FromForm] string AltText,
             [FromForm] string FileName,
-            [FromForm] string ContentType,
-            [FromForm] long SizeInBytes,
-            IFormFile File
-        )
+            [FromForm] bool ShowInGallery,
+            IFormFile? File)
         {
-            if (!ModelState.IsValid)
-            {
-                // Return detailed model validation errors
-                return BadRequest(ModelState);
-            }
-            if (File == null)
-            {
-                return BadRequest("File is required.");
-            }
-            try
-            {
-                var mo = new NewMediaRequest(
-                    Url,
-                    AltText,
-                    FileName,
-                    ContentType,
-                    File
-                );
-                var media = await _mediaRepository.CreateAsync(mo);
-                if (media == null)
-                {
-                    return BadRequest("Media not created.");
-                }
 
-                var dto = media.FromMediaToDTO(); // if you have a mapper
-                return Ok(dto);
-            }
-            catch (Exception ex)
+            var req = new Media
             {
-                // log error (optional)
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                AltText = AltText,
+                FileName = FileName,
+                ShowInGallery = ShowInGallery,
+            };
+
+            if (File != null)
+            {
+                req.SizeInBytes = File.Length;
+                req.ContentType = File.ContentType;
             }
+
+            var exists = await _mediaRepository.Exists(uuid ?? "");
+            var model = new ApiResponse<MediaDto>();
+
+            if (exists != null && uuid != null) // update
+            {
+                model = await _mediaRepository.UpdateAsync(uuid, req, file: File);
+            }
+            else
+            {
+                model = await _mediaRepository.CreateAsync(req, file: File);
+            }
+
+            return Ok(model);
         }
 
         [HttpGet("sum")]
@@ -104,18 +96,6 @@ namespace CrumbCodeBackend.Controllers
             return Ok(media);
         }
 
-        [HttpPatch("edit/{id}")]
-        public async Task<IActionResult> Edit([FromRoute] string id, [FromBody] EditMediaRequest request)
-        {
-            var media = await _mediaRepository.Edit(id, request);
-            if(media == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(media);
-        }
-
         [HttpGet("get-one/{id}")]
         public async Task<IActionResult> GetOne([FromRoute] string id)
         {
@@ -125,42 +105,22 @@ namespace CrumbCodeBackend.Controllers
                 return Unauthorized();
             }
 
-            var dto = media.FromMediaToDTO();
             return Ok(media);
         }
 
-        [HttpDelete("recycle/{id}")]
-        public async Task<IActionResult> Recycle([FromRoute] string id)
+        [HttpDelete("safe-delete/{uuid}")]
+        public override async Task<IActionResult> SafeDelete([FromRoute] string uuid)
         {
-            var media = await _mediaRepository.Recycle(id, "");
-            if(media == null)
+            var model = await _mediaRepository.SafeDelete(uuid);
+
+            if (model == null)
             {
-                return Unauthorized();
+                return BadRequest("model not gotten");
             }
 
-            var dto = media.FromMediaToDTO();
-            return Ok(dto);
+            return Ok(model);
         }
 
-        [HttpDelete("delete/{id}")]
-        public async Task<IActionResult> Delete([FromRoute] string id)
-        {
-            var media = await _mediaRepository.Delete(id);
-            if(media == null)
-            {
-                return Unauthorized();
-            }
-
-            var deleteFromS3 = await _amazonS3Service.DeleteFileAsync(media.ObjectKey ?? throw new InvalidOperationException());
-            
-            if(deleteFromS3 == true)
-            {
-                return Ok("deleted");
-            }
-
-            return BadRequest("not deleted");
-        }
-        
         [HttpGet("download")]
         public async Task<IActionResult> DownloadFile([FromQuery] string objKey)
         {

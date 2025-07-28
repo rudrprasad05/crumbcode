@@ -13,7 +13,6 @@ export async function GetMedia(
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
 
-  console.log("params:", params);
   const res = await axiosGlobal.get<ApiResponse<Media[]>>(
     `media/get-all?${params}`,
     {
@@ -23,32 +22,33 @@ export async function GetMedia(
   return res.data;
 }
 
-export async function GetOneMedia(
-  uuid: string,
-  token?: string
-): Promise<Media> {
-  const res = await axiosGlobal.get<Media>("media/get-one/" + uuid);
+export async function GetOneMedia(uuid: string): Promise<ApiResponse<Media>> {
+  const token = await GetToken();
+  const res = await axiosGlobal.get<ApiResponse<Media>>(
+    "media/get-one/" + uuid,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
   return res.data;
 }
 
-export async function UploadOneFile(form: FormData) {
-  try {
-    const res = await axiosGlobal.post("media/create", form);
-    return res.data;
-  } catch (error) {
-    console.dir(error, { depth: null });
-  }
-}
-
-export async function GetStarMedia() {
+export async function UploadOneFile(
+  form: FormData,
+  uuid?: string
+): Promise<ApiResponse<Media>> {
+  let apistr = "";
   const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
-  const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsStarred=true"
-  );
 
+  if (uuid && uuid.trim().length > 0) {
+    apistr = "media/upsert?uuid=" + uuid;
+  } else {
+    apistr = "media/upsert";
+  }
+
+  const res = await axiosGlobal.post(apistr, form, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
   return res.data;
 }
 
@@ -57,47 +57,24 @@ export async function SumMedia() {
   if (!token) {
     return redirect("/");
   }
-  const res = await axiosGlobal.get<number>("media/sum");
-
-  return res.data;
-}
-
-export async function GetDeleted() {
-  const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
-  const res = await axiosGlobal.get<Partial<Media>[]>(
-    "media/get-all?IsDeleted=true"
-  );
-
-  return res.data;
-}
-
-export async function RenameMedia(name: string, id: string) {
-  const res = await axiosGlobal.patch<Partial<Media>[]>("media/rename/" + id, {
-    name,
+  const res = await axiosGlobal.get<number>("media/sum", {
+    headers: { Authorization: `Bearer ${token}` },
   });
 
   return res.data;
 }
 
-export async function DeleteMedia(id: string) {
+export async function SafeDeleteMedia(
+  uuid: string
+): Promise<ApiResponse<Media>> {
   const token = await GetToken();
-  if (!token) {
-    return redirect("/");
-  }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/recycle/" + id);
 
-  return res.data;
-}
-
-export async function DeleteForever(id: string) {
-  const token = await GetToken();
-  //   if (!token) {
-  //     return redirect("/");
-  //   }
-  const res = await axiosGlobal.delete<Partial<Media>[]>("media/delete/" + id);
+  const res = await axiosGlobal.delete<ApiResponse<Media>>(
+    "media/safe-delete/" + uuid,
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 
   return res.data;
 }
@@ -109,7 +86,9 @@ export async function GetOne(id: string): Promise<Partial<Media>> {
     if (!token || token == "" || token == undefined) {
       return redirect("/errors/403");
     }
-    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id);
+    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
     return res.data;
   } catch (error) {

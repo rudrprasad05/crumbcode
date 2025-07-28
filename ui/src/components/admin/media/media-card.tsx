@@ -7,6 +7,9 @@ import { Media } from "@/types";
 import { Ban, Edit, FileText, ImageIcon, Trash2, Video } from "lucide-react";
 import { useState } from "react";
 import { DeleteMediaDialoge } from "./delete-media-dialoge";
+import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface MediaCardProps {
   item: Media;
@@ -16,6 +19,8 @@ interface MediaCardProps {
 export function MediaCard({ item, onDelete }: MediaCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const router = useRouter();
 
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes";
@@ -59,15 +64,30 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
       <CardContent className="p-0 bg-white">
         <div className="relative aspect-square bg-gray-100 rounded-t-lg overflow-hidden">
           {item.contentType.includes("image") && isImageValid ? (
-            <img
-              src={item.url || "/image.svg"}
-              onError={(e) => {
-                e.currentTarget.onerror = null; // prevent infinite loop
-                setIsImageValid(false);
-              }}
-              alt={item.altText || item.fileName}
-              className="w-full h-full object-cover"
-            />
+            <>
+              <Image
+                width={100}
+                height={100}
+                src={item.url || "/image.svg"}
+                onError={(e) => {
+                  e.currentTarget.onerror = null; // prevent infinite loop
+                  setIsImageValid(false);
+                }}
+                onLoad={() => setIsImageLoaded(true)}
+                alt={item.altText || item.fileName}
+                className={cn(
+                  "w-full h-full object-cover",
+                  isImageLoaded ? "opacity-100" : "opacity-0"
+                )}
+              />
+              {!isImageLoaded && (
+                <div
+                  className={cn(
+                    "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                  )}
+                ></div>
+              )}
+            </>
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-gray-50">
               {getTypeIcon()}
@@ -76,19 +96,24 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
 
           {isHovered && (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-12 text-black transition-all bg-white/50 backdrop-blur-sm group-hover:opacity-100">
-              <Button variant="outline" className="w-full">
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
+              <Button
+                variant="outline"
+                onClick={() => router.push("/admin/media/edit/" + item.uuid)}
+                className="w-full flex items-center justify-between"
+              >
+                Edit <Edit className="" />
               </Button>
-              <Button variant="outline" className="w-full">
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete
-              </Button>
+
               <DeleteMediaDialoge id={item.uuid} />
             </div>
           )}
 
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-2 right-2 flex items-center gap-2">
+            {item.showInGallery && (
+              <Badge variant="secondary" className={`text-xs text-pink-950`}>
+                Gallery
+              </Badge>
+            )}
             <Badge variant="secondary" className={`text-xs ${getTypeColor()}`}>
               {item.contentType.split("/")[0]}
             </Badge>
@@ -115,8 +140,9 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
             )}
           </div>
 
-          <div className="text-xs text-gray-400">
-            {new Date(item.createdOn).toLocaleDateString()}
+          <div className="text-xs text-gray-400 flex justify-between items-center">
+            <div>{new Date(item.createdOn).toLocaleDateString()}</div>
+            <div>{formatFileSize(item.sizeInBytes)}</div>
           </div>
         </div>
       </CardContent>

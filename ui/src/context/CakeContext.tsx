@@ -12,7 +12,7 @@ import { SaveCake } from "@/actions/Cake";
 import { toast } from "sonner";
 import { GetAllCakeTypes } from "@/actions/CakeType";
 
-let defaultMedia: Partial<Media> = {
+const defaultMedia: Partial<Media> = {
   url: "/default-img.jpeg",
   objectKey: "crumbcode/d6dab80c-3acd-4e6a-a750-506c7243991f.jpeg",
   altText: "default image placeholder",
@@ -25,7 +25,7 @@ let defaultMedia: Partial<Media> = {
   updatedOn: "2025-06-28T22:41:32.499489",
 };
 
-let defaultCakeData: Partial<Cake> = {
+const defaultCakeData: Partial<Cake> = {
   name: "Default cake name",
   description: "Default cake desc",
   price: 10,
@@ -40,8 +40,9 @@ let defaultCakeData: Partial<Cake> = {
 // Create context
 const CakeContext = createContext<{
   cake: Partial<Cake>;
+  isSaving: boolean;
   cakeTypes: Partial<CakeType[]> | undefined;
-  setInitialCakeState: (cake: Partial<Cake>) => void;
+  setInitialCakeState: (data: Partial<Cake>) => void;
   changeMedia: (media: Media) => void;
   updateCakeValues: <K extends keyof Cake>(key: K, value: Cake[K]) => void;
   saveCakeContext: () => void;
@@ -49,8 +50,9 @@ const CakeContext = createContext<{
   setHasChanged: React.Dispatch<React.SetStateAction<boolean>>;
 }>({
   cake: defaultCakeData,
+  isSaving: false,
   cakeTypes: undefined,
-  setInitialCakeState: (cake: Partial<Cake>) => {},
+  setInitialCakeState: () => {},
   changeMedia: (media: Media) => {},
   updateCakeValues: () => {},
   saveCakeContext: () => {},
@@ -66,6 +68,7 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   );
   const [hasChanged, setHasChanged] = useState(false);
   const initialHashRef = useRef<string>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     const getData = async () => {
@@ -76,6 +79,8 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    console.log("hit2");
+    console.log(cake);
     const currentHash = hash(cake);
     if (!initialHashRef.current) {
       initialHashRef.current = currentHash;
@@ -83,9 +88,12 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
     setHasChanged(currentHash !== initialHashRef.current);
   }, [cake]);
 
-  function setInitialCakeState(cake: Partial<Cake>) {
-    setCake(cake);
-    initialHashRef.current = hash(cake);
+  function setInitialCakeState(data: Partial<Cake>) {
+    console.log("comp", data, cake);
+    if (data == cake) return;
+    console.log("hit3");
+    setCake(data);
+    initialHashRef.current = hash(data);
   }
 
   function updateCakeValues<K extends keyof Cake>(key: K, value: Cake[K]) {
@@ -98,26 +106,31 @@ export const CakeProvider = ({ children }: { children: ReactNode }) => {
   // TODO when media is uploaded, it calls this function to change the context. but the url being sent is incorrect?? idk. this occurs in NewMediaForm in the edit cake page. should also occur in the new cake page
 
   function changeMedia(media: Media) {
-    console.log("trigger1");
-    console.log(media);
-    setCake((prev) => ({ ...prev, media }));
+    console.log("changemedia", media);
+    setCake((prev) => ({ ...prev, media: media }));
   }
 
   async function saveCakeContext() {
-    initialHashRef.current = hash(cake);
-    setHasChanged(false);
-    cake.cakeTypeId = cake.cakeType?.id;
-    cake.mediaId = cake.media?.id;
-    console.dir(cake);
-    // return;
-    await SaveCake(cake, cake.uuid);
-    toast.success("Saved successfully");
+    setIsSaving(true);
+    try {
+      cake.cakeTypeId = cake.cakeType?.id;
+      cake.mediaId = cake.media?.id;
+      await SaveCake(cake, cake.uuid);
+      initialHashRef.current = hash(cake);
+      setHasChanged(false);
+
+      toast.success("Saved successfully");
+    } catch (error) {
+      toast.error("Error ocured. Changes not saved");
+    }
+    setIsSaving(false);
   }
 
   return (
     <CakeContext.Provider
       value={{
         cake,
+        isSaving,
         cakeTypes,
         setInitialCakeState,
         updateCakeValues,

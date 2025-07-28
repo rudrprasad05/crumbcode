@@ -3,6 +3,7 @@ import { AuthProvider } from "@/context/UserContext";
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -60,7 +61,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${roboto.variable} antialiased`}>
         <AuthProvider>
-          {children}
+          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
           <Toaster />
         </AuthProvider>
       </body>

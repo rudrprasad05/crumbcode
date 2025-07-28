@@ -9,6 +9,8 @@ import { destroyCookie } from "nookies";
 import {
   createContext,
   ReactNode,
+  Suspense,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -17,7 +19,7 @@ import { toast } from "sonner";
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, redirect?: string) => Promise<void>;
   register: (data: RegisterFormType) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -29,33 +31,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
-  const redirect = searchParams.get("redirect");
 
   // 🔹 Load session from cookies on mount
-  useEffect(() => {
-    checkAuth();
-    console.log("user", user);
-  }, [pathname, searchParams, router]);
 
   const helperHandleRedirectAfterLogin = (tmp: User) => {
-    // if (!tmp) {
-    //   router.push(redirect || "/");
-    //   return;
-    // }
     setUser(tmp);
     toast.success("Successfully logged in", {
       description: "Redirecting shortly",
     });
     if (tmp.role == "Admin") {
-      router.push(redirect || "/admin");
+      router.push("/admin");
     } else {
-      router.push(redirect || "/");
+      router.push("/");
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, redirect?: string) => {
     let tempUser: User;
     try {
       const res = await axiosGlobal.post<LoginResponse>("auth/login", {
@@ -70,12 +62,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token: res.data.token,
         role: res.data.role,
       };
+      localStorage.setItem("user", JSON.stringify(tempUser));
+
+      if (redirect && redirect.trim().length > 0) {
+        router.push("/" + redirect);
+      } else {
+        helperHandleRedirectAfterLogin(tempUser);
+      }
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Invalid credentials");
     }
-
-    helperHandleRedirectAfterLogin(tempUser);
   };
 
   const register = async (data: RegisterFormType) => {
@@ -95,44 +92,57 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         role: res.data.role,
       };
       setUser(tempUser);
+      localStorage.setItem("user", JSON.stringify(tempUser));
+
       toast.success("Successfully registered");
     } catch (error) {
       console.error("Login failed:", error);
       throw new Error("Invalid credentials");
     }
 
-    helperHandleRedirectAfterLogin(tempUser);
+    // helperHandleRedirectAfterLogin(tempUser);
   };
 
   // 🔹 Logout function
   const logout = (unAuth = false) => {
     destroyCookie(null, "token");
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
     setUser(null);
 
     toast.info("Logging out");
     router.push("/");
   };
 
-  const checkAuth = async () => {
-    let token = localStorage.getItem("token");
-    let isAdmin = pathname.includes("admin");
-    let tempUser: User;
-    console.log("trigger 1");
+  const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    const isAdmin = pathname.includes("admin");
+    let tempUser: User = JSON.parse(localStorage.getItem("user") ?? "");
 
-    try {
-      let res = await axiosGlobal.get<LoginResponse>("auth/me");
-      tempUser = {
-        id: res.data.id,
-        username: res.data.username,
-        email: res.data.email,
-        token: res.data.token,
-        role: res.data.role,
-      };
-    } catch (error) {
-      console.log(error);
+    if (tempUser) {
+      setUser(tempUser);
+      return;
     }
-  };
+
+    if (isAdmin)
+      try {
+        const res = await axiosGlobal.get<LoginResponse>("auth/me", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        tempUser = {
+          id: res.data.id,
+          username: res.data.username,
+          email: res.data.email,
+          token: res.data.token,
+          role: res.data.role,
+        };
+      } catch (error) {}
+  }, [pathname]);
+
+  useEffect(() => {
+    checkAuth();
+  }, [pathname, router, checkAuth]);
 
   return (
     <AuthContext.Provider

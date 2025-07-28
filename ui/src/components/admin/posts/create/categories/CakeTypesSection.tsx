@@ -52,7 +52,7 @@ function Header() {
 
           <Select>
             <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue />
+              <SelectValue defaultValue={"all"} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Types</SelectItem>
@@ -115,7 +115,7 @@ function HandleDataSection() {
       setLoading(false);
     };
     getData();
-  }, [router, pagination.pageNumber]);
+  }, [router, pagination.pageNumber, pagination.pageSize, setList]);
 
   if (loading) {
     return <TableSkeleton columns={3} rows={8} showHeader />;

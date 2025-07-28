@@ -25,6 +25,8 @@ _UpgradeReport_Files/
 bin/
 obj/
 TestResults/
+publish/
+publish-linux/
 ###################
 # Web publish log #
 ###################

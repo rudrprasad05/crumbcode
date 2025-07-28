@@ -1,13 +1,13 @@
 "use client";
 
 import { GetAllCakes } from "@/actions/Cake";
-import { GetMedia } from "@/actions/Media";
 import { LoadingCard } from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import PaginationSection from "@/components/global/PaginationSection";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Image from "next/image";
 import {
   Select,
   SelectContent,
@@ -16,14 +16,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Cake, CakeType, CakeTypeColorClasses, Media, MetaData } from "@/types";
-import { Plus, Search } from "lucide-react";
+import { Cake, CakeTypeColorClasses, ESortBy, Media, MetaData } from "@/types";
+import { FileText, ImageIcon, Plus, Search, Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { getTypeIcon } from "@/lib/icon-parse";
 
 interface ICakeTypesSection {
   data: Cake[];
   isLoading: boolean;
+}
+
+interface Filters {
+  search: string;
+  isAvailable?: boolean;
+  sortBy?: ESortBy;
 }
 
 export default function CakeSection() {
@@ -37,17 +44,27 @@ export default function CakeSection() {
     totalPages: 0,
   });
 
+  const [filters, setFilters] = useState<Filters>({
+    sortBy: ESortBy.DSC,
+    search: "",
+    isAvailable: undefined,
+  });
+
   useEffect(() => {
     setCakeItems([]);
+    console.log(filters);
+    // return;
     const getData = async () => {
       const data = await GetAllCakes({
         pageNumber: pagination.pageNumber,
         pageSize: pagination.pageSize,
+        sortBy: filters.sortBy,
       });
 
       setCakeItems(data.data as Cake[]);
       setPagination((prev) => ({
         ...prev,
+        totalCount: data.meta?.totalCount as number,
         totalPages: Math.ceil(
           (data.meta?.totalCount as number) / pagination.pageSize
         ),
@@ -56,11 +73,11 @@ export default function CakeSection() {
       setLoading(false);
     };
     getData();
-  }, [pagination.pageNumber]);
+  }, [pagination.pageNumber, pagination.pageSize, filters]);
 
   return (
     <div>
-      <Header />
+      <Header filters={filters} onChange={setFilters} />
       <HandleDataSection isLoading={loading} data={cakeItems} />
       <div className="py-8">
         <PaginationSection
@@ -72,7 +89,13 @@ export default function CakeSection() {
   );
 }
 
-function Header() {
+function Header({
+  filters,
+  onChange,
+}: {
+  filters: Filters;
+  onChange: (newFilters: Filters) => void;
+}) {
   return (
     <>
       <div>
@@ -84,25 +107,36 @@ function Header() {
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input
-              placeholder="Search posts..."
+              placeholder="Search cakes..."
               className="pl-10 bg-white border-gray-200"
+              value={filters.search || ""}
+              onChange={(e) => onChange({ ...filters, search: e.target.value })}
             />
           </div>
 
-          <Select>
+          <Select
+            value={String(filters.sortBy) || "DSC"}
+            onValueChange={(val) =>
+              onChange({ ...filters, sortBy: val as unknown as ESortBy })
+            }
+          >
             <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue />
+              <SelectValue placeholder="Sort by" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="cake">Cakes</SelectItem>
-              <SelectItem value="feature">Features</SelectItem>
+              <SelectItem value="DSC">Newest</SelectItem>
+              <SelectItem value="ASC">Oldest</SelectItem>
             </SelectContent>
           </Select>
 
-          <Select>
+          <Select
+            value={String(filters.isAvailable || "all")}
+            onValueChange={(val) =>
+              onChange({ ...filters, isAvailable: val as unknown as boolean })
+            }
+          >
             <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue />
+              <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
@@ -112,7 +146,7 @@ function Header() {
           </Select>
         </div>
 
-        <Link href={"/admin/cakes/create?type=cake"}>
+        <Link href={"/admin/cakes/create"}>
           <div
             className={`${buttonVariants({
               variant: "default",
@@ -124,6 +158,80 @@ function Header() {
         </Link>
       </div>
     </>
+  );
+}
+
+function CakeCard({ data }: { data: Cake }) {
+  const [isImageValid, setIsImageValid] = useState(true);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
+
+  console.log(data.media);
+
+  return (
+    <div
+      key={data.uuid}
+      className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden"
+    >
+      <div className="relative aspect-square h-48 bg-gray-100 rounded-t-lg overflow-hidden">
+        {isImageValid ? (
+          <>
+            <Image
+              width={100}
+              height={100}
+              src={data.media?.url || "/image.svg"}
+              onError={(e) => {
+                e.currentTarget.onerror = null; // prevent infinite loop
+                setIsImageValid(false);
+              }}
+              onLoad={() => setIsImageLoaded(true)}
+              alt={(data.media?.altText || data.media?.fileName) as string}
+              className={cn(
+                "w-full h-full object-cover",
+                isImageLoaded ? "opacity-100" : "opacity-0"
+              )}
+            />
+            {!isImageLoaded && (
+              <div
+                className={cn(
+                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                )}
+              ></div>
+            )}
+          </>
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-50">
+            {getTypeIcon(data.media as Media)}
+          </div>
+        )}
+      </div>
+      <div className="p-4 flex-1/2 flex flex-col">
+        <div className="flex justify-between">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {data.name as string}
+          </h3>
+          <div className="text-xs text-rose-600 font-bold">
+            {"$" + data.price}
+          </div>
+        </div>
+        <p className="text-gray-600 mb-4">{data.description as string}</p>
+        <div className="mt-auto flex justify-between items-center">
+          <Link
+            href={`/admin/cakes/edit/${data.uuid}`}
+            className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
+          >
+            Edit
+          </Link>
+          <Badge
+            className={cn(
+              "text-white",
+              CakeTypeColorClasses[data.cakeType?.color as string]
+            )}
+          >
+            {data.cakeType?.name || "no tag"}
+          </Badge>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -143,35 +251,7 @@ function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
       {data.map((i) => (
-        <div className="bg-white flex flex-col rounded-xl shadow-md overflow-hidden">
-          <div className="h-48 overflow-hidden">
-            <img
-              src={i.media?.url as string}
-              alt={""}
-              className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
-            />
-          </div>
-          <div className="p-4 flex-1/2">
-            <div className="flex justify-between">
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                {i.name as string}
-              </h3>
-              <div className="text-xs text-rose-600 font-bold">
-                {"$" + i.price}
-              </div>
-            </div>
-            <p className="text-gray-600 mb-4">{i.description as string}</p>
-            <div className="mt-auto">
-              <Link
-                href={`/admin/cakes/edit/cake/${i.uuid}`}
-                className="text-rose-600 text-sm underline leading-2 font-medium hover:text-rose-800 transition-colors"
-              >
-                Edit
-              </Link>
-              {/* <Badge>{i.cakeType.name}</Badge> */}
-            </div>
-          </div>
-        </div>
+        <CakeCard data={i} key={i.uuid} />
       ))}
     </div>
   );

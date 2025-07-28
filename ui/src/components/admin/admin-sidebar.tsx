@@ -1,7 +1,14 @@
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from "@/components/ui/sidebar"
-import { SidebarLogo } from "./sidebar/sidebar-logo"
-import { SidebarNavigation } from "./sidebar/sidebar-navigation"
-import { SidebarUserMenu } from "./sidebar/sidebar-user-menu"
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarRail,
+} from "@/components/ui/sidebar";
+import { SidebarLogo } from "./sidebar/sidebar-logo";
+import { SidebarNavigation } from "./sidebar/sidebar-navigation";
+import { SidebarUserMenu } from "./sidebar/sidebar-user-menu";
+import SideBarStorage from "./sidebar/SideBarStorage";
 
 export function AdminSidebar() {
   return (
@@ -12,6 +19,7 @@ export function AdminSidebar() {
 
       <SidebarContent className="p-2">
         <SidebarNavigation />
+        <SideBarStorage />
       </SidebarContent>
 
       <SidebarFooter className="border-t border-gray-200 p-2">
@@ -20,5 +28,5 @@ export function AdminSidebar() {
 
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

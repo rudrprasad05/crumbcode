@@ -9,6 +9,7 @@ namespace CrumbCodeBackend.Models.Requests
     {
         public bool? IsStarred { get; set; } = null;
         public bool? IsDeleted { get; set; } = false;
+        public bool? ShowInGallery { get; set; } = null;
         private const int MaxPageSize = 100;
         private int _pageSize = 10;
         public int PageNumber { get; set; } = 1;

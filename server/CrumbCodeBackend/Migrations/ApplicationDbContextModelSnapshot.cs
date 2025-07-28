@@ -53,6 +53,9 @@ namespace CrumbCodeBackend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -154,6 +157,9 @@ namespace CrumbCodeBackend.Migrations
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("tinyint(1)");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<int?>("MediaId")
                         .HasColumnType("int");
 
@@ -203,6 +209,9 @@ namespace CrumbCodeBackend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("longtext");
@@ -217,6 +226,57 @@ namespace CrumbCodeBackend.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("CakeTypes");
+                });
+
+            modelBuilder.Entity("CrumbCodeBackend.Models.ContactMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UUID")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("ContactMessages");
                 });
 
             modelBuilder.Entity("CrumbCodeBackend.Models.Media", b =>
@@ -242,9 +302,15 @@ namespace CrumbCodeBackend.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
                     b.Property<string>("ObjectKey")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<bool>("ShowInGallery")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<long>("SizeInBytes")
                         .HasColumnType("bigint");
@@ -273,8 +339,15 @@ namespace CrumbCodeBackend.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ActionUrl")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
 
                     b.Property<bool>("IsRead")
                         .HasColumnType("tinyint(1)");
@@ -308,6 +381,47 @@ namespace CrumbCodeBackend.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("CrumbCodeBackend.Models.SocialMedia", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Icon")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("UUID")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedOn")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SocialMedias");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
                     b.Property<string>("Id")
@@ -336,13 +450,13 @@ namespace CrumbCodeBackend.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0a61b33d-baab-4763-885b-8a936b033f9e",
+                            Id = "d9900fc5-1aaf-447b-8e4e-4ccaeeca2cb4",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "c63019cf-069a-4954-bcc5-6a7676f91938",
+                            Id = "60e4a2ff-045b-4ce7-b30e-c8968316d5cf",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -484,6 +598,17 @@ namespace CrumbCodeBackend.Migrations
                     b.Navigation("Media");
                 });
 
+            modelBuilder.Entity("CrumbCodeBackend.Models.ContactMessage", b =>
+                {
+                    b.HasOne("CrumbCodeBackend.Models.AppUser", "User")
+                        .WithMany("ContactMessages")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CrumbCodeBackend.Models.Notification", b =>
                 {
                     b.HasOne("CrumbCodeBackend.Models.AppUser", "User")
@@ -547,6 +672,8 @@ namespace CrumbCodeBackend.Migrations
 
             modelBuilder.Entity("CrumbCodeBackend.Models.AppUser", b =>
                 {
+                    b.Navigation("ContactMessages");
+
                     b.Navigation("Notifications");
                 });
 

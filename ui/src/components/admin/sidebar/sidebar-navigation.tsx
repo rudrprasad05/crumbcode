@@ -17,8 +17,14 @@ import {
   Database,
   Tag,
   Cake,
+  Bell,
+  Globe,
+  Cloud,
+  Trash2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useEffect, useState } from "react";
+import { GetStorageUsed } from "@/actions/Site";
 
 const navigationItems = [
   {
@@ -36,11 +42,11 @@ const navigationItems = [
     href: "/admin/categories",
     icon: Tag,
   },
-  {
-    title: "Reviews",
-    href: "/admin/reviews",
-    icon: Star,
-  },
+  //   {
+  //     title: "Site",
+  //     href: "/admin/site",
+  //     icon: Globe,
+  //   },
   {
     title: "Socials",
     href: "/admin/socials",
@@ -56,15 +62,25 @@ const navigationItems = [
     href: "/admin/media",
     icon: Database,
   },
+  {
+    title: "Notifications",
+    href: "/admin/notifications",
+    icon: Bell,
+  },
+  {
+    title: "Recycle Bin",
+    href: "/admin/bin",
+    icon: Trash2,
+  },
 ];
 
 export function SidebarNavigation() {
   const pathname = usePathname();
 
   return (
-    <SidebarGroup>
-      <SidebarGroupContent>
-        <SidebarMenu>
+    <SidebarGroup className="h-full">
+      <SidebarGroupContent className="h-full">
+        <SidebarMenu className="h-full">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
             return (
