@@ -1,0 +1,62 @@
+services:
+  db-migrate:
+    build:
+      context: ./server/CrumbCodeBackend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__Default: "server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD}"
+    command: ["dotnet", "ef", "database", "update"]
+    networks:
+      - crumbcode_network
+    restart: "no" # Run once and exit
+
+  backend:
+    build:
+      context: ./server/CrumbCodeBackend
+      dockerfile: Dockerfile
+    depends_on:
+      - db-migrate # Wait for migrations to complete
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__Default=server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD}
+    ports:
+      - "${BACKEND_PORT}:8080"
+    restart: unless-stopped
+    networks:
+      - crumbcode_network
+
+  frontend:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT}:3000"
+    depends_on:
+      - backend # Wait for migrations to complete
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:${BACKEND_PORT}/api/
+    restart: unless-stopped
+    networks:
+      - crumbcode_network
+
+  db:
+    image: mysql:8.0
+    container_name: crumbcode-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - crumbcode_data:/var/lib/mysql
+    restart: unless-stopped
+    networks:
+      - crumbcode_network
+
+volumes:
+  crumbcode_data:
+
+networks:
+  crumbcode_network:
+    driver: bridge
