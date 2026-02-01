@@ -5,46 +5,34 @@ using System.Threading.Tasks;
 
 namespace CrumbCodeBackend.Middleware
 {
-    public class Log
+    public class LoggingMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly string _logDirectory = "logs";
+        private readonly ILogger<LoggingMiddleware> _logger;
 
-        public Log(RequestDelegate next)
+        public LoggingMiddleware(RequestDelegate next, ILogger<LoggingMiddleware> logger)
         {
             _next = next;
-
-            // Ensure the logs directory exists
-            if (!Directory.Exists(_logDirectory))
-            {
-                Directory.CreateDirectory(_logDirectory);
-            }
+            _logger = logger;
         }
 
         public async Task InvokeAsync(HttpContext context)
         {
-            var logFilePath = Path.Combine(_logDirectory, $"{DateTime.Now:yyyy-MM-dd}.log");
+            var requestTime = DateTime.UtcNow;
+            var ip = context.Connection.RemoteIpAddress?.ToString();
+            var method = context.Request.Method;
+            var path = context.Request.Path;
+            var query = context.Request.QueryString.Value;
+            var ua = context.Request.Headers["User-Agent"];
+            var traceId = context.TraceIdentifier;
 
-            // Log request details
-            var logMessage = $"[{DateTime.Now:HH:mm:ss}] {context.Request.Method} {context.Request.Path} {context.Request.QueryString}\n";
-            await File.AppendAllTextAsync(logFilePath, logMessage);
-
-            // Call the next middleware in the pipeline
+            // Call next
             await _next(context);
-        }
 
-        public static async Task Write(string message)
-        {
-            var logDirectory = "logs";
-            var logFilePath = Path.Combine(logDirectory, $"{DateTime.Now:yyyy-MM-dd}.log");
+            var status = context.Response.StatusCode;
 
-            if (!Directory.Exists(logDirectory))
-            {
-                Directory.CreateDirectory(logDirectory);
-            }
-
-            var logMessage = $"[{DateTime.Now:HH:mm:ss}] {message}\n";
-            await File.AppendAllTextAsync(logFilePath, logMessage);
+            _logger.LogInformation("Req {Method} {Path}{Query} | IP: {IP} | Status: {Status} | UA: {UA} | TraceId: {TraceId}",
+                method, path, query, ip, status, ua, traceId);
         }
     }
 }

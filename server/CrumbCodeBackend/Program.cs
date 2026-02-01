@@ -8,9 +8,14 @@ using CrumbCodeBackend.Service;
 using CrumbCodeBackend.Middleware;
 using Microsoft.AspNetCore.Authorization;
 using System.Text.Json.Serialization;
+using DotNetEnv;
+using Amazon.S3;
+using Amazon;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerServices();
@@ -27,7 +32,30 @@ builder.Services.AddControllers()
 builder.Services.AddSingleton<IAmazonS3Service, AmazonS3Service>();
 builder.Services.AddSingleton<IUserContextService, UserContextService>();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, CustomAuthorizationMiddlewareResultHandler>();
+builder.Services.AddSingleton<IAmazonS3>(sp =>
+{
+    var config = sp.GetRequiredService<IConfiguration>().GetSection("AWS_S3");
 
+    Console.WriteLine("=== AWS S3 CONFIG DEBUG ===");
+    Console.WriteLine($"AccessKey: {config["AccessKey"]}...");
+    Console.WriteLine($"BucketName: {config["BucketName"]}");
+    Console.WriteLine($"Region: {config["Region"]}");
+    Console.WriteLine($"ServiceURL: {config["ServiceURL"]}");
+    Console.WriteLine("===========================");
+
+    var s3Config = new AmazonS3Config
+    {
+        RegionEndpoint = RegionEndpoint.GetBySystemName(config["Region"]!),
+        ServiceURL = config["ServiceURL"],   // ← keep this for real AWS too
+        ForcePathStyle = true                // ← THIS IS REQUIRED even on real AWS when using ServiceURL
+    };
+
+    return new AmazonS3Client(
+        config["AccessKey"]!,
+        config["SecretKey"]!,
+        s3Config
+    );
+});
 
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
@@ -50,8 +78,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app
-.UseCors("allowFrontend")
-.UseHttpsRedirection()
+.UseCors("allowSpecificOrigin")
+// .UseHttpsRedirection()
 .UseAuthentication()
 .UseAuthorization();
 
@@ -61,7 +89,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseMiddleware<TokenMiddleware>();
-app.UseMiddleware<Log>();
+app.UseMiddleware<LoggingMiddleware>();
+app.UseMiddleware<ApiResponseMiddleware>();
 app.MapControllers();
 
 using (var scope = app.Services.CreateScope())

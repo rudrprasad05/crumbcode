@@ -18,19 +18,20 @@ namespace CrumbCodeBackend.Config
     {
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
-            var frontendUrl = configuration["Frontend:Url"] ?? throw new InvalidOperationException("Frontend URL not configured");
-            var allowedOrigins = configuration["CORS:AllowedOrigins"]
-                ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                ?? Array.Empty<string>();
+            var frontend = configuration["AllowedHosts"] ?? throw new InvalidOperationException();
+            var allowedOrigins = configuration.GetSection("CorsOrigins").Get<string[]>()
+                ?? ["https://localhost:3000", "https://frcs.procyonfiji.com", "https://frcs-api.procyonfiji.com"];
 
             services.AddCors(c =>
             {
-                c.AddPolicy("allowFrontend", options =>
+                c.AddPolicy("allowSpecificOrigin", options =>
                 {
-                    options.WithOrigins(allowedOrigins)
-                        .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .AllowCredentials();
+                    options
+                    .WithOrigins(allowedOrigins!)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials()
+                    .SetIsOriginAllowed(_ => true);
                 });
             });
             services.AddAuthentication(options =>
