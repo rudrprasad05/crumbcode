@@ -8,10 +8,10 @@ namespace CrumbCodeBackend.Interfaces
 {
     public interface IAmazonS3Service
     {
-        Task<string?> UploadFileAsync(IFormFile file, string guid);
+        Task<string?> UploadFileAsync(IFormFile file);
         public Task<GetObjectResponse?> GetObjectAsync(string objKey);
         public Task<bool> DeleteFileAsync(string fileName);
         public Task<string> GetImageSignedUrl(string key);
-        
+
     }
 }

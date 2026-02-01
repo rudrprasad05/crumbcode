@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using CrumbCodeBackend.Interfaces;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using Amazon;
+using CrumbCodeBackend.Interfaces;
 
 namespace CrumbCodeBackend.Service
 {
@@ -14,26 +14,17 @@ namespace CrumbCodeBackend.Service
     {
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
+        private readonly string _folderName;
         private readonly string _serviceUrl;
 
-        public AmazonS3Service(IConfiguration configuration)
+        public AmazonS3Service(IAmazonS3 s3Client, IConfiguration configuration)
         {
-            // Initialize the S3 client
-            var awsOptions = configuration.GetSection("MINIO");
-            var accessKey = awsOptions["AccessKey"];
-            var secretKey = awsOptions["SecretKey"];
-            var region = RegionEndpoint.GetBySystemName(awsOptions["Region"]);
-            _serviceUrl = awsOptions["ServiceURL"] ?? throw new InvalidOperationException("service URl");
+            _s3Client = s3Client ?? throw new ArgumentNullException(nameof(s3Client));
 
-            var config = new AmazonS3Config
-            {
-                RegionEndpoint = region,
-                ServiceURL = _serviceUrl,
-                ForcePathStyle = true // Important for MinIO
-            };
-
-            _s3Client = new AmazonS3Client(accessKey, secretKey, config);
-            _bucketName = awsOptions["BucketName"] ?? throw new InvalidOperationException("bucket name");
+            var aws = configuration.GetSection("AWS_S3");
+            _bucketName = aws["BucketName"] ?? throw new InvalidOperationException("AWS_S3:BucketName missing");
+            _folderName = aws["FolderName"] ?? throw new InvalidOperationException("AWS_S3:FolderName missing");
+            _serviceUrl = aws["ServiceURL"] ?? throw new InvalidOperationException("AWS_S3:ServiceURL missing");
         }
 
         public async Task<string> GetImageSignedUrl(string key)
@@ -45,8 +36,9 @@ namespace CrumbCodeBackend.Service
                 Verb = HttpVerb.GET,
                 Expires = DateTime.UtcNow.AddMinutes(15)
             });
+            url = url.Replace("com/mctechfiji", "com", StringComparison.OrdinalIgnoreCase);
 
-            return url;               
+            return url;
         }
 
         public async Task<GetObjectResponse?> GetObjectAsync(string objKey)
@@ -73,36 +65,33 @@ namespace CrumbCodeBackend.Service
                 return null;
             }
         }
-        public async Task<string?> UploadFileAsync(IFormFile file, string guid)
+        public async Task<string?> UploadFileAsync(IFormFile file)
         {
-            if (file.Length > 0)
+            var accessKey = Environment.GetEnvironmentVariable("AWS_S3__AccessKey");
+            var secretKey = Environment.GetEnvironmentVariable("AWS_S3__SecretKey");
+            var bucketName = Environment.GetEnvironmentVariable("AWS_S3__BucketName");
+            var folderName = Environment.GetEnvironmentVariable("AWS_S3__FolderName");
+            var regionName = Environment.GetEnvironmentVariable("AWS_S3__Region");
+
+            var region = RegionEndpoint.GetBySystemName(regionName);
+
+            using var s3Client = new AmazonS3Client(accessKey, secretKey, region);
+            using var transferUtility = new TransferUtility(s3Client);
+
+            var objectKey = $"{folderName}/{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+
+            using var fileStream = file.OpenReadStream();
+            var request = new TransferUtilityUploadRequest
             {
-                try
-                {
-                    // Generate a unique file name for the file
-                    var fileName = "crumbcode/" + guid + Path.GetExtension(file.FileName);
+                InputStream = fileStream,
+                BucketName = bucketName,
+                Key = objectKey,
+                ContentType = file.ContentType
+            };
 
-                    // Create a new TransferUtility instance to upload the file
-                    using (var newMemoryStream = new MemoryStream())
-                    {
-                        await file.CopyToAsync(newMemoryStream);
-                        var fileTransferUtility = new TransferUtility(_s3Client);
+            await transferUtility.UploadAsync(request);
 
-                        // Upload the file to S3
-                        await fileTransferUtility.UploadAsync(newMemoryStream, _bucketName, fileName);
-
-                        // Return the file URL
-                        return $"{_serviceUrl}/{_bucketName}/{fileName}";
-                    }
-                }
-                catch (AmazonS3Exception e)
-                {
-                    // Handle S3 exceptions here
-                    throw new Exception($"Error uploading file: {e.Message}", e);
-                }
-            }
-
-            return null;
+            return objectKey;
         }
 
         public async Task<bool> DeleteFileAsync(string fileName)
@@ -113,7 +102,7 @@ namespace CrumbCodeBackend.Service
                 var request = new DeleteObjectRequest
                 {
                     BucketName = _bucketName,
-                    Key = "crumbcode/" + fileName
+                    Key = _folderName + "/" + fileName
                 };
 
                 // Delete the object from S3

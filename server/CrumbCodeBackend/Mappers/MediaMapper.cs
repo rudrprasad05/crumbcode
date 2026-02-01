@@ -1,47 +1,99 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+
 using CrumbCodeBackend.DTO;
+using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Models;
-using CrumbCodeBackend.Models.Response;
 
 namespace CrumbCodeBackend.Mappers
 {
-    public static class MediaMapper
+    public interface IMediaMapper
     {
-        public static GetOnlyMediaRes FromMediaToDTO(this Media request)
+        Task<MediaDto> ToDtoAsync(Media media);
+        Task<List<MediaDto>> FromModelToDtoAsync(ICollection<Media> request);
+
+        Task<Media> FromDtoToModelAsync(MediaDto? media);
+        Task<List<Media>> FromDtoToModelAsync(ICollection<MediaDto> request);
+
+
+    }
+
+    public class MediaMapper : IMediaMapper
+    {
+        private readonly IAmazonS3Service _s3Service;
+
+        public MediaMapper(IAmazonS3Service azureBlobService)
         {
-            ArgumentNullException.ThrowIfNull(request);
-            return new GetOnlyMediaRes
+            _s3Service = azureBlobService;
+        }
+
+        public async Task<Media> FromDtoToModelAsync(MediaDto? media)
+        {
+            if (media == null)
             {
-                Id = request.Id,
-                AltText = request.AltText,
-                FileName = request.FileName,
-                ContentType = request.ContentType,
-                SizeInBytes = request.SizeInBytes,
-                UUID = request.UUID,
-                Url = request.Url,
-                CreatedOn = request.CreatedOn,
-                ShowInGallery = request.ShowInGallery
+                return new Media();
+            }
+            var signedUrl = await _s3Service.GetImageSignedUrl(media.ObjectKey ?? "");
+            return new Media
+            {
+                Id = media.Id,
+                AltText = media.AltText,
+                FileName = media.FileName,
+                ContentType = media.ContentType,
+                SizeInBytes = media.SizeInBytes,
+                UUID = media.UUID.ToString(),
+                Url = signedUrl ?? media.Url,
+                ObjectKey = media.ObjectKey ?? "",
+                ShowInGallery = media.ShowInGallery,
             };
         }
 
-        public static MediaDto FromModelToDTO(this Media request, string? url = null)
+        public async Task<List<Media>> FromDtoToModelAsync(ICollection<MediaDto> request)
         {
-            ArgumentNullException.ThrowIfNull(request);
+            var dtoList = new List<Media>();
+            foreach (var media in request)
+            {
+                var dto = await FromDtoToModelAsync(media);
+                dtoList.Add(dto);
+            }
+
+            return dtoList;
+        }
+
+        public async Task<List<MediaDto>> FromModelToDtoAsync(ICollection<Media> request)
+        {
+            var dtoList = new List<MediaDto>();
+            foreach (var media in request)
+            {
+                var dto = await ToDtoAsync(media);
+                dtoList.Add(dto);
+            }
+
+            return dtoList;
+        }
+
+        public async Task<MediaDto> ToDtoAsync(Media media)
+        {
+            if (media == null)
+                return new MediaDto { };
+
+            var signedUrl = string.IsNullOrEmpty(media.ObjectKey) ? null
+                : await _s3Service.GetImageSignedUrl(media.ObjectKey);
+
+
             return new MediaDto
             {
-                Id = request.Id,
-                AltText = request.AltText,
-                FileName = request.FileName,
-                ContentType = request.ContentType,
-                SizeInBytes = request.SizeInBytes,
-                UUID = request.UUID,
-                Url = url ?? request.Url,
-                ShowInGallery = request.ShowInGallery
+                Id = media.Id,
+                AltText = media.AltText,
+                FileName = media.FileName,
+                ContentType = media.ContentType,
+                SizeInBytes = media.SizeInBytes,
+                UUID = media.UUID,
+                Url = signedUrl ?? media.Url,
+                ObjectKey = media.ObjectKey ?? "",
+                ShowInGallery = media.ShowInGallery,
             };
-
         }
     }
+
 }
+
