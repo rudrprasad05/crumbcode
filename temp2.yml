@@ -1,8 +1,6 @@
 services:
   db-migrate:
-    build:
-      context: ./server/CrumbCodeBackend
-      dockerfile: Dockerfile
+    image: rudrprasad/crumbcode:backend-v1.0.3
     depends_on:
       db:
         condition: service_healthy
@@ -20,48 +18,31 @@ services:
     restart: "no"
 
   backend:
-    build:
-      context: ./server/CrumbCodeBackend
-      dockerfile: Dockerfile
+    image: rudrprasad/crumbcode:backend-v1.0.3
     depends_on:
       db:
         condition: service_healthy
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ConnectionStrings__DefaultConnection=server=db;port=3306;database=${MYSQL_DATABASE};user=${MYSQL_USER};password=${MYSQL_PASSWORD};AllowPublicKeyRetrieval=True;SslMode=None;Connection Timeout=60;Default Command Timeout=300;
-      - ASPNETCORE_URLS=http://+:5080
-      - Backend__Url=${Backend_Url}
-      - Frontend__Url=${Fronend_Url}
-      - AllowedHosts=${AllowedHosts}
+      - Backend__Url=http://backend:5080
+      - Frontend__Url=http://frontend:3000
+      - JWT__Issuer=http://backend:5080
+      - JWT__Audience=http://frontend:3000
       - JWT__SigningKey=${JWT_SIGNING_KEY}
-      - AWS_S3__AccessKey=${AWS_S3__AccessKey}
-      - AWS_S3__SecretKey=${AWS_S3__SecretKey}
-      - AWS_S3__BucketName=${AWS_S3__BucketName}
-      - AWS_S3__FolderName=${AWS_S3__FolderName}
-      - AWS_S3__Region=${AWS_S3__Region}
-      - AWS_S3__ServiceURL=${AWS_S3__ServiceURL}
-      - CORS__AllowedOrigins=${CORS_AllowedOrigins}
+      - MINIO__AccessKey=${MINIO_ACCESS_KEY}
+      - MINIO__SecretKey=${MINIO_SECRET_KEY}
+      - MINIO__BucketName=${MINIO_BUCKET_NAME}
+      - MINIO__Region=${MINIO_REGION}
+      - MINIO__ServiceURL=${MINIO_SERVICE_URL}
+      # Add CORS configuration
+      - CORS__AllowedOrigins=http://localhost:${FRONTEND_PORT}
     ports:
       - "${BACKEND_PORT}:5080"
     restart: unless-stopped
     networks:
       - crumbcode_network
 
-  frontend:
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL}
-    ports:
-      - "${FRONTEND_PORT}:3000"
-    depends_on:
-      - backend
-    environment:
-      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL}
-    restart: unless-stopped
-    networks:
-      - crumbcode_network
   db:
     image: mysql:8.0
     container_name: crumbcode-mysql
@@ -97,3 +78,6 @@ volumes:
 networks:
   crumbcode_network:
     driver: bridge
+# build commands
+# docker build --platform linux/amd64 -t rudrprasad/crumbcode:backend-v1.0.3 .
+# docker build --platform linux/amd64 -t rudrprasad/crumbcode:frontend-v1.0.1 .

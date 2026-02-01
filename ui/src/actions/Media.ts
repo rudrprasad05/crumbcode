@@ -14,7 +14,7 @@ export async function GetMedia(
   const params = buildMediaQueryParams(query);
 
   const res = await axiosGlobal.get<ApiResponse<Media[]>>(
-    `media/get-all?${params}`,
+    `/media/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -25,7 +25,7 @@ export async function GetMedia(
 export async function GetOneMedia(uuid: string): Promise<ApiResponse<Media>> {
   const token = await GetToken();
   const res = await axiosGlobal.get<ApiResponse<Media>>(
-    "media/get-one/" + uuid,
+    "/media/get-one/" + uuid,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -41,9 +41,9 @@ export async function UploadOneFile(
   const token = await GetToken();
 
   if (uuid && uuid.trim().length > 0) {
-    apistr = "media/upsert?uuid=" + uuid;
+    apistr = "/media/upsert?uuid=" + uuid;
   } else {
-    apistr = "media/upsert";
+    apistr = "/media/upsert";
   }
 
   const res = await axiosGlobal.post(apistr, form, {
@@ -57,7 +57,7 @@ export async function SumMedia() {
   if (!token) {
     return redirect("/");
   }
-  const res = await axiosGlobal.get<number>("media/sum", {
+  const res = await axiosGlobal.get<number>("/media/sum", {
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -70,7 +70,7 @@ export async function SafeDeleteMedia(
   const token = await GetToken();
 
   const res = await axiosGlobal.delete<ApiResponse<Media>>(
-    "media/safe-delete/" + uuid,
+    "/media/safe-delete/" + uuid,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -86,7 +86,7 @@ export async function GetOne(id: string): Promise<Partial<Media>> {
     if (!token || token == "" || token == undefined) {
       return redirect("/errors/403");
     }
-    const res = await axiosGlobal.get<Partial<Media>>("media/get-one/" + id, {
+    const res = await axiosGlobal.get<Partial<Media>>("/media/get-one/" + id, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

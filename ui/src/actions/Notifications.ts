@@ -11,7 +11,7 @@ export async function GetAllNotifications(
   const params = buildMediaQueryParams(query);
 
   const res = await axiosGlobal.get<ApiResponse<Notification[]>>(
-    `notification/get-all?${params}`,
+    `/notification/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -26,7 +26,7 @@ export async function MarkAsRead(
   const token = await GetToken();
 
   const res = await axiosGlobal.get<ApiResponse<Notification>>(
-    `notification/mark-read?uuid=${uuid}`,
+    `/notification/mark-read?uuid=${uuid}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }
@@ -41,7 +41,7 @@ export async function SafeDeleteNotification(
   const token = await GetToken();
 
   const res = await axiosGlobal.delete<ApiResponse<Notification>>(
-    `notification/safe-delete?uuid=${uuid}`,
+    `/notification/safe-delete?uuid=${uuid}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

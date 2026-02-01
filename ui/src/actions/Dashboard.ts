@@ -11,7 +11,7 @@ export async function GetDashboardData(
   const token = await GetToken();
 
   const res = await axiosGlobal.get<ApiResponse<DashboardData>>(
-    `dashboard/get`,
+    `/dashboard/get`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

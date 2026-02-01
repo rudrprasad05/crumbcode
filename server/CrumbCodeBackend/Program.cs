@@ -50,14 +50,14 @@ if (app.Environment.IsDevelopment())
 }
 
 app
-.UseCors("allowSpecificOrigin")
+.UseCors("allowFrontend")
 .UseHttpsRedirection()
 .UseAuthentication()
 .UseAuthorization();
 
 if (app.Environment.IsDevelopment())
 {
-    app.UseDeveloperExceptionPage(); 
+    app.UseDeveloperExceptionPage();
 }
 
 // app.UseMiddleware<TokenMiddleware>();
@@ -72,7 +72,7 @@ using (var scope = app.Services.CreateScope())
         var connection = dbContext.Database.GetDbConnection();
         Console.WriteLine("🔍 Connection string being used:");
         Console.WriteLine(connection.ConnectionString);
-        
+
         dbContext.Database.OpenConnection(); // Test the connection
         dbContext.Database.CloseConnection();
         Console.WriteLine("Database connection successful.");

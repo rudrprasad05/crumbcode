@@ -1,15 +1,14 @@
 "use client";
 
 import { axiosGlobal } from "@/lib/axios";
-import { User } from "@/types";
+import { ApiResponse, User } from "@/types";
 import { LoginResponse } from "@/types/schema";
 import { RegisterFormType } from "@/types/zod";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { destroyCookie } from "nookies";
 import {
   createContext,
   ReactNode,
-  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -48,37 +47,74 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const login = async (email: string, password: string, redirect?: string) => {
+    setIsLoading(true);
     let tempUser: User;
     try {
-      const res = await axiosGlobal.post<LoginResponse>("auth/login", {
-        email,
-        password,
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // Ensures cookies are sent and received
+        body: JSON.stringify({ email, password }),
       });
-      localStorage.setItem("token", res.data.token);
-      tempUser = {
-        id: res.data.id,
-        username: res.data.username,
-        email: res.data.email,
-        token: res.data.token,
-        role: res.data.role,
-      };
-      localStorage.setItem("user", JSON.stringify(tempUser));
 
-      if (redirect && redirect.trim().length > 0) {
-        router.push("/" + redirect);
-      } else {
-        helperHandleRedirectAfterLogin(tempUser);
+      console.log("d12456", res);
+
+      // Check response status
+      if (!res.ok) {
+        if (res.status === 422) {
+          router.push("/auth/verify-email");
+          return;
+        }
+        const errorData = await res.json();
+        toast.error("An error occurred", {
+          description: errorData.message || "Invalid credentials",
+        });
+        return;
       }
+
+      const resp: ApiResponse<User> = await res.json();
+      const data = resp.data;
+
+      console.log("d123", data);
+      // Validate response data
+      if (!data || !data.token) {
+        toast.error("An error occurred", { description: resp.message });
+        return;
+      }
+
+      tempUser = {
+        id: data.id || "",
+        username: data.username || "",
+        email: data.email || "",
+        token: data.token,
+        role: data.role || "",
+      } as User;
+
+      setUser(tempUser);
+      localStorage.setItem("user", JSON.stringify(tempUser));
+      localStorage.setItem("token", data.token);
+
+      // Handle redirect
+      console.log("1wwwq hit", user);
+
+      helperHandleRedirectAfterLogin(tempUser);
+      //   }
     } catch (error) {
       console.error("Login failed:", error);
-      throw new Error("Invalid credentials");
+      toast.error("Login failed", {
+        description: "Invalid credentials or server error",
+      });
+    } finally {
+      setIsLoading(false);
     }
+
+    setIsLoading(false);
   };
 
   const register = async (data: RegisterFormType) => {
     let tempUser: User;
     try {
-      const res = await axiosGlobal.post<LoginResponse>("auth/register", {
+      const res = await axiosGlobal.post<LoginResponse>("/auth/register", {
         email: data.email,
         username: data.username,
         password: data.password,
@@ -127,7 +163,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (isAdmin)
       try {
-        const res = await axiosGlobal.get<LoginResponse>("auth/me", {
+        const res = await axiosGlobal.get<LoginResponse>("/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
         tempUser = {

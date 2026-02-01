@@ -13,7 +13,7 @@ export async function GetAllSocialMedia(
 
   try {
     const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
-      `social-media/get-all?${params}`,
+      `/social-media/get-all?${params}`,
       {
         headers: { Authorization: `Bearer ${token}` },
       }
@@ -36,7 +36,7 @@ export async function CreateSocialMedia(
   uuid?: string
 ): Promise<SocialMedia> {
   const res = await axiosGlobal.post<SocialMedia>(
-    "social-media/upsert?uuid=" + uuid,
+    "/social-media/upsert?uuid=" + uuid,
     dto
   );
 
@@ -47,7 +47,7 @@ export async function GetOneSocialMedia(
   uuid?: string
 ): Promise<ApiResponse<SocialMedia>> {
   const res = await axiosGlobal.get<ApiResponse<SocialMedia>>(
-    "social-media/get-one?uuid=" + uuid
+    "/social-media/get-one?uuid=" + uuid
   );
   return res.data;
 }

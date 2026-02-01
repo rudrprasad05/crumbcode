@@ -14,21 +14,23 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace CrumbCodeBackend.Config
 {
-   public static class Authentication
+    public static class Authentication
     {
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
-        {   
-            var frontend = configuration["AllowedHosts"] ?? throw new InvalidOperationException();
-            services.AddCors(c => 
+        {
+            var frontendUrl = configuration["Frontend:Url"] ?? throw new InvalidOperationException("Frontend URL not configured");
+            var allowedOrigins = configuration["CORS:AllowedOrigins"]
+                ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                ?? Array.Empty<string>();
+
+            services.AddCors(c =>
             {
-                c.AddPolicy("allowSpecificOrigin", options => 
+                c.AddPolicy("allowFrontend", options =>
                 {
-                    options
-                    .WithOrigins(frontend)
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials()
-                    .SetIsOriginAllowed(_ => true);
+                    options.WithOrigins(allowedOrigins)
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
                 });
             });
             services.AddAuthentication(options =>
@@ -78,5 +80,5 @@ namespace CrumbCodeBackend.Config
         }
     }
 
-    
+
 }

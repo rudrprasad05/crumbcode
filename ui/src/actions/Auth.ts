@@ -8,6 +8,6 @@ import { AxiosResponse } from "axios";
 export async function Login(
   login: SignInFormType
 ): Promise<AxiosResponse<LoginResponse>> {
-  const res = await axiosGlobal.post<LoginResponse>("auth/login", login);
+  const res = await axiosGlobal.post<LoginResponse>("/auth/login", login);
   return res;
 }

@@ -15,7 +15,7 @@ export async function CreateMessage(
 
   try {
     const res = await axiosGlobal.post<ApiResponse<ContactMessage>>(
-      `contact/upsert`,
+      `/contact/upsert`,
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -35,7 +35,7 @@ export async function GetAllContactMessages(
   const params = buildMediaQueryParams(query);
 
   const res = await axiosGlobal.get<ApiResponse<ContactMessage[]>>(
-    `contact/get-all?${params}`,
+    `/contact/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
     }

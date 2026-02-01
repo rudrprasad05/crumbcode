@@ -18,7 +18,7 @@ export async function GetAllCakesSite(
   const params = buildMediaQueryParams(query);
 
   const res = await axiosGlobal.get<ApiResponse<Cake[]>>(
-    `site/get-all-cakes?${params}`
+    `/site/get-all-cakes?${params}`
   );
 
   return res.data;
@@ -31,7 +31,7 @@ export async function GetAllSocialMediaSite(
 
   try {
     const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
-      `site/get-all-social-media?${params}`
+      `/site/get-all-social-media?${params}`
     );
 
     return res.data;
@@ -53,7 +53,7 @@ export async function GetStorageUsed(
 
   try {
     const res = await axiosGlobal.get<ApiResponse<number>>(
-      `site/get-storage-used?${params}`
+      `/site/get-storage-used?${params}`
     );
 
     return res.data;
@@ -77,7 +77,7 @@ export async function GetMediaSite(
   console.log(query);
 
   const res = await axiosGlobal.get<ApiResponse<Media[]>>(
-    `site/get-all-media?${params}`
+    `/site/get-all-media?${params}`
   );
   return res.data;
 }

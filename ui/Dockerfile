@@ -4,6 +4,9 @@ WORKDIR /app
 COPY package.json package-lock.json ./ 
 RUN npm ci
 
+ARG NEXT_PUBLIC_API_BASE_URL
+ENV NEXT_PUBLIC_API_BASE_URL=https://api.crumbcodefiji.com/api
+
 COPY . .
 RUN npm run build
 

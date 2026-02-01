@@ -46,11 +46,11 @@ namespace CrumbCodeBackend.Controllers
                 return Unauthorized("Invalud username");
             }
 
-            if(user.EmailConfirmed)
+            if (user.EmailConfirmed)
             {
                 return Ok("Email already confirmed");
             }
-            
+
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
             return Ok("Email confirmed");
@@ -91,7 +91,7 @@ namespace CrumbCodeBackend.Controllers
 
                 // Include role(s) in JWT
                 var roles = await _userManager.GetRolesAsync(user);
-                var token = _tokenService.CreateToken(user, roles); 
+                var token = _tokenService.CreateToken(user, roles);
 
                 // Set cookie
                 var cookieOptions = new CookieOptions
@@ -99,8 +99,11 @@ namespace CrumbCodeBackend.Controllers
                     HttpOnly = true,
                     Secure = !_env.IsDevelopment(),
                     SameSite = SameSiteMode.None,
-                    Expires = DateTime.UtcNow.AddDays(7)
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    Domain = ".crumbcodefiji.com"
                 };
+
+                Console.WriteLine(cookieOptions);
 
                 Response.Cookies.Append("token", token, cookieOptions);
 
@@ -110,7 +113,7 @@ namespace CrumbCodeBackend.Controllers
                     Username = user.UserName ?? "",
                     Email = user.Email ?? "",
                     Token = token,
-                    Role = roles.FirstOrDefault() ?? "User"
+                    Role = roles.FirstOrDefault() ?? "User",
                 });
             }
             catch (Exception ex)
@@ -122,7 +125,7 @@ namespace CrumbCodeBackend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
-            if(!ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -133,9 +136,9 @@ namespace CrumbCodeBackend.Controllers
                 {
                     return Unauthorized("Invalud Email");
                 }
-                
-                var result = await _signInManager.CheckPasswordSignInAsync (user, model.Password, false);
-                if(!result.Succeeded)
+
+                var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
+                if (!result.Succeeded)
                 {
                     return Unauthorized("Username or password is incorrect");
                 }
@@ -151,7 +154,7 @@ namespace CrumbCodeBackend.Controllers
                 });
 
                 var userRole = roles.FirstOrDefault() ?? "user";
-                
+
                 return Ok(
                     new LoginResponse
                     {
@@ -181,7 +184,7 @@ namespace CrumbCodeBackend.Controllers
                     return Unauthorized(new { message = "Token missing or invalid" });
                 }
 
-                var token = authHeader.Substring(7); 
+                var token = authHeader.Substring(7);
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
@@ -199,7 +202,7 @@ namespace CrumbCodeBackend.Controllers
 
                 var roles = await _userManager.GetRolesAsync(user);
                 var userRole = roles.FirstOrDefault() ?? "user";
-                
+
                 return Ok(
                     new LoginResponse
                     {
@@ -217,8 +220,8 @@ namespace CrumbCodeBackend.Controllers
             }
         }
 
-      
-    
+
+
     }
 }
 

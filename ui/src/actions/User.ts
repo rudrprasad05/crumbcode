@@ -19,7 +19,7 @@ export async function GetUser() {
 }
 
 export async function LoginUser(data: SignInFormType): Promise<LoginResponse> {
-  const res = await axiosGlobal.post<LoginResponse>("auth/login", data);
+  const res = await axiosGlobal.post<LoginResponse>("/auth/login", data);
 
   return res.data;
 }
@@ -46,7 +46,7 @@ export async function GetToken(): Promise<string | undefined> {
 //   if (!token) {
 //     return redirect("/");
 //   }
-//   const res = await axiosGlobal.get<Partial<User>>("user/get/" + email, {
+//   const res = await axiosGlobal.get<Partial<User>>("/user/get/" + email, {
 //     headers: { Authorization: `Bearer ${token}` },
 //   });
 
