@@ -40,7 +40,7 @@ services:
       - AWS_S3__FolderName=${AWS_S3__FolderName}
       - AWS_S3__Region=${AWS_S3__Region}
       - AWS_S3__ServiceURL=${AWS_S3__ServiceURL}
-      - AllowedOrigins=${CORS_AllowedOrigins}
+      - AllowedOrigins=${AllowedOrigins}
     ports:
       - "${BACKEND_PORT}:5080"
     restart: unless-stopped
