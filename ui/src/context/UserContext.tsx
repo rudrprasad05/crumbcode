@@ -39,11 +39,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     toast.success("Successfully logged in", {
       description: "Redirecting shortly",
     });
-    if (tmp.role == "Admin") {
-      router.push("/admin");
-    } else {
-      router.push("/");
-    }
+
+    router.push("/admin");
   };
 
   const login = async (email: string, password: string, redirect?: string) => {
