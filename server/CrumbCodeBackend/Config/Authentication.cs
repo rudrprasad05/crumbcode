@@ -19,8 +19,8 @@ namespace CrumbCodeBackend.Config
         public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration)
         {
             var frontend = configuration["AllowedHosts"] ?? throw new InvalidOperationException();
-            var allowedOrigins = configuration.GetSection("CorsOrigins").Get<string[]>()
-                ?? ["https://localhost:3000", "https://frcs.procyonfiji.com", "https://frcs-api.procyonfiji.com"];
+            var allowedOrigins = (Environment.GetEnvironmentVariable("AllowedOrigins") ?? "")
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             services.AddCors(c =>
             {
