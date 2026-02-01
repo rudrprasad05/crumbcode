@@ -1,13 +1,15 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using CrumbCodeBackend.DTO;
 using CrumbCodeBackend.Interfaces;
 using CrumbCodeBackend.Models;
 using CrumbCodeBackend.Models.Response;
+using CrumbCodeBackend.Models.Requests;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using static CrumbCodeBackend.Models.Requests.AuthRequestObject;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace CrumbCodeBackend.Controllers
@@ -122,26 +124,56 @@ namespace CrumbCodeBackend.Controllers
             }
         }
 
+        /// <summary>
+        /// Handle login
+        /// </summary>
+        /// <param name="model">Login Reuest -> email, password</param>
+        /// <returns></returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest model)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
+
             }
             try
             {
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                var user = await _userManager.Users
+                    .FirstOrDefaultAsync(u => u.Email == model.Email);
                 if (user == null)
                 {
-                    return Unauthorized("Invalud Email");
+                    return BadRequest(ApiResponse<LoginDTO>.Fail(message: "invalid username or password"));
+                }
+
+                if (!user.EmailConfirmed)
+                {
+                    return UnprocessableEntity(ApiResponse<LoginDTO>.Forbidden(message: "email not verified"));
+                }
+
+                if (user.LockoutEnd > DateTime.UtcNow)
+                {
+                    return UnprocessableEntity(ApiResponse<LoginDTO>.Forbidden(message: "too to many requests"));
                 }
 
                 var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
                 if (!result.Succeeded)
                 {
-                    return Unauthorized("Username or password is incorrect");
+                    user.AccessFailedCount += 1;
+                    if (user.AccessFailedCount > 3)
+                    {
+                        user.LockoutEnabled = true;
+                        user.LockoutEnd = DateTime.UtcNow.AddMinutes(5);
+                        user.AccessFailedCount = 0;
+                    }
+                    await _userManager.UpdateAsync(user);
+
+                    return BadRequest(ApiResponse<LoginDTO>.Fail(message: "invalid username or password"));
                 }
+                user.LockoutEnabled = false;
+                user.LockoutEnd = null;
+                user.AccessFailedCount = 0;
+
                 var roles = await _userManager.GetRolesAsync(user);
                 var tokenString = _tokenService.CreateToken(user, roles);
 
@@ -149,21 +181,27 @@ namespace CrumbCodeBackend.Controllers
                 {
                     HttpOnly = true,
                     Secure = true,  // Set to false for local development
-                    SameSite = SameSiteMode.None,
+                    SameSite = SameSiteMode.Strict,
                     Expires = DateTime.UtcNow.AddHours(1)
                 });
 
                 var userRole = roles.FirstOrDefault() ?? "user";
+                await _userManager.UpdateAsync(user);
 
-                return Ok(
-                    new LoginResponse
-                    {
-                        Username = user.UserName ?? string.Empty,
-                        Email = user.Email ?? string.Empty,
-                        Id = user.Id,
-                        Token = tokenString,
-                        Role = userRole
-                    }
+                var pfp = new MediaDto();
+
+                var resDTO = new LoginDTO
+                {
+                    Username = user.UserName ?? string.Empty,
+                    Email = user.Email ?? string.Empty,
+                    Id = user.Id,
+                    Token = tokenString,
+                    Role = userRole,
+                    ProfilePictureLink = pfp.Url,
+                };
+
+                return Ok(ApiResponse<LoginDTO>.Ok(resDTO)
+
                 );
 
             }
