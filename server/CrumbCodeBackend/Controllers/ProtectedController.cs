@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CrumbCodeBackend.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    // [Authorize(Roles = "Admin")]
     [ApiController]
     [Route("[controller]")]
     public class ProtectedController : BaseController
@@ -18,7 +18,7 @@ namespace CrumbCodeBackend.Controllers
             ITokenService tokenService
         ) : base(configuration, tokenService)
         {
-            
+
         }
 
     }
