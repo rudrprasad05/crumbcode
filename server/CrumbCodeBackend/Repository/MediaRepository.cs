@@ -94,7 +94,7 @@ namespace CrumbCodeBackend.Repository
 
         }
 
-        public async Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject)
+        public async Task<ApiResponse<List<Media>>> GetAll(CakeQueryObject queryObject)
         {
             var media = _context.Medias.AsQueryable();
             if (queryObject.IsDeleted.HasValue)
@@ -106,6 +106,13 @@ namespace CrumbCodeBackend.Repository
             {
                 media = media.Where(m => m.ShowInGallery == queryObject.ShowInGallery.Value);
             }
+
+            media = queryObject.SortBy switch
+            {
+                ESortBy.ASC => media.OrderBy(c => c.CreatedOn),
+                ESortBy.DSC => media.OrderByDescending(c => c.CreatedOn),
+                _ => media.OrderByDescending(c => c.CreatedOn)
+            };
 
             var totalCount = await media.CountAsync();
             var skip = (queryObject.PageNumber - 1) * queryObject.PageSize;

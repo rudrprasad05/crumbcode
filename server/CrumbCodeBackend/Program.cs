@@ -12,10 +12,9 @@ using DotNetEnv;
 using Amazon.S3;
 using Amazon;
 
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
-
-Env.Load();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerServices();

@@ -6,9 +6,8 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { useMedia } from "@/context/MediaContext";
 import { cn } from "@/lib/utils";
-import { Trash2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
 import Image from "next/image";
-import { useEffect } from "react";
 
 export default function SidebarDetailsTab() {
   const { media, updateValues, previewUrl, handleFileChange } = useMedia();
@@ -46,7 +45,7 @@ export default function SidebarDetailsTab() {
           <label
             htmlFor="file"
             className={cn(
-              "cursor-pointer flex items-center p-2 bg-secondary rounded hover:bg-secondary/80"
+              "cursor-pointer flex items-center p-2 bg-secondary rounded hover:bg-secondary/80",
             )}
           >
             <Upload className="mr-2" />
@@ -64,7 +63,7 @@ export default function SidebarDetailsTab() {
         )}
         {previewUrl && (
           <div className="relative w-1/2">
-            <div
+            {/* <div
               onClick={(e) =>
                 handleFileChange(
                   e as unknown as React.ChangeEvent<HTMLInputElement>,
@@ -74,7 +73,7 @@ export default function SidebarDetailsTab() {
               className="rounded-full p-1 absolute -top-2 cursor-pointer -right-2 bg-rose-500"
             >
               <Trash2 className="w-4 h-4 text-white" />
-            </div>
+            </div> */}
             <Image
               width={200}
               height={200}

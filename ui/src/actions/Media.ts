@@ -2,13 +2,13 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, Media, MediaQueryObject } from "@/types";
+import { ApiResponse, CakeQueryObject, Media } from "@/types";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
 export async function GetMedia(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<Media[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
@@ -17,7 +17,7 @@ export async function GetMedia(
     `/media/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
   return res.data;
 }
@@ -28,14 +28,14 @@ export async function GetOneMedia(uuid: string): Promise<ApiResponse<Media>> {
     "/media/get-one/" + uuid,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
   return res.data;
 }
 
 export async function UploadOneFile(
   form: FormData,
-  uuid?: string
+  uuid?: string,
 ): Promise<ApiResponse<Media>> {
   let apistr = "";
   const token = await GetToken();
@@ -65,7 +65,7 @@ export async function SumMedia() {
 }
 
 export async function SafeDeleteMedia(
-  uuid: string
+  uuid: string,
 ): Promise<ApiResponse<Media>> {
   const token = await GetToken();
 
@@ -73,7 +73,7 @@ export async function SafeDeleteMedia(
     "/media/safe-delete/" + uuid,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;

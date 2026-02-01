@@ -1,14 +1,14 @@
-import { ESortBy, MediaQueryObject } from "@/types";
+import { CakeQueryObject, ESortBy } from "@/types";
 import qs from "qs"; // npm install qs
 
-export const buildMediaQueryParams = (query?: MediaQueryObject) => {
-  const q = createMediaQueryObject(query);
+export const buildMediaQueryParams = (query?: CakeQueryObject) => {
+  const q = createCakeQueryObject(query);
   return qs.stringify(q, { skipNulls: true });
 };
 
-export function createMediaQueryObject(
-  query?: MediaQueryObject
-): MediaQueryObject {
+export function createCakeQueryObject(
+  query?: CakeQueryObject,
+): CakeQueryObject {
   const MAX_PAGE_SIZE = 100;
 
   if (!query)

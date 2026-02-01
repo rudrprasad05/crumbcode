@@ -1,5 +1,3 @@
-import { inherits } from "util";
-
 export interface BaseModel {
   id: number;
   uuid: string;
@@ -142,7 +140,7 @@ export interface NewMediaRequest {
   file: File; // This is the native browser File object for uploads
 }
 
-export interface MediaQueryObject {
+export interface CakeQueryObject {
   pageNumber?: number;
   pageSize?: number;
   showInGallery?: boolean;

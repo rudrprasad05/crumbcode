@@ -13,6 +13,7 @@ namespace CrumbCodeBackend.Models.Requests
         public int PageNumber { get; set; } = 1;
         public bool? IsAvailable { get; set; }
         public bool? IsDeleted { get; set; } = false;
+        public bool? ShowInGallery { get; set; } = false;
         public ESortBy SortBy { get; set; } = ESortBy.ASC;
         public int PageSize
         {

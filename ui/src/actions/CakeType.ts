@@ -4,9 +4,9 @@ import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
 import {
   ApiResponse,
+  CakeQueryObject,
   CakeType,
   Media,
-  MediaQueryObject,
   NewCakeTypeRequest,
 } from "@/types";
 import axios from "axios";
@@ -14,7 +14,7 @@ import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
 export async function GetAllCakeTypes(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<CakeType[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
@@ -23,7 +23,7 @@ export async function GetAllCakeTypes(
     `/caketype/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
   return res.data;
 }
@@ -38,7 +38,7 @@ export async function CreateCakeType(form: NewCakeTypeRequest) {
 }
 
 export async function DeleteCakeType(
-  uuid: string
+  uuid: string,
 ): Promise<ApiResponse<CakeType>> {
   const token = await GetToken();
   if (!token) {
@@ -46,7 +46,7 @@ export async function DeleteCakeType(
   }
   const res = await axiosGlobal.delete<ApiResponse<CakeType>>(
     `/caketype/delete/${uuid}`,
-    { headers: { Authorization: `Bearer ${token}` } }
+    { headers: { Authorization: `Bearer ${token}` } },
   );
 
   return res.data;
@@ -68,7 +68,7 @@ export async function GetDeleted() {
     return redirect("/");
   }
   const res = await axiosGlobal.get<Partial<Media>[]>(
-    "/media/get-all?IsDeleted=true"
+    "/media/get-all?IsDeleted=true",
   );
 
   return res.data;
@@ -88,7 +88,7 @@ export async function DeleteMedia(id: string) {
     return redirect("/");
   }
   const res = await axiosGlobal.delete<Partial<Media>[]>(
-    "/media/recycle/" + id
+    "/media/recycle/" + id,
   );
 
   return res.data;
@@ -103,7 +103,7 @@ export async function DeleteForever(id: string) {
     "/media/delete/" + id,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;

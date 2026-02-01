@@ -70,7 +70,7 @@ namespace CrumbCodeBackend.Controllers
         }
 
         [HttpGet("get-all-media")]
-        public async Task<IActionResult> GetAllMedia([FromQuery] MediaQueryObject queryObject)
+        public async Task<IActionResult> GetAllMedia([FromQuery] CakeQueryObject queryObject)
         {
             var model = await _mediaRepository.GetAll(queryObject);
 

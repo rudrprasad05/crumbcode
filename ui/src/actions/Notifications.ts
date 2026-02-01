@@ -1,11 +1,10 @@
-import { ApiResponse, MediaQueryObject } from "@/types";
-import { GetToken } from "./User";
-import { buildMediaQueryParams } from "@/lib/params";
-import { Notification } from "@/types";
 import { axiosGlobal } from "@/lib/axios";
+import { buildMediaQueryParams } from "@/lib/params";
+import { ApiResponse, CakeQueryObject, Notification } from "@/types";
+import { GetToken } from "./User";
 
 export async function GetAllNotifications(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<Notification[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
@@ -14,14 +13,14 @@ export async function GetAllNotifications(
     `/notification/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;
 }
 
 export async function MarkAsRead(
-  uuid?: string
+  uuid?: string,
 ): Promise<ApiResponse<Notification>> {
   const token = await GetToken();
 
@@ -29,14 +28,14 @@ export async function MarkAsRead(
     `/notification/mark-read?uuid=${uuid}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;
 }
 
 export async function SafeDeleteNotification(
-  uuid?: string
+  uuid?: string,
 ): Promise<ApiResponse<Notification>> {
   const token = await GetToken();
 
@@ -44,7 +43,7 @@ export async function SafeDeleteNotification(
     `/notification/safe-delete?uuid=${uuid}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;

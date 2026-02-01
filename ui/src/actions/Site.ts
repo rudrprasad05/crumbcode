@@ -1,37 +1,36 @@
 "use server";
 
 import { axiosGlobal } from "@/lib/axios";
-import { FromModelToNewRequestDTO } from "@/mappers/CakeMapper";
+import { buildMediaQueryParams } from "@/lib/params";
 import {
   ApiResponse,
   Cake,
+  CakeQueryObject,
   Media,
-  MediaQueryObject,
   SocialMedia,
 } from "@/types";
 import { GetToken } from "./User";
-import { buildMediaQueryParams } from "@/lib/params";
 
 export async function GetAllCakesSite(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<Cake[]>> {
   const params = buildMediaQueryParams(query);
 
   const res = await axiosGlobal.get<ApiResponse<Cake[]>>(
-    `/site/get-all-cakes?${params}`
+    `/site/get-all-cakes?${params}`,
   );
 
   return res.data;
 }
 
 export async function GetAllSocialMediaSite(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<SocialMedia[]>> {
   const params = buildMediaQueryParams(query);
 
   try {
     const res = await axiosGlobal.get<ApiResponse<SocialMedia[]>>(
-      `/site/get-all-social-media?${params}`
+      `/site/get-all-social-media?${params}`,
     );
 
     return res.data;
@@ -47,13 +46,13 @@ export async function GetAllSocialMediaSite(
 }
 
 export async function GetStorageUsed(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<number>> {
   const params = buildMediaQueryParams(query);
 
   try {
     const res = await axiosGlobal.get<ApiResponse<number>>(
-      `/site/get-storage-used?${params}`
+      `/site/get-storage-used?${params}`,
     );
 
     return res.data;
@@ -69,7 +68,7 @@ export async function GetStorageUsed(
 }
 
 export async function GetMediaSite(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<Media[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
@@ -77,7 +76,7 @@ export async function GetMediaSite(
   console.log(query);
 
   const res = await axiosGlobal.get<ApiResponse<Media[]>>(
-    `/site/get-all-media?${params}`
+    `/site/get-all-media?${params}`,
   );
   return res.data;
 }

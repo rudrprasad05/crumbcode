@@ -14,7 +14,7 @@ namespace CrumbCodeBackend.Interfaces
         public Task<ApiResponse<MediaDto>> UpdateAsync(string uuid, Media media, IFormFile? file);
         public Task<ApiResponse<MediaDto>> CreateAsync(Media media, IFormFile? file);
         public Task<ApiResponse<MediaDto>> GetOne(string uuid);
-        public Task<ApiResponse<List<Media>>> GetAll(MediaQueryObject queryObject);
+        public Task<ApiResponse<List<Media>>> GetAll(CakeQueryObject queryObject);
         public Task<Media?> Exists(string uuid);
         public Task<ApiResponse<MediaDto>> SafeDelete(string uuid);
         public Task<ApiResponse<double>> SumStorage();

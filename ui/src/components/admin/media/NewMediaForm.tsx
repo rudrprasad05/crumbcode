@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { Media } from "@/types";
 import { NewMediaFormSchema, NewMediaFormType } from "@/types/zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Image as ImageIcon, Loader2, Trash, Upload } from "lucide-react";
+import { Image as ImageIcon, Loader2, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -91,7 +91,7 @@ export default function NewMediaForm() {
         <label
           htmlFor="file"
           className={cn(
-            "cursor-pointer flex items-center p-2 bg-secondary rounded hover:bg-secondary/80"
+            "cursor-pointer flex items-center p-2 bg-secondary rounded hover:bg-secondary/80",
           )}
         >
           <Upload className="mr-2" />
@@ -113,9 +113,9 @@ export default function NewMediaForm() {
         <div className="flex items-center gap-2 w-full">
           <ImageIcon className="w-6 h-6" />
           <div className="truncate w-full">{file.name}</div>
-          <Button variant="destructive" onClick={removeFile} type="button">
+          {/* <Button variant="destructive" onClick={removeFile} type="button">
             <Trash className="w-4 h-4" />
-          </Button>
+          </Button> */}
         </div>
       )}
       {errors.file && (

@@ -1,12 +1,11 @@
 "use client";
 
-import { GetAllCakes } from "@/actions/Cake";
+import { GetAllCakesSite } from "@/actions/Site";
 import { Cake, ESortBy, MetaData } from "@/types";
 import { useEffect, useState } from "react";
 import ErrorContainer from "../global/ErrorContainer";
 import { LoadingContainer } from "../global/LoadingContainer";
 import CakeCard from "./cake-card";
-import { GetAllCakesSite } from "@/actions/Site";
 
 export default function PopularCakes() {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +25,7 @@ export default function PopularCakes() {
         const data = await GetAllCakesSite({
           pageNumber: pagination.pageNumber,
           pageSize: pagination.pageSize,
-          sortBy: ESortBy.ASC,
+          sortBy: ESortBy.DSC,
         });
 
         setcakes(data.data as Cake[]);
@@ -34,7 +33,7 @@ export default function PopularCakes() {
           ...prev,
           totalCount: data.meta?.totalCount as number,
           totalPages: Math.ceil(
-            (data.meta?.totalCount as number) / pagination.pageSize
+            (data.meta?.totalCount as number) / pagination.pageSize,
           ),
         }));
         seterror(null);

@@ -13,7 +13,7 @@ namespace CrumbCodeBackend.Interfaces
     {
         public Task<CakeType?> CreateAsync(NewCakeTypeRequest cakeType);
         public Task<ApiResponse<CakeType>> DeleteAsync(string uuid);
-        public Task<ApiResponse<List<CakeType>>> GetAllAsync(MediaQueryObject queryObject);
+        public Task<ApiResponse<List<CakeType>>> GetAllAsync(CakeQueryObject queryObject);
         public Task<ApiResponse<CakeType>> GetOne(string uuid);
     }
 }

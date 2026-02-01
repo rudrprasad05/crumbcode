@@ -1,15 +1,13 @@
 "use server";
 
+import { ContactFormValues } from "@/components/home/contact-form";
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, ContactMessage, Media, MediaQueryObject } from "@/types";
-import axios from "axios";
-import { redirect } from "next/navigation";
+import { ApiResponse, CakeQueryObject, ContactMessage } from "@/types";
 import { GetToken } from "./User";
-import { ContactFormValues } from "@/components/home/contact-form";
 
 export async function CreateMessage(
-  data: ContactFormValues
+  data: ContactFormValues,
 ): Promise<ApiResponse<ContactMessage>> {
   const token = await GetToken();
 
@@ -19,7 +17,7 @@ export async function CreateMessage(
       data,
       {
         headers: { Authorization: `Bearer ${token}` },
-      }
+      },
     );
     return res.data;
   } catch (error) {
@@ -29,7 +27,7 @@ export async function CreateMessage(
 }
 
 export async function GetAllContactMessages(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<ContactMessage[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
@@ -38,7 +36,7 @@ export async function GetAllContactMessages(
     `/contact/get-all?${params}`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;

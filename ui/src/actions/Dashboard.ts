@@ -1,12 +1,11 @@
 "use server";
 
 import { axiosGlobal } from "@/lib/axios";
-import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, Cake, DashboardData, MediaQueryObject } from "@/types";
+import { ApiResponse, CakeQueryObject, DashboardData } from "@/types";
 import { GetToken } from "./User";
 
 export async function GetDashboardData(
-  query?: MediaQueryObject
+  query?: CakeQueryObject,
 ): Promise<ApiResponse<DashboardData>> {
   const token = await GetToken();
 
@@ -14,7 +13,7 @@ export async function GetDashboardData(
     `/dashboard/get`,
     {
       headers: { Authorization: `Bearer ${token}` },
-    }
+    },
   );
 
   return res.data;

@@ -24,9 +24,9 @@ namespace CrumbCodeBackend.Controllers
 
         public MediaController(IMediaRepository mediaRepository,
             IAmazonS3Service amazonS3Service,
-            IConfiguration configuration, 
+            IConfiguration configuration,
             ITokenService tokenService
-        )  : base(configuration, tokenService)
+        ) : base(configuration, tokenService)
         {
             _mediaRepository = mediaRepository;
             _amazonS3Service = amazonS3Service;
@@ -79,17 +79,17 @@ namespace CrumbCodeBackend.Controllers
 
         [HttpGet("get-all")]
         [ProducesResponseType(typeof(GetAllMediaResponse), 200)]
-        
-        public async Task<IActionResult> GetAll([FromQuery] MediaQueryObject queryObject)
+
+        public async Task<IActionResult> GetAll([FromQuery] CakeQueryObject queryObject)
         {
             var media = await _mediaRepository.GetAll(queryObject);
             if (media == null)
             {
                 return BadRequest(new ApiResponse<List<CakeType>>
-                    {
-                        Success = false,
-                        StatusCode = 400,   
-                    }
+                {
+                    Success = false,
+                    StatusCode = 400,
+                }
                 );
             }
 
@@ -100,7 +100,7 @@ namespace CrumbCodeBackend.Controllers
         public async Task<IActionResult> GetOne([FromRoute] string id)
         {
             var media = await _mediaRepository.GetOne(id);
-            if(media == null)
+            if (media == null)
             {
                 return Unauthorized();
             }
@@ -136,7 +136,7 @@ namespace CrumbCodeBackend.Controllers
                 using var responseStream = fileStream.ResponseStream;
                 using var memoryStream = new MemoryStream();
                 await responseStream.CopyToAsync(memoryStream);
-                
+
                 var contentType = fileStream.Headers["Content-Type"];
                 return File(memoryStream.ToArray(), contentType, objKey);
             }

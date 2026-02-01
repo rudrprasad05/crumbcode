@@ -1,6 +1,4 @@
 "use client";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   SidebarGroup,
   SidebarGroupContent,
@@ -8,23 +6,18 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import {
-  LayoutDashboard,
-  FileText,
-  Star,
-  Share2,
-  MessageSquare,
-  Database,
-  Tag,
-  Cake,
-  Bell,
-  Globe,
-  Cloud,
-  Trash2,
-} from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useEffect, useState } from "react";
-import { GetStorageUsed } from "@/actions/Site";
+import {
+  Bell,
+  Cake,
+  Database,
+  LayoutDashboard,
+  MessageSquare,
+  Share2,
+  Tag,
+} from "lucide-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navigationItems = [
   {
@@ -67,11 +60,11 @@ const navigationItems = [
     href: "/admin/notifications",
     icon: Bell,
   },
-  {
-    title: "Recycle Bin",
-    href: "/admin/bin",
-    icon: Trash2,
-  },
+  //   {
+  //     title: "Recycle Bin",
+  //     href: "/admin/bin",
+  //     icon: Trash2,
+  //   },
 ];
 
 export function SidebarNavigation() {
@@ -92,7 +85,7 @@ export function SidebarNavigation() {
                     "w-full justify-start gap-3 px-3 py-2 text-sm font-medium transition-colors",
                     isActive
                       ? "bg-rose-50 text-rose-700 hover:bg-rose-100"
-                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                      : "text-gray-700 hover:bg-gray-100 hover:text-gray-900",
                   )}
                 >
                   <Link href={item.href}>

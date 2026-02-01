@@ -57,12 +57,12 @@ namespace CrumbCodeBackend.Repository
                 Data = model
             };
         }
-        
+
         public async Task<ApiResponse<CakeType>> GetOne(string uuid)
         {
             var modelQ = _context.CakeTypes.AsQueryable();
             var model = await modelQ.FirstOrDefaultAsync(m => m.UUID == uuid);
-            
+
             if (model == null)
             {
                 return new ApiResponse<CakeType>
@@ -80,7 +80,7 @@ namespace CrumbCodeBackend.Repository
             };
         }
 
-        public async Task<ApiResponse<List<CakeType>>> GetAllAsync(MediaQueryObject queryObject)
+        public async Task<ApiResponse<List<CakeType>>> GetAllAsync(CakeQueryObject queryObject)
         {
 
             var media = _context.CakeTypes.AsQueryable();

@@ -19,9 +19,9 @@ namespace CrumbCodeBackend.Controllers
     {
         private readonly ICakeTypeRepository _cakeTypeRepository;
 
-        public CakeTypeController(ICakeTypeRepository cakeTypeRepository, IConfiguration configuration, 
+        public CakeTypeController(ICakeTypeRepository cakeTypeRepository, IConfiguration configuration,
             ITokenService tokenService
-        )  : base(configuration, tokenService)
+        ) : base(configuration, tokenService)
         {
             _cakeTypeRepository = cakeTypeRepository;
         }
@@ -56,8 +56,8 @@ namespace CrumbCodeBackend.Controllers
 
         [HttpGet("get-all")]
         [ProducesResponseType(typeof(GetAllCakeTypeResponse), 200)]
-        
-        public async Task<IActionResult> GetAll([FromQuery] MediaQueryObject queryObject)
+
+        public async Task<IActionResult> GetAll([FromQuery] CakeQueryObject queryObject)
         {
             var model = await _cakeTypeRepository.GetAllAsync(queryObject);
 
