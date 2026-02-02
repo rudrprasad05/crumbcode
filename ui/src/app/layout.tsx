@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
+import TanstackProvider from "@/context/TanstackProvider";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -60,10 +61,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${roboto.variable} antialiased`}>
-        <AuthProvider>
-          <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
-          <Toaster />
-        </AuthProvider>
+        <TanstackProvider>
+          <AuthProvider>
+            <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            <Toaster />
+          </AuthProvider>
+        </TanstackProvider>
       </body>
     </html>
   );

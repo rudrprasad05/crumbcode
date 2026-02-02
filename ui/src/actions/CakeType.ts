@@ -4,7 +4,7 @@ import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
 import {
   ApiResponse,
-  CakeQueryObject,
+  QueryObject,
   CakeType,
   Media,
   NewCakeTypeRequest,
@@ -14,7 +14,7 @@ import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
 export async function GetAllCakeTypes(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<CakeType[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);

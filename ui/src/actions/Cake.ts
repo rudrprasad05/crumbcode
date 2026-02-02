@@ -3,11 +3,11 @@
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
 import { FromModelToNewRequestDTO } from "@/mappers/CakeMapper";
-import { ApiResponse, Cake, CakeQueryObject } from "@/types";
+import { ApiResponse, Cake, QueryObject } from "@/types";
 import { GetToken } from "./User";
 
 export async function GetAllCakes(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<Cake[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);

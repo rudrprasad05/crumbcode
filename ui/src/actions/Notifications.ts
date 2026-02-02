@@ -1,10 +1,10 @@
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, CakeQueryObject, Notification } from "@/types";
+import { ApiResponse, QueryObject, Notification } from "@/types";
 import { GetToken } from "./User";
 
 export async function GetAllNotifications(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<Notification[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);

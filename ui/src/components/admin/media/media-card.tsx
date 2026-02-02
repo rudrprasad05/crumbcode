@@ -13,10 +13,9 @@ import { useRouter } from "next/navigation";
 
 interface MediaCardProps {
   item: Media;
-  onDelete: () => void;
 }
 
-export function MediaCard({ item, onDelete }: MediaCardProps) {
+export function MediaCard({ item }: MediaCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const [isImageValid, setIsImageValid] = useState(true);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
@@ -77,13 +76,13 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
                 alt={item.altText || item.fileName}
                 className={cn(
                   "w-full h-full object-cover",
-                  isImageLoaded ? "opacity-100" : "opacity-0"
+                  isImageLoaded ? "opacity-100" : "opacity-0",
                 )}
               />
               {!isImageLoaded && (
                 <div
                   className={cn(
-                    "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                    "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse",
                   )}
                 ></div>
               )}
@@ -104,7 +103,7 @@ export function MediaCard({ item, onDelete }: MediaCardProps) {
                 Edit <Edit className="" />
               </Button>
 
-              <DeleteMediaDialoge id={item.uuid} />
+              {/* <DeleteMediaDialoge id={item.uuid} /> */}
             </div>
           )}
 

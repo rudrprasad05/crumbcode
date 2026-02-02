@@ -1,11 +1,11 @@
 "use server";
 
 import { axiosGlobal } from "@/lib/axios";
-import { ApiResponse, CakeQueryObject, DashboardData } from "@/types";
+import { ApiResponse, QueryObject, DashboardData } from "@/types";
 import { GetToken } from "./User";
 
 export async function GetDashboardData(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<DashboardData>> {
   const token = await GetToken();
 

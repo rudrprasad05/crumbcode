@@ -2,11 +2,11 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, CakeQueryObject, SocialMedia } from "@/types";
+import { ApiResponse, QueryObject, SocialMedia } from "@/types";
 import { GetToken } from "./User";
 
 export async function GetAllSocialMedia(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<SocialMedia[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);

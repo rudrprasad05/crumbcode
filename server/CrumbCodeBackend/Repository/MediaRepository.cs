@@ -82,9 +82,9 @@ namespace CrumbCodeBackend.Repository
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                var dto = await _mediaMapper.ToDtoAsync(newMedia);
+                // var dto = await _mediaMapper.ToDtoAsync(newMedia);
 
-                return ApiResponse<MediaDto>.Ok(data: dto);
+                return ApiResponse<MediaDto>.Ok(data: new MediaDto());
             }
             catch (Exception)
             {

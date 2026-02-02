@@ -2,13 +2,13 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, CakeQueryObject, Media } from "@/types";
+import { ApiResponse, QueryObject, Media } from "@/types";
 import axios from "axios";
 import { redirect } from "next/navigation";
 import { GetToken } from "./User";
 
 export async function GetMedia(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<Media[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);

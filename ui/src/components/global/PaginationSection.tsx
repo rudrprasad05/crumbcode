@@ -11,11 +11,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
-import { MetaData } from "@/types";
+import { MetaData, QueryObject } from "@/types";
 
 interface IPagination {
-  pagination: MetaData;
-  setPagination: Dispatch<SetStateAction<MetaData>>;
+  pagination: QueryObject;
+  setPagination: Dispatch<SetStateAction<QueryObject>>;
 }
 
 export default function PaginationSection({
@@ -26,15 +26,15 @@ export default function PaginationSection({
     setPagination((prev) => ({ ...prev, pageNumber: i }));
   };
   const handleNext = () => {
-    let cPage = pagination.pageNumber;
-    if (++cPage > pagination.totalPages) {
+    let cPage = pagination.pageNumber || 1;
+    if (++cPage > (pagination.totalPages || 1)) {
       return;
     }
     setPagination((prev) => ({ ...prev, pageNumber: cPage }));
   };
 
   const handlePrev = () => {
-    let cPage = pagination.pageNumber;
+    let cPage = pagination.pageNumber || 1;
     if (--cPage < 1) {
       return;
     }
@@ -61,12 +61,12 @@ export default function PaginationSection({
           <PaginationPrevious
             className={cn(
               "cursor-pointer",
-              disableButton("prev") && "pointer-events-none opacity-50"
+              disableButton("prev") && "pointer-events-none opacity-50",
             )}
             onClick={() => handlePrev()}
           />
         </PaginationItem>
-        {Array.from({ length: pagination.totalPages }, (_, i) => (
+        {Array.from({ length: pagination.totalPages || 1 }, (_, i) => (
           <PaginationItem key={i}>
             <PaginationLink
               className="cursor-pointer"
@@ -81,7 +81,7 @@ export default function PaginationSection({
           <PaginationNext
             className={cn(
               "cursor-pointer",
-              disableButton("next") && "pointer-events-none opacity-50"
+              disableButton("next") && "pointer-events-none opacity-50",
             )}
             onClick={() => handleNext()}
           />

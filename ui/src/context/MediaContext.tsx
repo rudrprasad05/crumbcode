@@ -1,5 +1,6 @@
 import { UploadOneFile } from "@/actions/Media";
 import { Cake, Media } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
 import hash from "object-hash";
 import React, {
   createContext,
@@ -34,7 +35,7 @@ const MediaContext = createContext<{
   isSaving: boolean;
   handleFileChange: (
     event: React.ChangeEvent<HTMLInputElement>,
-    del?: boolean
+    del?: boolean,
   ) => void;
   setInitialState: (cake: Partial<Cake>) => void;
   updateValues: <K extends keyof Media>(key: K, value: Media[K]) => void;
@@ -62,6 +63,7 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [file, setFile] = useState<File | undefined>(undefined);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const currentHash = hash({
@@ -86,7 +88,7 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,
-    del = false
+    del = false,
   ) => {
     const file = event.target.files?.[0];
     if (del) {
@@ -125,23 +127,25 @@ export const MediaProvider = ({ children }: { children: ReactNode }) => {
       throw new Error();
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("altText", m.altText);
-      formData.append("fileName", m.fileName);
-      formData.append("showInGallery", String(m.showInGallery));
+    const formData = new FormData();
+    formData.append("altText", m.altText);
+    formData.append("fileName", m.fileName);
+    formData.append("showInGallery", String(m.showInGallery));
 
-      if (file) {
-        formData.append("file", file);
-      }
+    if (file) {
+      formData.append("file", file);
+    }
 
-      toast.success("Uploaded successfully");
-      const res = await UploadOneFile(formData, m.uuid);
+    toast.success("Uploaded successfully");
+    const res = await UploadOneFile(formData, m.uuid);
 
-      if (!res) throw new Error("Upload failed");
-    } catch (error) {
-      console.error(error);
-      toast.error("Upload failed");
+    if (res.success) {
+      toast.success("Media saved successfully");
+
+      queryClient.invalidateQueries({
+        queryKey: ["admin-media", {}],
+        exact: false,
+      });
     }
   }
 

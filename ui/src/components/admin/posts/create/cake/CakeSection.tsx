@@ -16,146 +16,127 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Cake, CakeTypeColorClasses, ESortBy, Media, MetaData } from "@/types";
+import {
+  ApiResponse,
+  Cake,
+  CakeTypeColorClasses,
+  ESortBy,
+  Media,
+  MetaData,
+  QueryObject,
+  UserRoles,
+} from "@/types";
 import { FileText, ImageIcon, Plus, Search, Video } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getTypeIcon } from "@/lib/icon-parse";
-
-interface ICakeTypesSection {
-  data: Cake[];
-  isLoading: boolean;
-}
-
-interface Filters {
-  search: string;
-  isAvailable?: boolean;
-  sortBy?: ESortBy;
-}
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { FIVE_MINUTE_CACHE } from "@/lib/const";
+import { SectionHeader } from "@/components/global/SectionHeader";
+import { RoleWrapper } from "@/components/global/RoleWrapper";
+import { H1, P } from "@/components/font/HeaderFonts";
 
 export default function CakeSection() {
-  const [cakeItems, setCakeItems] = useState<Cake[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 0,
     pageSize: 8,
     totalPages: 0,
   });
 
-  const [filters, setFilters] = useState<Filters>({
-    sortBy: ESortBy.DSC,
-    search: "",
-    isAvailable: undefined,
+  const query = useQuery({
+    queryKey: ["admin-cake", pagination],
+    queryFn: () => GetAllCakes({ ...pagination }),
+    staleTime: FIVE_MINUTE_CACHE,
   });
 
-  useEffect(() => {
-    setCakeItems([]);
-    console.log(filters);
-    // return;
-    const getData = async () => {
-      const data = await GetAllCakes({
-        pageNumber: pagination.pageNumber,
-        pageSize: pagination.pageSize,
-        sortBy: filters.sortBy,
-      });
-
-      setCakeItems(data.data as Cake[]);
-      setPagination((prev) => ({
-        ...prev,
-        totalCount: data.meta?.totalCount as number,
-        totalPages: Math.ceil(
-          (data.meta?.totalCount as number) / pagination.pageSize
-        ),
-      }));
-
-      setLoading(false);
-    };
-    getData();
-  }, [pagination.pageNumber, pagination.pageSize, filters]);
-
   return (
-    <div>
-      <Header filters={filters} onChange={setFilters} />
-      <HandleDataSection isLoading={loading} data={cakeItems} />
-      <div className="py-8">
-        <PaginationSection
-          pagination={pagination}
-          setPagination={setPagination}
-        />
-      </div>
-    </div>
+    <>
+      <SectionHeader
+        pagination={pagination}
+        setPagination={setPagination}
+        newButton={<NewProjectButton />}
+      >
+        <H1>Cakes</H1>
+        <P className="text-muted-foreground">
+          Create and manage your cakes here
+        </P>
+      </SectionHeader>
+
+      <HandleDataSection
+        query={query}
+        pagination={pagination}
+        setPagination={setPagination}
+      />
+    </>
   );
 }
 
-function Header({
-  filters,
-  onChange,
+function NewProjectButton() {
+  return (
+    <RoleWrapper allowedRoles={[UserRoles.ADMIN]}>
+      <Link href={"/admin/cakes/create"}>
+        <div
+          className={`${buttonVariants({
+            variant: "default",
+          })} w-full text-start justify-start px-2 my-2`}
+        >
+          <Plus />
+          New Cake
+        </div>
+      </Link>
+    </RoleWrapper>
+  );
+}
+
+function HandleDataSection({
+  query,
+  pagination,
+  setPagination,
 }: {
-  filters: Filters;
-  onChange: (newFilters: Filters) => void;
+  query: UseQueryResult<ApiResponse<Cake[]>, Error>;
+  pagination: QueryObject;
+  setPagination: React.Dispatch<React.SetStateAction<QueryObject>>;
 }) {
+  if (query.isError) {
+    return <div className="text-red-500">Error loading cakes.</div>;
+  }
+
+  const data = query.data?.data ?? [];
+  const meta = query.data?.meta;
+
+  console.log(data);
+
+  if (query.isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {Array.from({ length: 10 }, (_, i) => (
+          <LoadingCard key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (data.length == 0) {
+    return <NoDataContainer />;
+  }
+
   return (
     <>
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Cakes</h1>
-        <p className="text-gray-600 mt-2">Create and manage your cakes here</p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
+        {data.map((i) => (
+          <CakeCard data={i} key={i.uuid} />
+        ))}
       </div>
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex items-center gap-4 flex-1">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input
-              placeholder="Search cakes..."
-              className="pl-10 bg-white border-gray-200"
-              value={filters.search || ""}
-              onChange={(e) => onChange({ ...filters, search: e.target.value })}
-            />
-          </div>
-
-          <Select
-            value={String(filters.sortBy) || "DSC"}
-            onValueChange={(val) =>
-              onChange({ ...filters, sortBy: val as unknown as ESortBy })
-            }
-          >
-            <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="DSC">Newest</SelectItem>
-              <SelectItem value="ASC">Oldest</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={String(filters.isAvailable || "all")}
-            onValueChange={(val) =>
-              onChange({ ...filters, isAvailable: val as unknown as boolean })
-            }
-          >
-            <SelectTrigger className="w-32 bg-white border-gray-200">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="inactive">Inactive</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <Link href={"/admin/cakes/create"}>
-          <div
-            className={`${buttonVariants({
-              variant: "default",
-            })} w-full text-start justify-start px-2 my-2`}
-          >
-            <Plus />
-            New Cake
-          </div>
-        </Link>
+      <div className="py-8">
+        <PaginationSection
+          pagination={{
+            ...pagination,
+            totalCount: meta?.totalCount ?? 0,
+            totalPages: meta?.totalPages ?? 0,
+          }}
+          setPagination={setPagination}
+        />
       </div>
     </>
   );
@@ -187,13 +168,13 @@ function CakeCard({ data }: { data: Cake }) {
               alt={(data.media?.altText || data.media?.fileName) as string}
               className={cn(
                 "w-full h-full object-cover",
-                isImageLoaded ? "opacity-100" : "opacity-0"
+                isImageLoaded ? "opacity-100" : "opacity-0",
               )}
             />
             {!isImageLoaded && (
               <div
                 className={cn(
-                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse",
                 )}
               ></div>
             )}
@@ -224,35 +205,13 @@ function CakeCard({ data }: { data: Cake }) {
           <Badge
             className={cn(
               "text-white",
-              CakeTypeColorClasses[data.cakeType?.color as string]
+              CakeTypeColorClasses[data.cakeType?.color as string],
             )}
           >
             {data.cakeType?.name || "no tag"}
           </Badge>
         </div>
       </div>
-    </div>
-  );
-}
-
-function HandleDataSection({ data, isLoading }: ICakeTypesSection) {
-  if (data.length === 0 && !isLoading) {
-    return <NoDataContainer />;
-  }
-  if (isLoading) {
-    return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
-        {Array.from({ length: 8 }, (_, i) => (
-          <LoadingCard key={i} />
-        ))}
-      </div>
-    );
-  }
-  return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 py-2">
-      {data.map((i) => (
-        <CakeCard data={i} key={i.uuid} />
-      ))}
     </div>
   );
 }

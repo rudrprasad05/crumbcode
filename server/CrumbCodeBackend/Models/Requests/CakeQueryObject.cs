@@ -12,8 +12,8 @@ namespace CrumbCodeBackend.Models.Requests
         private int _pageSize = 10;
         public int PageNumber { get; set; } = 1;
         public bool? IsAvailable { get; set; }
-        public bool? IsDeleted { get; set; } = false;
-        public bool? ShowInGallery { get; set; } = false;
+        public bool? IsDeleted { get; set; }
+        public bool? ShowInGallery { get; set; }
         public ESortBy SortBy { get; set; } = ESortBy.ASC;
         public int PageSize
         {

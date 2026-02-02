@@ -3,7 +3,7 @@
 import { ContactFormValues } from "@/components/home/contact-form";
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import { ApiResponse, CakeQueryObject, ContactMessage } from "@/types";
+import { ApiResponse, QueryObject, ContactMessage } from "@/types";
 import { GetToken } from "./User";
 
 export async function CreateMessage(
@@ -27,7 +27,7 @@ export async function CreateMessage(
 }
 
 export async function GetAllContactMessages(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<ContactMessage[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);

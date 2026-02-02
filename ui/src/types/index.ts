@@ -6,6 +6,27 @@ export interface BaseModel {
   isDeleted: boolean;
 }
 
+export enum UserRoles {
+  ADMIN = "ADMIN",
+  USER = "USER",
+}
+
+export interface QueryObject {
+  pageNumber?: number;
+  pageSize?: number;
+  totalCount?: number;
+  totalPages?: number;
+  showInGallery?: boolean;
+  isDeleted?: boolean;
+  sortBy?: ESortBy;
+  uuid?: string;
+  companyName?: string;
+  role?: UserRoles;
+  isAvailable?: boolean;
+  search?: string;
+  userId?: string;
+}
+
 export interface Cake extends BaseModel {
   name: string;
   description: string;
@@ -138,15 +159,6 @@ export interface NewMediaRequest {
   contentType: string;
   sizeInBytes: number;
   file: File; // This is the native browser File object for uploads
-}
-
-export interface CakeQueryObject {
-  pageNumber?: number;
-  pageSize?: number;
-  showInGallery?: boolean;
-  isDeleted?: boolean;
-  sortBy?: ESortBy;
-  isAvailable?: boolean;
 }
 
 export enum ESortBy {

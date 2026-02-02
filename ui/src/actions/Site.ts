@@ -2,17 +2,11 @@
 
 import { axiosGlobal } from "@/lib/axios";
 import { buildMediaQueryParams } from "@/lib/params";
-import {
-  ApiResponse,
-  Cake,
-  CakeQueryObject,
-  Media,
-  SocialMedia,
-} from "@/types";
+import { ApiResponse, Cake, QueryObject, Media, SocialMedia } from "@/types";
 import { GetToken } from "./User";
 
 export async function GetAllCakesSite(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<Cake[]>> {
   const params = buildMediaQueryParams(query);
 
@@ -24,7 +18,7 @@ export async function GetAllCakesSite(
 }
 
 export async function GetAllSocialMediaSite(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<SocialMedia[]>> {
   const params = buildMediaQueryParams(query);
 
@@ -46,7 +40,7 @@ export async function GetAllSocialMediaSite(
 }
 
 export async function GetStorageUsed(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<number>> {
   const params = buildMediaQueryParams(query);
 
@@ -68,7 +62,7 @@ export async function GetStorageUsed(
 }
 
 export async function GetMediaSite(
-  query?: CakeQueryObject,
+  query?: QueryObject,
 ): Promise<ApiResponse<Media[]>> {
   const token = await GetToken();
   const params = buildMediaQueryParams(query);
