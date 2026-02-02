@@ -12,10 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ESortBy, MetaData, Notification } from "@/types";
+import { ESortBy, MetaData, Notification, QueryObject } from "@/types";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NotificationCard } from "./NotificationCard";
+import { useQuery } from "@tanstack/react-query";
+import { FIVE_MINUTE_CACHE } from "@/lib/const";
 
 interface ICakeTypesSection {
   data: Notification[];
@@ -23,43 +25,30 @@ interface ICakeTypesSection {
 }
 
 export default function NotificationSection() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 0,
     pageSize: 8,
     totalPages: 0,
+    sortBy: ESortBy.ASC,
   });
 
-  useEffect(() => {
-    setNotifications([]);
-    const getData = async () => {
-      const data = await GetAllNotifications({
-        pageNumber: pagination.pageNumber,
-        pageSize: pagination.pageSize,
-        sortBy: ESortBy.ASC,
-      });
+  const query = useQuery({
+    queryKey: ["admin-notifications", pagination],
+    queryFn: () => GetAllNotifications({ ...pagination }),
+    staleTime: FIVE_MINUTE_CACHE,
+  });
 
-      setNotifications(data.data as Notification[]);
-      setPagination((prev) => ({
-        ...prev,
-        totalCount: data.meta?.totalCount as number,
-        totalPages: Math.ceil(
-          (data.meta?.totalCount as number) / pagination.pageSize
-        ),
-      }));
+  if (query.isError) {
+    return <div className="text-red-500">Error loading media.</div>;
+  }
 
-      setLoading(false);
-    };
-    getData();
-  }, [pagination.pageNumber, pagination.pageSize]);
+  const data = query.data?.data ?? [];
 
   return (
     <div>
       <Header />
-      <HandleDataSection isLoading={loading} data={notifications} />
+      <HandleDataSection isLoading={query.isLoading} data={data} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}

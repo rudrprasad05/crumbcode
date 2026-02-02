@@ -1,7 +1,7 @@
 "use client";
 
 import { GetMedia } from "@/actions/Media";
-import { Media, MetaData } from "@/types";
+import { Media, MetaData, QueryObject } from "@/types";
 import { useEffect, useState } from "react";
 import { MediaGrid } from "./media-grid";
 import { MediaHeader } from "./media-header";
@@ -12,7 +12,7 @@ import PaginationSection from "@/components/global/PaginationSection";
 
 export function MediaLibrary() {
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 1,
     pageSize: 10,
@@ -31,7 +31,7 @@ export function MediaLibrary() {
       setPagination((prev) => ({
         ...prev,
         totalPages: Math.ceil(
-          (data.meta?.totalCount as number) / pagination.pageSize
+          (data.meta?.totalCount as number) / (pagination.pageSize || 10),
         ),
       }));
 
@@ -48,7 +48,7 @@ export function MediaLibrary() {
   return (
     <div className="space-y-6">
       <MediaHeader />
-      <MediaGrid items={mediaItems} onDelete={handleDelete} />
+      <MediaGrid items={mediaItems} />
       <PaginationSection
         pagination={pagination}
         setPagination={setPagination}

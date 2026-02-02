@@ -15,8 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { FIVE_MINUTE_CACHE } from "@/lib/const";
 import { parseSocialLink } from "@/lib/link-parse";
-import { MetaData, SocialMedia } from "@/types";
+import { MetaData, QueryObject, SocialMedia } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { FC, SVGProps, useEffect, useState } from "react";
@@ -27,39 +29,44 @@ interface ISocialSection {
 }
 
 export default function SocialSection() {
-  const [socialItems, setSocialItems] = useState<SocialMedia[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 0,
     pageSize: 8,
     totalPages: 0,
   });
+  const query = useQuery({
+    queryKey: ["admin-social", pagination],
+    queryFn: () => GetAllSocialMedia({ ...pagination }),
+    staleTime: FIVE_MINUTE_CACHE,
+  });
+  if (query.isError) {
+    return <div className="text-red-500">Error loading cakes.</div>;
+  }
 
-  useEffect(() => {
-    setSocialItems([]);
-    const getData = async () => {
-      const data = await GetAllSocialMedia({
-        pageNumber: pagination.pageNumber,
-        pageSize: pagination.pageSize,
-      });
-      setSocialItems(data.data as SocialMedia[]);
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: Math.ceil(
-          (data.meta?.totalCount as number) / pagination.pageSize
-        ),
-      }));
+  const data = query.data?.data ?? [];
+  const meta = query.data?.meta;
 
-      setLoading(false);
-    };
-    getData();
-  }, [pagination.pageNumber, pagination.pageSize]);
+  console.log(data);
+
+  if (query.isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {Array.from({ length: 10 }, (_, i) => (
+          <LoadingCard key={i} />
+        ))}
+      </div>
+    );
+  }
+
+  if (data.length == 0) {
+    return <NoDataContainer />;
+  }
 
   return (
     <div>
       <Header />
-      <HandleDataSection isLoading={loading} data={socialItems} />
+      <HandleDataSection isLoading={query.isLoading} data={data} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}
@@ -159,7 +166,7 @@ export function SocialMediaCard({ data }: { data: SocialMedia }) {
 
   useEffect(() => {
     const foundIcon = SocialIcons.find(
-      (icon) => icon.name.toLowerCase() === data?.icon?.toLowerCase()
+      (icon) => icon.name.toLowerCase() === data?.icon?.toLowerCase(),
     )?.Icon;
 
     setIcon(() => foundIcon || Default);

@@ -13,7 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ContactMessage, MetaData } from "@/types";
+import { FIVE_MINUTE_CACHE } from "@/lib/const";
+import { ContactMessage, MetaData, QueryObject } from "@/types";
+import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -24,42 +26,30 @@ interface ICakeTypesSection {
 }
 
 export default function MessageSection() {
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 0,
     pageSize: 8,
     totalPages: 0,
   });
 
-  useEffect(() => {
-    setMessages([]);
-    const getData = async () => {
-      const data = await GetAllContactMessages({
-        pageNumber: pagination.pageNumber,
-        pageSize: pagination.pageSize,
-      });
+  const query = useQuery({
+    queryKey: ["admin-messages", pagination],
+    queryFn: () => GetAllContactMessages({ ...pagination }),
+    staleTime: FIVE_MINUTE_CACHE,
+  });
 
-      setMessages(data.data as ContactMessage[]);
-      setPagination((prev) => ({
-        ...prev,
-        totalCount: data.meta?.totalCount as number,
-        totalPages: Math.ceil(
-          (data.meta?.totalCount as number) / pagination.pageSize
-        ),
-      }));
+  if (query.isError) {
+    return <div className="text-red-500">Error loading media.</div>;
+  }
 
-      setLoading(false);
-    };
-    getData();
-  }, [pagination.pageNumber, pagination.pageSize]);
+  const data = query.data?.data ?? [];
+  const meta = query.data?.meta;
 
   return (
     <div>
       <Header />
-      <HandleDataSection isLoading={loading} data={messages} />
+      <HandleDataSection isLoading={query.isLoading} data={data} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}
@@ -74,7 +64,7 @@ function Header() {
   return (
     <>
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Cakes</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
         <p className="text-gray-600 mt-2">
           Create and manage your messages here
         </p>

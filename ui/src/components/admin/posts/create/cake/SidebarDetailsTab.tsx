@@ -31,7 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useCake } from "@/context/CakeContext";
 import { cn } from "@/lib/utils";
-import { CakeType, Media, MetaData } from "@/types";
+import { CakeType, Media, MetaData, QueryObject } from "@/types";
 import { Check, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -73,7 +73,7 @@ export default function SidebarDetailsTab() {
             value={(cake.cakeType?.id as unknown as string) ?? ""}
             onValueChange={(val) => {
               const selectedType = cakeTypes?.find(
-                (ct) => (ct?.id as unknown as string) === val
+                (ct) => (ct?.id as unknown as string) === val,
               );
               updateCakeValues("cakeType", selectedType as CakeType);
             }}
@@ -140,13 +140,13 @@ export default function SidebarDetailsTab() {
                   alt={(cake.media?.altText || cake.media?.fileName) as string}
                   className={cn(
                     "w-full h-full object-cover",
-                    isImageLoaded ? "opacity-100" : "opacity-0"
+                    isImageLoaded ? "opacity-100" : "opacity-0",
                   )}
                 />
                 {!isImageLoaded && (
                   <div
                     className={cn(
-                      "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                      "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse",
                     )}
                   ></div>
                 )}
@@ -206,7 +206,7 @@ function MediaListTab({
   const [isImageLoading, setIsImageLoading] = useState<boolean[]>([]);
   const [mediaItems, setMediaItems] = useState<Media[]>([]);
 
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 1,
     pageSize: 6,
@@ -225,7 +225,7 @@ function MediaListTab({
       setPagination((prev) => ({
         ...prev,
         totalPages: Math.ceil(
-          (data.meta?.totalCount as number) / pagination.pageSize
+          (data.meta?.totalCount as number) / (pagination.pageSize || 10),
         ),
       }));
     };
@@ -253,7 +253,7 @@ function MediaListTab({
           }}
           key={media.uuid}
           className={cn(
-            "relative rounded-lg overflow-visible border hover:ring-2 ring-primary transition cursor-pointer"
+            "relative rounded-lg overflow-visible border hover:ring-2 ring-primary transition cursor-pointer",
           )}
         >
           {cake.media?.objectKey == media.objectKey && (

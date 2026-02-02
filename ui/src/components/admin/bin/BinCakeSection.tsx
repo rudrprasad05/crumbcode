@@ -53,7 +53,7 @@ export function BinCakeSection({ cakes, setCakes }: Props) {
       ...prev,
       totalCount: data.meta?.totalCount as number,
       totalPages: Math.ceil(
-        (data.meta?.totalCount as number) / pagination.pageSize
+        (data.meta?.totalCount as number) / pagination.pageSize,
       ),
     }));
 
@@ -70,10 +70,10 @@ export function BinCakeSection({ cakes, setCakes }: Props) {
     <div>
       <HandleDataSection isLoading={loading} data={cakes} />
       <div className="py-8">
-        <PaginationSection
+        {/* <PaginationSection
           pagination={pagination}
           setPagination={setPagination}
-        />
+        /> */}
       </div>
     </div>
   );
@@ -115,13 +115,13 @@ function CakeCard({ data }: { data: Cake }) {
               alt={(data.media?.altText || data.media?.fileName) as string}
               className={cn(
                 "w-full h-full object-cover",
-                isImageLoaded ? "opacity-100" : "opacity-0"
+                isImageLoaded ? "opacity-100" : "opacity-0",
               )}
             />
             {!isImageLoaded && (
               <div
                 className={cn(
-                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse"
+                  "absolute top-0 left-0 w-full h-full object-cover bg-gray-300 animate-pulse",
                 )}
               ></div>
             )}

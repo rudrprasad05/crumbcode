@@ -1,7 +1,10 @@
 "use client";
 
 import { GetAllCakeTypes } from "@/actions/CakeType";
-import { TableSkeleton } from "@/components/global/LoadingContainer";
+import {
+  LoadingCard,
+  TableSkeleton,
+} from "@/components/global/LoadingContainer";
 import NoDataContainer from "@/components/global/NoDataContainer";
 import { buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { CakeTypeProvider, useCakeType } from "@/context/CakeTypeContext";
-import { CakeType, MetaData } from "@/types";
+import { CakeType, MetaData, QueryObject } from "@/types";
 import { Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -21,6 +24,8 @@ import { useEffect, useState } from "react";
 import { columns } from "./columns";
 import { DataTable } from "./dataTable";
 import PaginationSection from "@/components/global/PaginationSection";
+import { useQuery } from "@tanstack/react-query";
+import { FIVE_MINUTE_CACHE } from "@/lib/const";
 
 export default function CakeTypesSection() {
   return (
@@ -89,47 +94,43 @@ function Header() {
 }
 
 function HandleDataSection() {
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
-  const { list, setList } = useCakeType();
-  const [pagination, setPagination] = useState<MetaData>({
+  const [pagination, setPagination] = useState<QueryObject>({
     pageNumber: 1,
     totalCount: 1,
     pageSize: 10,
     totalPages: 0,
   });
-  useEffect(() => {
-    const getData = async () => {
-      const res = await GetAllCakeTypes({
-        pageNumber: pagination.pageNumber,
-        pageSize: pagination.pageSize,
-      });
-      setList(res.data || []);
-      setPagination((prev) => ({
-        ...prev,
-        totalPages: Math.ceil(
-          (res.meta?.totalCount as number) / pagination.pageSize
-        ),
-      }));
-
-      setLoading(false);
-    };
-    getData();
-  }, [router, pagination.pageNumber, pagination.pageSize, setList]);
-
-  if (loading) {
-    return <TableSkeleton columns={3} rows={8} showHeader />;
+  const query = useQuery({
+    queryKey: ["admin-cake-type", pagination],
+    queryFn: () => GetAllCakeTypes({ ...pagination }),
+    staleTime: FIVE_MINUTE_CACHE,
+  });
+  if (query.isError) {
+    return <div className="text-red-500">Error loading cakes.</div>;
   }
 
-  if (!list) {
-    return <>Invalid URL</>;
+  const data = query.data?.data ?? [];
+  const meta = query.data?.meta;
+
+  console.log(data);
+
+  if (query.isLoading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+        {Array.from({ length: 10 }, (_, i) => (
+          <LoadingCard key={i} />
+        ))}
+      </div>
+    );
   }
-  if (list.length === 0) {
+
+  if (data.length == 0) {
     return <NoDataContainer />;
   }
+
   return (
     <>
-      <DataTable columns={columns} data={list as CakeType[]} />
+      <DataTable columns={columns} data={data} />
       <div className="py-8">
         <PaginationSection
           pagination={pagination}
