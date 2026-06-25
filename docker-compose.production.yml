@@ -28,10 +28,7 @@ services:
       - crumbcode_network
 
   db-migrate:
-    image: ${BACKEND_IMAGE:-rudrprasad/crumbcode-api}:${BACKEND_VERSION:-dev}
-    build:
-      context: ./server/CrumbCodeBackend
-      dockerfile: Dockerfile
+    image: ${BACKEND_IMAGE:-rudrprasad/crumbcode-api}:${BACKEND_VERSION:-latest}
     depends_on:
       db:
         condition: service_healthy
@@ -57,10 +54,7 @@ services:
       - crumbcode_network
 
   backend:
-    image: ${BACKEND_IMAGE:-rudrprasad/crumbcode-api}:${BACKEND_VERSION:-dev}
-    build:
-      context: ./server/CrumbCodeBackend
-      dockerfile: Dockerfile
+    image: ${BACKEND_IMAGE:-rudrprasad/crumbcode-api}:${BACKEND_VERSION:-latest}
     depends_on:
       db:
         condition: service_healthy
@@ -88,12 +82,7 @@ services:
       - crumbcode_network
 
   frontend:
-    image: ${FRONTEND_IMAGE:-rudrprasad/crumbcode-web}:${FRONTEND_VERSION:-dev}
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_API_BASE_URL: ${NEXT_PUBLIC_API_BASE_URL:-__NEXT_PUBLIC_API_BASE_URL__}
+    image: ${FRONTEND_IMAGE:-rudrprasad/crumbcode-web}:${FRONTEND_VERSION:-latest}
     depends_on:
       - backend
     environment:

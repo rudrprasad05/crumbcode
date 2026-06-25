@@ -65,9 +65,18 @@ builder.Services.AddScoped<ICakeTypeRepository, CakeTypeRepository>();
 builder.Services.AddScoped<ISocialMediaRepository, SocialMediaRepository>();
 builder.Services.AddScoped<IContactMessageRepository, ContactMessageRepository>();
 builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
-builder.WebHost.UseUrls(builder.Configuration["Backend:Url"] ?? throw new InvalidOperationException());
+builder.WebHost.UseUrls(builder.Configuration["Backend:Url"] ?? "http://+:5080");
 
 var app = builder.Build();
+
+if (args.Contains("--migrate", StringComparer.OrdinalIgnoreCase))
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await dbContext.Database.MigrateAsync();
+    Console.WriteLine("Database migrations applied.");
+    return;
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

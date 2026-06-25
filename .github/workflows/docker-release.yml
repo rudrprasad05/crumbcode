@@ -1,0 +1,116 @@
+name: Build and Push CrumbCode Images
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+      - "api/v*.*.*"
+      - "web/v*.*.*"
+  release:
+    types: [published]
+
+env:
+  BACKEND_IMAGE: rudrprasad/crumbcode-api
+  FRONTEND_IMAGE: rudrprasad/crumbcode-web
+  DOCKER_PLATFORMS: linux/amd64,linux/arm64
+
+jobs:
+  docker:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Prepare release metadata
+        id: release
+        shell: bash
+        run: |
+          ref="${GITHUB_REF_NAME}"
+          if [ "${{ github.event_name }}" = "release" ]; then
+            ref="${{ github.event.release.tag_name }}"
+          fi
+
+          build_backend=false
+          build_frontend=false
+
+          case "$ref" in
+            api/v*.*.*)
+              version="${ref#api/v}"
+              build_backend=true
+              ;;
+            web/v*.*.*)
+              version="${ref#web/v}"
+              build_frontend=true
+              ;;
+            v*.*.*)
+              version="${ref#v}"
+              build_backend=true
+              build_frontend=true
+              ;;
+            *)
+              echo "Unsupported tag '$ref'. Use vX.Y.Z, api/vX.Y.Z, or web/vX.Y.Z." >&2
+              exit 1
+              ;;
+          esac
+
+          major_minor="$(printf '%s' "$version" | cut -d. -f1,2)"
+          short_sha="${GITHUB_SHA::7}"
+
+          {
+            echo "version=$version"
+            echo "major_minor=$major_minor"
+            echo "short_sha=$short_sha"
+            echo "build_backend=$build_backend"
+            echo "build_frontend=$build_frontend"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push backend
+        if: steps.release.outputs.build_backend == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./server/CrumbCodeBackend
+          file: ./server/CrumbCodeBackend/Dockerfile
+          push: true
+          platforms: ${{ env.DOCKER_PLATFORMS }}
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:${{ steps.release.outputs.version }}
+            ${{ env.BACKEND_IMAGE }}:${{ steps.release.outputs.major_minor }}
+            ${{ env.BACKEND_IMAGE }}:sha-${{ steps.release.outputs.short_sha }}
+            ${{ env.BACKEND_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.release.outputs.version }}
+
+      - name: Build and push frontend
+        if: steps.release.outputs.build_frontend == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ui
+          file: ./ui/Dockerfile
+          push: true
+          platforms: ${{ env.DOCKER_PLATFORMS }}
+          build-args: |
+            NEXT_PUBLIC_API_BASE_URL=__NEXT_PUBLIC_API_BASE_URL__
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:${{ steps.release.outputs.version }}
+            ${{ env.FRONTEND_IMAGE }}:${{ steps.release.outputs.major_minor }}
+            ${{ env.FRONTEND_IMAGE }}:sha-${{ steps.release.outputs.short_sha }}
+            ${{ env.FRONTEND_IMAGE }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.version=${{ steps.release.outputs.version }}

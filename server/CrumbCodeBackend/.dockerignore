@@ -1,0 +1,10 @@
+bin
+obj
+publish
+TestResults
+.git
+.gitignore
+.vs
+*.user
+*.suo
+*.log
