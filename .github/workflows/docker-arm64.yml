@@ -1,0 +1,53 @@
+name: ARM64 Docker Images
+
+on:
+  push:
+    branches:
+      - main
+      - master
+      - develop
+  pull_request:
+  workflow_dispatch:
+
+env:
+  DOCKER_PLATFORM: linux/arm64
+
+jobs:
+  docker-arm64:
+    name: ${{ matrix.name }} ARM64 build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Backend
+            image: rudrprasad/crumbcode-api
+            context: ./server/CrumbCodeBackend
+            dockerfile: ./server/CrumbCodeBackend/Dockerfile
+            build_args: ""
+          - name: Frontend
+            image: rudrprasad/crumbcode-web
+            context: ./ui
+            dockerfile: ./ui/Dockerfile
+            build_args: |
+              NEXT_PUBLIC_API_BASE_URL=http://localhost:5080/api/
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ARM64 image
+        uses: docker/build-push-action@v6
+        with:
+          context: ${{ matrix.context }}
+          file: ${{ matrix.dockerfile }}
+          push: false
+          platforms: ${{ env.DOCKER_PLATFORM }}
+          build-args: ${{ matrix.build_args }}
+          tags: ${{ matrix.image }}:arm64-ci

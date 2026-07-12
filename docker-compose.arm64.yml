@@ -1,0 +1,12 @@
+services:
+  db:
+    platform: linux/arm64
+
+  db-migrate:
+    platform: linux/arm64
+
+  backend:
+    platform: linux/arm64
+
+  frontend:
+    platform: linux/arm64
