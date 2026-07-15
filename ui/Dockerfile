@@ -36,6 +36,8 @@ COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 COPY --chown=node:node docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
 RUN chmod 755 /usr/local/bin/docker-entrypoint.sh
+RUN chown -R node:node /app \
+    && chmod 755 /usr/local/bin/docker-entrypoint.sh
 
 USER node
 
